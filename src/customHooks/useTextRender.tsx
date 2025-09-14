@@ -1,49 +1,71 @@
-import { Indent } from "lucide-react";
+
+import React, { useEffect , useState } from "react";
 import useThemeHook from "./useThemeHook";
-
-
-
-
-
 
 interface TextRenderProps {
   currentLetter: {index:number , letter:string};
   currentText: string;
+  inputValue : string
 }
-export const useTextRender = ({currentText , currentLetter}:TextRenderProps) => {
+export const useTextRender = ({currentText , currentLetter , inputValue}:TextRenderProps) => {
+    const [lastIndexReached , setLastIndexReached] = React.useState<number>(currentLetter.index);
+    const [wrongChars , setWrongChars] = useState<number[]>([]);
+
 
     const {isDarkMode} = useThemeHook();
+
+    useEffect(() => {
+        setLastIndexReached(currentLetter.index);
+    }, [currentLetter]);
+    
+    useEffect(()=>{
+           if(inputValue === '') return ;
+           if(currentLetter.letter !== currentText[currentLetter.index] ){
+                setWrongChars(prev => {
+                if (prev.includes(currentLetter.index)) return prev;
+                return [...prev, currentLetter.index];
+                
+              });
+           }
+
+    },[currentLetter])
+  
     return currentText.split('').map((char, index) => {
       let className = 'transition-all duration-150 ';
-      console.log( 'CURRENT LETTER INDEX' , currentLetter.index);
-      console.log( 'char INDEX' ,index);
-
-      const parralelIndex = currentText.indexOf(currentLetter.letter) ;
-
-      if (parralelIndex === currentLetter.index) {
+      console.log('char' , char)
+      console.log('current letter ' , currentLetter.letter)
+      
+      if (index === currentLetter.index) {
         // Current letter highlighting (placeholder logic)
         if(char === currentLetter.letter){
             className += isDarkMode 
-              ? 'text-green-500 text-white rounded-sm' 
-              : 'text-green-500 text-white rounded-sm';
+              ? 'bg-yellow-500 text-white rounded-sm' 
+              : 'bg-yellow-500 text-white rounded-sm';
         }
-        
-     
-      } else if (index < currentLetter.index) {
-        // Typed letters (placeholder logic)
-        className += isDarkMode 
-          ? 'text-green-400' 
-          : 'text-green-600';
-      } else {
-        // Untyped letters
-        className += isDarkMode 
-          ? 'text-gray-400' 
-          : 'text-gray-600';
+        if(char !== currentLetter.letter && inputValue !== '' ){
+          
+            className += isDarkMode 
+              ? 'text-red-500  rounded-sm' 
+              : 'text-red-500  rounded-sm';
+        }
       }
+  
+      if (index > lastIndexReached || inputValue === '') {
+              // Untyped letters
+              className += isDarkMode 
+                ? 'text-gray-400' 
+                : 'text-gray-600';
+          }else{
+ 
+                if(wrongChars.includes(index)){
+                     className +="text-red-500"
+                }
+          }
+      
 
       return (
-        <span key={index} className={className}>
-          {char === ' ' ? '\u00A0' : char}
+        <span key={index} className={`${className} ` }>
+          {char === ' ' ? '\u00A0' :  char}
         </span>
       );
     });

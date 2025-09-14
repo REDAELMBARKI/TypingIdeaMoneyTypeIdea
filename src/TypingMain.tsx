@@ -31,17 +31,17 @@ const TypingApp: React.FC = () => {
 
   const handleReset = () => {
     // Placeholder for reset functionality
-    setCurrentLetter({index:0 , letter:''});
+    setCurrentLetter({index:-1 , letter:''});
+    setInputValue('');
     const randomText = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
     setCurrentText(randomText);
     if (hiddenInputRef.current) {
-      hiddenInputRef.current.value = '';
       hiddenInputRef.current.focus();
     }
   };
 
 
-  const renderText = useTextRender({currentText , currentLetter}) 
+  const renderText = useTextRender({currentText , currentLetter , inputValue}) 
 
   useEffect(() => {
      if(inputValue.length > currentLetter.index){
