@@ -7,6 +7,8 @@ interface TextRenderProps {
   currentText: string;
   inputValue : string
 }
+
+
 export const useTextRender = ({currentText , currentLetter , inputValue}:TextRenderProps) => {
     const [lastIndexReached , setLastIndexReached] = React.useState<number>(currentLetter.index);
     const [wrongChars , setWrongChars] = useState<number[]>([]);
@@ -27,13 +29,12 @@ export const useTextRender = ({currentText , currentLetter , inputValue}:TextRen
                 
               });
            }
-
+           console.log('current index' , currentLetter.index)
     },[currentLetter])
   
     return currentText.split('').map((char, index) => {
       let className = 'transition-all duration-150 ';
-      console.log('char' , char)
-      console.log('current letter ' , currentLetter.letter)
+      
       
       if (index === currentLetter.index) {
         // Current letter highlighting (placeholder logic)
@@ -62,11 +63,13 @@ export const useTextRender = ({currentText , currentLetter , inputValue}:TextRen
                 }
           }
       
-
+  
       return (
         <span key={index} className={`${className} ` }>
           {char === ' ' ? '\u00A0' :  char}
         </span>
-      );
+      )
+
+     
     });
   };

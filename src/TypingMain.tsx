@@ -4,6 +4,7 @@ import Footer from './partials/Footer';
 import States from './partials/States';
 import Reseter from './partials/Reseter';
 import { useTextRender } from './customHooks/useTextRender';
+import useCharacterDeleteHook from './customHooks/useCharacterDeleteHook';
 
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog near the riverbank.",
@@ -42,7 +43,7 @@ const TypingApp: React.FC = () => {
 
 
   const renderText = useTextRender({currentText , currentLetter , inputValue}) 
-
+  const handleDeleteChar = useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter})
   useEffect(() => {
      if(inputValue.length > currentLetter.index){
          setCurrentLetter({...currentLetter , index : inputValue.length - 1 , letter: inputValue[inputValue.length -1]}) ;
@@ -80,7 +81,11 @@ const TypingApp: React.FC = () => {
           onChange={(e) => {
             setInputValue(e.target.value)}}
           value={inputValue}
-
+          onKeyDown={(e)=> {
+                if(e.key === "Backspace" || e.key === "Delete"){
+                   handleDeleteChar()
+                }
+          }}
           type="text"
           // -left-9999px  opacity-1 
 
