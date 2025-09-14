@@ -3,6 +3,7 @@ import useThemeHook from './customHooks/useThemeHook';
 import Footer from './partials/Footer';
 import States from './partials/States';
 import Reseter from './partials/Reseter';
+import { useTextRender } from './customHooks/useTextRender';
 
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog near the riverbank.",
@@ -15,9 +16,11 @@ const sampleTexts = [
 const TypingApp: React.FC = () => {
  
   const [currentText, setCurrentText] = useState(sampleTexts[0]);
-  const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
+  const [currentLetter, setCurrentLetter] = useState<{index:number , letter:string}>({index:0 , letter:''});
   const hiddenInputRef = useRef<HTMLInputElement>(null);
- const {isDarkMode } =  useThemeHook();
+  const [inputValue , setInputValue] = useState<string>('');
+
+  const {isDarkMode } =  useThemeHook();
 
   // Focus the hidden input on component mount
   useEffect(() => {
@@ -28,7 +31,7 @@ const TypingApp: React.FC = () => {
 
   const handleReset = () => {
     // Placeholder for reset functionality
-    setCurrentLetterIndex(0);
+    setCurrentLetter({index:0 , letter:''});
     const randomText = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
     setCurrentText(randomText);
     if (hiddenInputRef.current) {
@@ -38,35 +41,15 @@ const TypingApp: React.FC = () => {
   };
 
 
-  const renderText = () => {
-    return currentText.split('').map((char, index) => {
-      let className = 'transition-all duration-150 ';
-      
-      if (index === currentLetterIndex) {
-        // Current letter highlighting (placeholder logic)
-        className += isDarkMode 
-          ? 'bg-blue-500 text-white rounded-sm' 
-          : 'bg-blue-500 text-white rounded-sm';
-      } else if (index < currentLetterIndex) {
-        // Typed letters (placeholder logic)
-        className += isDarkMode 
-          ? 'text-green-400' 
-          : 'text-green-600';
-      } else {
-        // Untyped letters
-        className += isDarkMode 
-          ? 'text-gray-400' 
-          : 'text-gray-600';
-      }
+  const renderText = useTextRender({currentText , currentLetter}) 
 
-      return (
-        <span key={index} className={className}>
-          {char === ' ' ? '\u00A0' : char}
-        </span>
-      );
-    });
-  };
-
+  useEffect(() => {
+     if(inputValue.length > currentLetter.index){
+         setCurrentLetter({...currentLetter , index : inputValue.length - 1 , letter: inputValue[inputValue.length -1]}) ;
+     }
+  }, [inputValue])
+ 
+ 
   return (
     <div className={`min-h-screen transition-colors duration-300  ${
       isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
@@ -75,7 +58,7 @@ const TypingApp: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pb-20">
         {/* Text Display */}
-        <div className="w-full max-w-4xl mx-auto">
+        <div className="w-full max-w-4xl mx-auto mt-5">
           <div className={`
             text-2xl sm:text-3xl lg:text-4xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
             font-mono text-center p-6 sm:p-8 lg:p-12 rounded-2xl shadow-sm
@@ -85,16 +68,25 @@ const TypingApp: React.FC = () => {
             }
           `}>
             <div className='mx-w-full break-words'>
-              {renderText()}
+              {renderText}
             </div>
           </div>
         </div>
 
         {/* Hidden Input Field */}
         <input
-          ref={hiddenInputRef}
+
+          ref={hiddenInputRef} 
+          onChange={(e) => {
+            setInputValue(e.target.value)}}
+          value={inputValue}
+
           type="text"
-          className="absolute -left-9999px opacity-0 pointer-events-none"
+          // -left-9999px  opacity-1 
+
+          className="absolute 
+           z-[10000]
+           pointer-events-none"
           aria-hidden="true"
           autoComplete="off"
           autoCapitalize="off"
