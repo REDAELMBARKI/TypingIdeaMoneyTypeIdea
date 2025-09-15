@@ -5,6 +5,7 @@ import States from './partials/States';
 import Reseter from './partials/Reseter';
 import { useTextRender } from './customHooks/useTextRender';
 import useCharacterDeleteHook from './customHooks/useCharacterDeleteHook';
+import useAudio from './customHooks/useAudio';
 
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog near the riverbank.",
@@ -50,7 +51,8 @@ const TypingApp: React.FC = () => {
      }
   }, [inputValue])
  
- 
+ // audio player 
+ useAudio();
   return (
     <div className={`min-h-screen transition-colors duration-300  ${
       isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
@@ -98,7 +100,8 @@ const TypingApp: React.FC = () => {
           autoCorrect="off"
           spellCheck="false"
         />
-
+         
+       
         {/* Controls */}
         <div className="flex items-center justify-center mt-8 space-x-4">
           <Reseter isDarkMode={isDarkMode}  handleReset={handleReset} />
@@ -110,7 +113,10 @@ const TypingApp: React.FC = () => {
 
       {/* Footer */}
       <Footer isDarkMode={isDarkMode} />
+     
     </div>
+
+
   );
 };
 

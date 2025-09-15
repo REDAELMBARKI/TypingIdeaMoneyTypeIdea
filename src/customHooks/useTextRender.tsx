@@ -29,7 +29,6 @@ export const useTextRender = ({currentText , currentLetter , inputValue}:TextRen
                 
               });
            }
-           console.log('current index' , currentLetter.index)
     },[currentLetter])
   
     return currentText.split('').map((char, index) => {
