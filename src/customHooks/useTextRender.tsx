@@ -38,9 +38,9 @@ export const useTextRender = ({currentText , currentLetter , inputValue}:TextRen
       if (index === currentLetter.index) {
         // Current letter highlighting (placeholder logic)
         if(char === currentLetter.letter){
-            className += isDarkMode 
-              ? 'bg-yellow-500 text-white rounded-sm' 
-              : 'bg-yellow-500 text-white rounded-sm';
+            // className += isDarkMode 
+            //   ? 'bg-yellow-500 text-white rounded-sm' 
+            //   : 'bg-yellow-500 text-white rounded-sm';
         }
         if(char !== currentLetter.letter && inputValue !== '' ){
           
@@ -64,7 +64,11 @@ export const useTextRender = ({currentText , currentLetter , inputValue}:TextRen
       
   
       return (
-        <span key={index} className={`${className} ` }>
+        <span key={index} className={`px-[1px] ${className} ${
+          inputValue !== '' &&
+          index === currentLetter.index + 1 ? 
+
+          'display-indicator' : inputValue === '' ?  index === currentLetter.index ? 'display-indicator' : '' : ''  }` }>
           {char === ' ' ? '\u00A0' :  char}
         </span>
       )
