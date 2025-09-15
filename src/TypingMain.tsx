@@ -6,6 +6,7 @@ import Reseter from './partials/Reseter';
 import { useTextRender } from './customHooks/useTextRender';
 import useCharacterDeleteHook from './customHooks/useCharacterDeleteHook';
 import useAudio from './customHooks/useAudio';
+import { allowedKeys } from './data/allowdKeys';
 
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog near the riverbank.",
@@ -21,7 +22,9 @@ const TypingApp: React.FC = () => {
   const [currentLetter, setCurrentLetter] = useState<{index:number , letter:string}>({index:0 , letter:''});
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const [inputValue , setInputValue] = useState<string>('');
-
+  const [wrongChars , setWrongChars] = useState<number[]>([]);
+  const [isEnableSound] = useState<boolean>(true);
+ 
   const {isDarkMode } =  useThemeHook();
 
   // Focus the hidden input on component mount
@@ -43,16 +46,21 @@ const TypingApp: React.FC = () => {
   };
 
 
-  const renderText = useTextRender({currentText , currentLetter , inputValue}) 
-  const handleDeleteChar = useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter})
+  const renderText = useTextRender({currentText , currentLetter , inputValue , wrongChars , setWrongChars}) 
+  const handleDeleteChar = useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter , wrongChars , setWrongChars})
   useEffect(() => {
      if(inputValue.length > currentLetter.index){
          setCurrentLetter({...currentLetter , index : inputValue.length - 1 , letter: inputValue[inputValue.length -1]}) ;
      }
+
+     // clear wrong chars array
+     if(inputValue === '') {
+      setWrongChars([]);
+     }
   }, [inputValue])
  
  // audio player 
- useAudio();
+  useAudio({allowedKeys , isEnableSound});
   return (
     <div className={`min-h-screen transition-colors duration-300  ${
       isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
@@ -89,9 +97,8 @@ const TypingApp: React.FC = () => {
                 }
           }}
           type="text"
-          // -left-9999px  opacity-1 
 
-          className="absolute 
+          className="absolute -left-9999px  opacity-0
            z-[10000]
            pointer-events-none"
           aria-hidden="true"

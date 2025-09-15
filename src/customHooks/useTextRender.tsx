@@ -1,23 +1,25 @@
 
-import React, { useEffect , useState } from "react";
+import React, { useEffect } from "react";
 import useThemeHook from "./useThemeHook";
 
 interface TextRenderProps {
   currentLetter: {index:number , letter:string};
   currentText: string;
-  inputValue : string
+  inputValue : string ;
+  wrongChars : number[];
+  setWrongChars : React.Dispatch<React.SetStateAction<number[]>>
 }
 
 
-export const useTextRender = ({currentText , currentLetter , inputValue}:TextRenderProps) => {
+export const useTextRender = ({currentText , currentLetter , inputValue , wrongChars , setWrongChars}:TextRenderProps) => {
     const [lastIndexReached , setLastIndexReached] = React.useState<number>(currentLetter.index);
-    const [wrongChars , setWrongChars] = useState<number[]>([]);
-
+   
 
     const {isDarkMode} = useThemeHook();
 
     useEffect(() => {
         setLastIndexReached(currentLetter.index);
+
     }, [currentLetter]);
     
     useEffect(()=>{
@@ -62,7 +64,7 @@ export const useTextRender = ({currentText , currentLetter , inputValue}:TextRen
                 }
           }
       
-  
+      
       return (
         <span key={index} className={`px-[1px] ${className} ${
           inputValue !== '' &&
