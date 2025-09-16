@@ -25,7 +25,7 @@ const TypingApp: React.FC = () => {
   const [inputValue , setInputValue] = useState<string>('');
   const [wrongChars , setWrongChars] = useState<number[]>([]);
   const [isEnableSound] = useState<boolean>(true);
-  const [isFrozen , setisFrozen] =  useState<boolean>(false);
+  const [trachChars , setTrachChars] =  useState<string[]>([]);
   const {isDarkMode } =  useThemeHook();
 
 
@@ -64,15 +64,13 @@ const TypingApp: React.FC = () => {
      if(inputValue === '') {
       setWrongChars([]);
      }
-
-
   }, [inputValue])
  
 
   
  // audio player 
   useAudio({allowedKeys , isEnableSound});
-  useBlur({wrongChars , hiddenInputRef , currentLetter , currentText , setisFrozen , isFrozen})
+  useBlur({wrongChars , hiddenInputRef , currentLetter , currentText , setTrachChars , trachChars })
   return (
     <div className={`min-h-screen transition-colors duration-300  ${
       isDarkMode ? 'bg-gray-900' : 'bg-gray-50'

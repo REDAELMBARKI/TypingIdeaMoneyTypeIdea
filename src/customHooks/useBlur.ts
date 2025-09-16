@@ -6,29 +6,32 @@ import { useEffect } from "react";
     wrongChars : number[] ;
     currentLetter : {index:number , letter:string} ;
     currentText : string ;
+    trachChars : string[];
+    setTrachChars : React.Dispatch<React.SetStateAction<string[]>>
  }
 
- const useBlur = ({ wrongChars , hiddenInputRef ,currentLetter , currentText}:BlureType) => {
+ const useBlur = ({ wrongChars , hiddenInputRef ,currentLetter , currentText ,trachChars, setTrachChars}:BlureType) => {
 
     useEffect(() => {
-            let isBlured = false ;
-            if (hiddenInputRef.current 
+
+           if (hiddenInputRef.current 
                 && wrongChars.length > 0
                 && currentText[currentLetter.index + 1] === ' '
                ) {
                    
-                   hiddenInputRef.current.blur();
-                   isBlured = true ;
+                   // here we shhoud puch to trachchrs
+                   setTrachChars()
+                  
             }
  
 
             const handleBlurChange = (e:KeyboardEvent) => {
                 if(e.key === ' ' && isBlured) {
                     console.log(wrongChars)
-                    hiddenInputRef.current?.focus()
+                    // hiddenInputRef.current?.focus()
                 }
                 if(e.key === 'Backspace' && isBlured){
-                    hiddenInputRef.current?.focus()
+                    // hiddenInputRef.current?.focus()
                 }
 
                 
