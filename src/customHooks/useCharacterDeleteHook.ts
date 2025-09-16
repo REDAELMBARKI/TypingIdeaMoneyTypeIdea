@@ -11,8 +11,6 @@ interface TextRenderProps {
 
 
 function useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter , wrongChars , setWrongChars}:TextRenderProps) {
- 
-  
   return function () {
        if(currentLetter.index > 0){
              // check if this charactre was wrong already if wrong remove it from wrongindexes 

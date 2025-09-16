@@ -7,6 +7,7 @@ import { useTextRender } from './customHooks/useTextRender';
 import useCharacterDeleteHook from './customHooks/useCharacterDeleteHook';
 import useAudio from './customHooks/useAudio';
 import { allowedKeys } from './data/allowdKeys';
+import useBlur from './customHooks/useBlur';
 
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog near the riverbank.",
@@ -18,21 +19,26 @@ const sampleTexts = [
 
 const TypingApp: React.FC = () => {
  
-  const [currentText, setCurrentText] = useState(sampleTexts[0]);
+  const [currentText, setCurrentText] = useState<string>(sampleTexts[0]);
   const [currentLetter, setCurrentLetter] = useState<{index:number , letter:string}>({index:0 , letter:''});
-  const hiddenInputRef = useRef<HTMLInputElement>(null);
+  
   const [inputValue , setInputValue] = useState<string>('');
   const [wrongChars , setWrongChars] = useState<number[]>([]);
   const [isEnableSound] = useState<boolean>(true);
- 
+  const [isFrozen , setisFrozen] =  useState<boolean>(false);
   const {isDarkMode } =  useThemeHook();
 
+
+ // refs
+  const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   // Focus the hidden input on component mount
   useEffect(() => {
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
   }, []);
+
+  
 
   const handleReset = () => {
     // Placeholder for reset functionality
@@ -46,8 +52,9 @@ const TypingApp: React.FC = () => {
   };
 
 
-  const renderText = useTextRender({currentText , currentLetter , inputValue , wrongChars , setWrongChars}) 
+  const renderText = useTextRender({currentText , currentLetter , inputValue , wrongChars , setWrongChars }) 
   const handleDeleteChar = useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter , wrongChars , setWrongChars})
+  
   useEffect(() => {
      if(inputValue.length > currentLetter.index){
          setCurrentLetter({...currentLetter , index : inputValue.length - 1 , letter: inputValue[inputValue.length -1]}) ;
@@ -57,10 +64,15 @@ const TypingApp: React.FC = () => {
      if(inputValue === '') {
       setWrongChars([]);
      }
+
+
   }, [inputValue])
  
+
+  
  // audio player 
   useAudio({allowedKeys , isEnableSound});
+  useBlur({wrongChars , hiddenInputRef , currentLetter , currentText , setisFrozen , isFrozen})
   return (
     <div className={`min-h-screen transition-colors duration-300  ${
       isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
@@ -86,20 +98,24 @@ const TypingApp: React.FC = () => {
 
         {/* Hidden Input Field */}
         <input
-
+          onPaste={(e) => e.preventDefault()}
           ref={hiddenInputRef} 
           onChange={(e) => {
-            setInputValue(e.target.value)}}
+            setInputValue(e.target.value)}
+          }
           value={inputValue}
           onKeyDown={(e)=> {
+              
                 if(e.key === "Backspace" || e.key === "Delete"){
+                   console.log('deleteed')
                    handleDeleteChar()
                 }
           }}
           type="text"
-
-          className="absolute -left-9999px  opacity-0
-           z-[10000]
+          //  opacity-0
+          //  z-[10000]
+          className="absolute -left-9999px 
+          
            pointer-events-none"
           aria-hidden="true"
           autoComplete="off"

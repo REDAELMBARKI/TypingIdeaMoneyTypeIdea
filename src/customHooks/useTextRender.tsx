@@ -7,11 +7,12 @@ interface TextRenderProps {
   currentText: string;
   inputValue : string ;
   wrongChars : number[];
+
   setWrongChars : React.Dispatch<React.SetStateAction<number[]>>
 }
 
 
-export const useTextRender = ({currentText , currentLetter , inputValue , wrongChars , setWrongChars}:TextRenderProps) => {
+export const useTextRender = ({currentText , currentLetter , inputValue , wrongChars , setWrongChars }:TextRenderProps) => {
     const [lastIndexReached , setLastIndexReached] = React.useState<number>(currentLetter.index);
    
 
@@ -32,6 +33,9 @@ export const useTextRender = ({currentText , currentLetter , inputValue , wrongC
               });
            }
     },[currentLetter])
+
+
+  
   
     return currentText.split('').map((char, index) => {
       let className = 'transition-all duration-150 ';
