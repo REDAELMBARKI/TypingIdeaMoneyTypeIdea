@@ -17,15 +17,11 @@ interface TextRenderProps {
 
 
 export const useTextRender = ({currentText , currentLetter , inputValue , wrongChars , setWrongChars  }:TextRenderProps) => {
-    const [lastIndexReached , setLastIndexReached] = React.useState<number>(currentLetter.index);
     
 
     const {isDarkMode} = useThemeHook();
 
-    useEffect(() => {
-        setLastIndexReached(currentLetter.index);
 
-    }, [currentLetter]);
     
     useEffect(()=>{
            if(inputValue === '') return ;
@@ -39,53 +35,40 @@ export const useTextRender = ({currentText , currentLetter , inputValue , wrongC
     },[currentLetter])
 
 
-    
+    useEffect(()=>{
+      console.log(wrongChars)
+    },[wrongChars])
   
     return currentText.split('').map((char, index) => {
       let className = 'transition-all duration-150 ';
-      
-      
-      if (index === currentLetter.index) {
-        // Current letter highlighting (placeholder logic)
-        if(char === currentLetter.letter){
-            // className += isDarkMode 
-            //   ? 'bg-yellow-500 text-white rounded-sm' 
-            //   : 'bg-yellow-500 text-white rounded-sm';
-        }
-        if(char !== currentLetter.letter && inputValue !== '' ){
-          
-            className += isDarkMode 
-              ? 'text-red-500  rounded-sm' 
-              : 'text-red-500  rounded-sm';
-        }
+
+      if (index > currentLetter.index - 1) {
+        // Untyped letters
+        className += isDarkMode ? 'text-gray-400' : 'text-gray-600';
+      } else if (wrongChars.includes(index)) {
+        // Wrong chars
+        className += 'text-red-500';
+      } else {
+        // Correct typed chars
+        className += isDarkMode ? 'text-white' : 'text-black';
       }
-  
-      if (index > lastIndexReached || inputValue === '') {
-              // Untyped letters
-              className += isDarkMode 
-                ? 'text-gray-400' 
-                : 'text-gray-600';
-          }else{
- 
-                if(wrongChars.includes(index)){
-                     className +="text-red-500"
-                }
-          }
-      
-      
+
+      // Custom indicator logic
+      let indicator = '';
+      if (
+        (inputValue !== '' && index === currentLetter.index + 1) ||
+        (inputValue === '' && index === currentLetter.index)
+      ) {
+        indicator = 'display-indicator';
+      }
+
       return (
-        <span key={index} className={`px-[1px]
-          mr-[${currentText[currentLetter.index + 1] === ' ' ? 30 : ''}px]
-         
-          ${className} ${
-          inputValue !== '' &&
-          index === currentLetter.index + 1 ? 
-
-          'display-indicator' : inputValue === '' ?  index === currentLetter.index ? 'display-indicator' : '' : ''  }` }>
-          {char === ' ' ? '\u00A0' :  char}
+        <span
+          key={index}
+          className={`px-[1px] mr-[${currentText[currentLetter.index + 1] === ' ' ? 30 : ''}px] ${className} ${indicator}`}
+        >
+          {char === ' ' ? '\u00A0' : char}
         </span>
-      )
-
-     
+      );
     });
   };

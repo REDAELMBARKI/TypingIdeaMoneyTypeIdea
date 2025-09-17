@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState  , useRef} from "react";
 import type { currentLetterType } from "../types/maintyping";
 
 
@@ -12,64 +12,62 @@ import type { currentLetterType } from "../types/maintyping";
     setTrachChars : React.Dispatch<React.SetStateAction<string[]>> ;
     setIsWrongWord : React.Dispatch<React.SetStateAction<boolean>>;
      setRightMargen:React.Dispatch<React.SetStateAction<number>> ;
+     setInputValue : React.Dispatch<React.SetStateAction<string>>
  }
 
- const useBlur = ({ wrongChars , hiddenInputRef ,currentLetter ,setCurrentLetter , currentText , setTrachChars ,setIsWrongWord , setRightMargen}:BlureType) => {
+ const useBlur = ({ wrongChars , hiddenInputRef ,currentLetter ,setCurrentLetter , currentText , setTrachChars ,setIsWrongWord , setRightMargen , setInputValue}:BlureType) => {
     // this collects the extra trach chars and make a word of them
-    const [trachWord ,setTrachWord] = useState<string[]>([])
-    useEffect(() => {
-            
-            if (! hiddenInputRef.current 
-                ||  wrongChars.length <= 0
-                ||  currentText[currentLetter.index + 1] !== ' '
-               ) {
-                   
-                  return ;
-            }
-           
-            // wrong word
-            setIsWrongWord(true) ;
-           // here we preserve the last index where we reach in the linup 
-           
-            setCurrentLetter({
-              ...currentLetter ,
-               indexBeforeError:currentLetter.index
-            })
-         
-            const handleBlurChange = (e:KeyboardEvent) => {
-               
-                if((e.key === ' ') ) {
-                    // space click continue jump to next word
-                    console.log('go to the next ')
-                     setCurrentLetter({
-                    ...currentLetter ,
-                    index:currentLetter.indexBeforeError
-                    })
-                   
-                    setIsWrongWord(false)
-                    setTrachChars((prev) => [...prev , trachWord.join('')])
-                    // emtpty the aarray for new word
-                    setTrachWord([])
-                    setRightMargen(0);
-                }
-                else if(e.key !== ' ' && e.key !== 'Backspace') {
-                     // gather the wrong chars 
-                     setTrachWord((prev) =>[ ...prev , e.key]) ;
-                     setRightMargen((prev)=> prev + 6)
-                     
-                }
-               
-               
-              
-            }
-           
-            window.addEventListener('keydown' , handleBlurChange)
+  const [trachWord, setTrachWord] = useState<string[]>([]);
+const trachWordRef = useRef<string[]>([]);
+const currentLetterRef = useRef(currentLetter);
 
+// keep refs in sync with latest state
+useEffect(() => {
+  trachWordRef.current = trachWord;
+}, [trachWord]);
 
+useEffect(() => {
+  currentLetterRef.current = currentLetter;
+}, [currentLetter]);
 
-            return () => window.removeEventListener('keydown' , handleBlurChange)
+useEffect(() => {
+  if (
+    !hiddenInputRef.current ||
+    wrongChars.length <= 0 ||
+    currentText[currentLetter.index + 1] !== ' '
+  ) {
+    return;
+  }
 
-        }, [wrongChars]);
+  setIsWrongWord(true);
+  setCurrentLetter(prev => ({ ...prev, indexBeforeError: prev.index }));
+
+  const handleBlurChange = (e: KeyboardEvent) => {
+    if (e.key === ' ') {
+      const word = trachWordRef.current.join('');
+
+      setCurrentLetter(prev => ({
+        ...prev,
+        index: prev.indexBeforeError!,
+      }));
+
+      setInputValue(prev => prev.replace(word, ''));
+      setIsWrongWord(false);
+      setTrachChars(prev => [...prev, word]);
+    //   setTrachWord([]); // reset UI
+      setRightMargen(0);
+    } 
+    else if (e.key !== 'Backspace') {
+      setTrachWord(prev => [...prev, e.key]);
+      setRightMargen(prev => prev + 6);
+    }
+  };
+
+  window.addEventListener('keydown', handleBlurChange);
+  return () => window.removeEventListener('keydown', handleBlurChange);
+}, [wrongChars]); 
+// ⬆️ note: no trachWord, no currentLetter
+
 
  }
 

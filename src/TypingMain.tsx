@@ -59,24 +59,38 @@ const TypingApp: React.FC = () => {
   const handleDeleteChar = useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter , wrongChars , setWrongChars})
   
   useEffect(() => {
-     // check also if i should pass to next word or free the currect index 
-     if((inputValue.length > currentLetter.index )){
-         console.log('is wrong word ? ' , isWrongWord)
-         setCurrentLetter({...currentLetter , index :  inputValue.length - 1 , letter: inputValue[inputValue.length -1]}) ;
-     }
+    // Only allow one character in input
+    if (inputValue.length > 1) {
+      setInputValue(inputValue.slice(-1));
+      return;
+    }
+    
+    // Compare input to currentText
+    if (inputValue.length === 1) {
+      const typedChar = inputValue;
+      const expectedChar = currentText[currentLetter.index];
+      if (typedChar === expectedChar) {
+        setCurrentLetter(prev => ({ ...prev, index: prev.index + 1, letter: typedChar }));
+        setWrongChars([]);
+      } else {
+        setWrongChars(prev => [...prev, currentLetter.index]);
+      }
+      setInputValue(''); // clear for next char
+    }
 
-     // clear wrong chars array
-     if(inputValue === '') {
+
+
+    // clear wrong chars array if input is empty
+    if (inputValue === '') {
       setWrongChars([]);
-     }
-
-  }, [inputValue])
+    }
+  }, [inputValue, currentLetter.index, currentText]);
  
 
   
  // audio player 
   useAudio({allowedKeys , isEnableSound});
-  useBlur({wrongChars , hiddenInputRef , currentLetter ,setCurrentLetter , currentText , setTrachChars , trachChars  , setIsWrongWord ,setRightMargen })
+  useBlur({wrongChars , hiddenInputRef , currentLetter ,setCurrentLetter , currentText , setTrachChars , trachChars  , setIsWrongWord ,setRightMargen ,setInputValue})
   return (
     <div className={`min-h-screen transition-colors duration-300  ${
       isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
@@ -103,23 +117,24 @@ const TypingApp: React.FC = () => {
         {/* Hidden Input Field */}
         <input
           onPaste={(e) => e.preventDefault()}
-          ref={hiddenInputRef} 
+          ref={hiddenInputRef}
           onChange={(e) => {
-            setInputValue(e.target.value)}
-          }
+            // Only allow one character
+            const value = e.target.value;
+            if (value.length > 1) {
+              setInputValue(value.slice(-1));
+            } else {
+              setInputValue(value);
+            }
+          }}
           value={inputValue}
-          onKeyDown={(e)=> {
-              
-                if(e.key === "Backspace" || e.key === "Delete"){
-                   handleDeleteChar()
-                }
+          onKeyDown={(e) => {
+            if (e.key === "Backspace" || e.key === "Delete") {
+              handleDeleteChar();
+            }
           }}
           type="text"
-          //  opacity-0
-          //  z-[10000]
-          className="absolute -left-9999px 
-          
-           pointer-events-none"
+          className="absolute -left-9999px pointer-events-none"
           aria-hidden="true"
           autoComplete="off"
           autoCapitalize="off"
