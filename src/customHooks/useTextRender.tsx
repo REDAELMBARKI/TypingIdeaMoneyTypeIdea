@@ -1,20 +1,24 @@
 
 import React, { useEffect } from "react";
 import useThemeHook from "./useThemeHook";
+import type { currentLetterType } from "../types/maintyping";
 
 interface TextRenderProps {
-  currentLetter: {index:number , letter:string};
+  currentLetter: currentLetterType;
   currentText: string;
   inputValue : string ;
   wrongChars : number[];
 
+  isWrongWord:boolean ;
   setWrongChars : React.Dispatch<React.SetStateAction<number[]>>
+  rightMargen:number;
+ 
 }
 
 
-export const useTextRender = ({currentText , currentLetter , inputValue , wrongChars , setWrongChars }:TextRenderProps) => {
+export const useTextRender = ({currentText , currentLetter , inputValue , wrongChars , setWrongChars  }:TextRenderProps) => {
     const [lastIndexReached , setLastIndexReached] = React.useState<number>(currentLetter.index);
-   
+    
 
     const {isDarkMode} = useThemeHook();
 
@@ -35,7 +39,7 @@ export const useTextRender = ({currentText , currentLetter , inputValue , wrongC
     },[currentLetter])
 
 
-  
+    
   
     return currentText.split('').map((char, index) => {
       let className = 'transition-all duration-150 ';
@@ -70,7 +74,10 @@ export const useTextRender = ({currentText , currentLetter , inputValue , wrongC
       
       
       return (
-        <span key={index} className={`px-[1px] ${className} ${
+        <span key={index} className={`px-[1px]
+          mr-[${currentText[currentLetter.index + 1] === ' ' ? 30 : ''}px]
+         
+          ${className} ${
           inputValue !== '' &&
           index === currentLetter.index + 1 ? 
 

@@ -1,9 +1,12 @@
+import type { currentLetterType } from "../types/maintyping";
+
 interface TextRenderProps {
-  currentLetter: {index:number , letter:string};
+  currentLetter: currentLetterType;
   currentText: string;
   setCurrentLetter : React.Dispatch<React.SetStateAction<{
     index: number;
     letter: string;
+    indexBeforeError:number|null ;
 }>>,
    wrongChars : number[];
    setWrongChars : React.Dispatch<React.SetStateAction<number[]>>
@@ -21,6 +24,7 @@ function useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter 
              setCurrentLetter({
                 index: currentLetter.index - 1,
                 letter: currentText[currentLetter.index - 1],
+                indexBeforeError:null
               });
        }
   }
