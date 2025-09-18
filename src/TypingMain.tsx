@@ -29,7 +29,7 @@ const TypingApp: React.FC = () => {
   const [trachChars , setTrachChars] =  useState<string[]>([]);
   const [isWrongWord , setIsWrongWord] =  useState<boolean>(false);
   const [rightMargen ,setRightMargen] = useState<number>(0);
-  
+  const [trachWord, setTrachWord] = useState<string[]>([]);
   // refs
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   //hooks
@@ -95,13 +95,13 @@ const TypingApp: React.FC = () => {
 
 
   // hooks call
-  const renderText = useTextRender({currentText , currentLetter , inputValue , wrongChars , setWrongChars , isWrongWord ,rightMargen }) 
+  const renderText = useTextRender({currentText , currentLetter , inputValue , wrongChars , setWrongChars , isWrongWord ,rightMargen ,trachWord }) 
   const handleDeleteChar = useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter , wrongChars , setWrongChars})
   
  // audio player 
   useAudio({allowedKeys , isEnableSound});
-  useBlur({wrongChars , hiddenInputRef , currentLetter ,setCurrentLetter ,
-         currentText , setTrachChars , trachChars  , setIsWrongWord ,setRightMargen ,setInputValue , inputValue})
+  useBlur({wrongChars , hiddenInputRef , currentLetter ,
+         currentText , setTrachChars , trachChars  , setIsWrongWord ,setRightMargen ,setInputValue , trachWord, setTrachWord})
   return (
     <div className={`min-h-screen transition-colors duration-300  ${
       isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
@@ -110,9 +110,9 @@ const TypingApp: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pb-20">
         {/* Text Display */}
-        <div className="w-full max-w-4xl mx-auto mt-5">
+        <div className="w-full max-w-screen mx-auto mt-5">
           <div className={`
-            text-2xl sm:text-3xl lg:text-4xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
+            text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
             font-mono text-center p-6 sm:p-8 lg:p-12 rounded-2xl shadow-sm
             ${isDarkMode 
               ? 'bg-gray-800/50 backdrop-blur-sm border border-gray-700/50' 
@@ -120,6 +120,7 @@ const TypingApp: React.FC = () => {
             }
           `}>
             <div className='mx-w-full break-words'>
+              {/* // text render */}
               {renderText}
             </div>
           </div>
@@ -146,7 +147,7 @@ const TypingApp: React.FC = () => {
             }
           }}
           type="text"
-          className="absolute -left-9999px pointer-events-none"
+          className="absolute -left-9999px opacity-0 pointer-events-none"
           aria-hidden="true"
           autoComplete="off"
           autoCapitalize="off"

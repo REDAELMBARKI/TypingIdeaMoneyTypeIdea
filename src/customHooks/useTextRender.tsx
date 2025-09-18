@@ -12,11 +12,11 @@ interface TextRenderProps {
   isWrongWord:boolean ;
   setWrongChars : React.Dispatch<React.SetStateAction<number[]>>
   rightMargen:number;
- 
+ trachWord : string[]
 }
 
 
-export const useTextRender = ({currentText , currentLetter , inputValue , wrongChars , setWrongChars  }:TextRenderProps) => {
+export const useTextRender = ({currentText , currentLetter , inputValue , wrongChars , setWrongChars ,rightMargen ,trachWord}:TextRenderProps) => {
     
 
     const {isDarkMode} = useThemeHook();
@@ -57,14 +57,24 @@ export const useTextRender = ({currentText , currentLetter , inputValue , wrongC
       ) {
         indicator = 'display-indicator';
       }
+  
 
+      
       return (
+
+        <>
+         {char === ' ' && index === currentLetter.index && trachWord.length > 0 && (
+          <span className="trach-word text-red-400">{trachWord.join('')}</span>
+        )}
         <span
           key={index}
-          className={`px-[1px] mr-[${currentText[currentLetter.index + 1] === ' ' ? 30 : ''}px] ${className} ${indicator}`}
+          className={`px-[1px]  ${className} ${indicator}`}
         >
-          {char === ' ' ? '\u00A0' : char}
+          {char === ' ' ? '\u00A0' : char} 
         </span>
+        
+
+         </>
       );
     });
   };

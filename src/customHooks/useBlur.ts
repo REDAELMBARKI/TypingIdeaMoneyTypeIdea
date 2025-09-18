@@ -1,23 +1,23 @@
-import { useEffect, useState  , useRef} from "react";
+import React, { useEffect  , useRef} from "react";
 import type { currentLetterType } from "../types/maintyping";
 
  interface BlureType {
     hiddenInputRef : React.RefObject<HTMLInputElement | null> ;
     wrongChars : number[] ;
     currentLetter : currentLetterType ;
-    setCurrentLetter :React.Dispatch<React.SetStateAction<currentLetterType>>  ;
     currentText : string ;
     trachChars : string[];
     setTrachChars : React.Dispatch<React.SetStateAction<string[]>> ;
     setIsWrongWord : React.Dispatch<React.SetStateAction<boolean>>;
      setRightMargen:React.Dispatch<React.SetStateAction<number>> ;
      setInputValue : React.Dispatch<React.SetStateAction<string>>;
-     inputValue: string
+      trachWord :string[] ;
+      setTrachWord : React.Dispatch<React.SetStateAction<string[]>> ;
  }
 
- const useBlur = ({ wrongChars , hiddenInputRef ,currentLetter ,setCurrentLetter , currentText , setTrachChars ,setIsWrongWord , setRightMargen , setInputValue , inputValue}:BlureType) => {
+ const useBlur = ({ wrongChars , hiddenInputRef ,currentLetter , currentText , setTrachChars ,setIsWrongWord , setRightMargen , setInputValue , trachWord, setTrachWord}:BlureType) => {
     // this collects the extra trach chars and make a word of them
-  const [trachWord, setTrachWord] = useState<string[]>([]);
+
 const trachWordRef = useRef<string[]>([]);
 const currentLetterRef = useRef(currentLetter);
 // keep refs in sync with latest state
@@ -43,7 +43,7 @@ const handleBlurChange = (e: KeyboardEvent) => {
       
       setTrachChars(prev => [...prev, word]);
       
-      // setTrachWord([]); 
+      setTrachWord([]); 
       
 
       setRightMargen(0);
