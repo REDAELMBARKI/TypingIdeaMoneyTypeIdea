@@ -34,10 +34,6 @@ export const useTextRender = ({currentText , currentLetter , inputValue , wrongC
            }
     },[currentLetter])
 
-
-    // useEffect(()=>{
-    //   console.log(wrongChars)
-    // },[wrongChars])
   
     return currentText.split('').map((char, index) => {
       let className = 'transition-all duration-150 ';

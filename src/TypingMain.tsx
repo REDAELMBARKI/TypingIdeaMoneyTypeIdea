@@ -55,38 +55,53 @@ const TypingApp: React.FC = () => {
     }
   };
 
-  const renderText = useTextRender({currentText , currentLetter , inputValue , wrongChars , setWrongChars , isWrongWord ,rightMargen }) 
-  const handleDeleteChar = useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter , wrongChars , setWrongChars})
-  
+
   useEffect(() => {
     // Only allow one character in input
     if (inputValue.length > 1) {
       setInputValue(inputValue.slice(-1));
       return;
     }
-
+  
+     if(isWrongWord){
+        
+          setCurrentLetter(prev => ({ ...prev, index: prev.index , letter: prev.letter })); 
+          
+      }
 
     // Compare input to currentText
     if (inputValue.length === 1) {
       const typedChar = inputValue;
       const expectedChar = currentText[currentLetter.index];
-      if (typedChar === expectedChar) {
-        setCurrentLetter(prev => ({ ...prev, index: prev.index + 1, letter: typedChar }));
-        
-      } else {
-        setWrongChars(prev => [...prev, currentLetter.index]);
-        setCurrentLetter(prev => ({ ...prev, index: prev.index + 1 }));
+
+      if (typedChar === expectedChar && !isWrongWord) {
+        setCurrentLetter(prev => ({ ...prev, index: prev.index + 1, letter: typedChar })); 
+      } 
+      else if(typedChar !== expectedChar && !isWrongWord) {
+           
+           setWrongChars(prev => [...prev, currentLetter.index]);
+           setCurrentLetter(prev => ({ ...prev, index: prev.index + 1 }));
+         
       }
+
+     
+
+
       setInputValue(''); // clear for next char
     }
 
   }, [inputValue, currentLetter.index, currentText]);
  
 
+
+  // hooks call
+  const renderText = useTextRender({currentText , currentLetter , inputValue , wrongChars , setWrongChars , isWrongWord ,rightMargen }) 
+  const handleDeleteChar = useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter , wrongChars , setWrongChars})
   
  // audio player 
   useAudio({allowedKeys , isEnableSound});
-  useBlur({wrongChars , hiddenInputRef , currentLetter ,setCurrentLetter , currentText , setTrachChars , trachChars  , setIsWrongWord ,setRightMargen ,setInputValue})
+  useBlur({wrongChars , hiddenInputRef , currentLetter ,setCurrentLetter ,
+         currentText , setTrachChars , trachChars  , setIsWrongWord ,setRightMargen ,setInputValue , inputValue})
   return (
     <div className={`min-h-screen transition-colors duration-300  ${
       isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
