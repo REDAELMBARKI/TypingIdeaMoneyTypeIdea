@@ -15,18 +15,26 @@ interface TextRenderProps {
 
 function useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter , wrongChars , setWrongChars}:TextRenderProps) {
   return function () {
-       if(currentLetter.index > 0){
+            if (currentLetter.index > 0) {
              // check if this charactre was wrong already if wrong remove it from wrongindexes 
-             if(wrongChars.includes(currentLetter.index)){
-                  const newArrayOfWrongs = wrongChars.filter((i) => i !== currentLetter.index)
+             console.log( 'current index ' , currentLetter.index ) ;
+             console.log( ' wrongs ' , wrongChars ) ;
+             console.log('eexists' , wrongChars.includes(currentLetter.index) )
+
+
+             if(wrongChars.includes(currentLetter.index - 1)){
+                  const newArrayOfWrongs = wrongChars.filter((i) => i !== currentLetter.index - 1)
                   setWrongChars(newArrayOfWrongs)
              }
-             setCurrentLetter({
-                index: currentLetter.index - 1,
-                letter: currentText[currentLetter.index - 1],
-                indexBeforeError:null
-              });
+                  
+                  setCurrentLetter(prev => ({
+                     index: prev.index -1,
+                     letter: currentText[prev.index -1] || '',
+                     indexBeforeError: null
+                  }));
        }
+
+      
   }
 }
 

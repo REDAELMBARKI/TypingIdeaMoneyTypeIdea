@@ -47,13 +47,13 @@ const TypingApp: React.FC = () => {
     // Placeholder for reset functionality
     setCurrentLetter({index:0, letter:'' , indexBeforeError:null});
     setInputValue('');
+     setWrongChars([]);
     const randomText = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
     setCurrentText(randomText);
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
   };
-
 
   const renderText = useTextRender({currentText , currentLetter , inputValue , wrongChars , setWrongChars , isWrongWord ,rightMargen }) 
   const handleDeleteChar = useCharacterDeleteHook({currentText , currentLetter , setCurrentLetter , wrongChars , setWrongChars})
@@ -64,26 +64,22 @@ const TypingApp: React.FC = () => {
       setInputValue(inputValue.slice(-1));
       return;
     }
-    
+
+
     // Compare input to currentText
     if (inputValue.length === 1) {
       const typedChar = inputValue;
       const expectedChar = currentText[currentLetter.index];
       if (typedChar === expectedChar) {
         setCurrentLetter(prev => ({ ...prev, index: prev.index + 1, letter: typedChar }));
-        setWrongChars([]);
+        
       } else {
         setWrongChars(prev => [...prev, currentLetter.index]);
+        setCurrentLetter(prev => ({ ...prev, index: prev.index + 1 }));
       }
       setInputValue(''); // clear for next char
     }
 
-
-
-    // clear wrong chars array if input is empty
-    if (inputValue === '') {
-      setWrongChars([]);
-    }
   }, [inputValue, currentLetter.index, currentText]);
  
 
@@ -130,6 +126,7 @@ const TypingApp: React.FC = () => {
           value={inputValue}
           onKeyDown={(e) => {
             if (e.key === "Backspace" || e.key === "Delete") {
+              
               handleDeleteChar();
             }
           }}
