@@ -11,6 +11,7 @@ interface TextRenderProps {
   isWrongWord: boolean;
   setWrongChars: React.Dispatch<React.SetStateAction<number[]>>;
   trachWord: string[];
+  wrongWords:string[];
 }
 
 export const useTextRender = ({
@@ -20,8 +21,10 @@ export const useTextRender = ({
   wrongChars,
   setWrongChars,
   trachWord,
+  wrongWords
 }: TextRenderProps) => {
   const { isDarkMode } = useThemeHook();
+   
 
   useEffect(() => {
     if (inputValue === "") return;
@@ -56,8 +59,13 @@ export const useTextRender = ({
       indicator = "display-indicator";
     }
 
+    // uderline wrong word
+
+    // underline wrongWords
+    
     return (
       <>
+      {/* trach words */}
         {char === " " &&
           index === currentLetter.index &&
           trachWord.length > 0 && (
@@ -65,7 +73,10 @@ export const useTextRender = ({
               {trachWord.join("")}
             </span>
           )}
-        <span key={index} className={`px-[1px]  ${className} ${indicator}`}>
+         {/* original text chars */}
+          <span key={index} className={`px-[1px]  ${className} ${indicator}`}
+        
+          >
           {char === " " ? "\u00A0" : char}
         </span>
       </>
