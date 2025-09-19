@@ -11,7 +11,7 @@ interface TextRenderProps {
   isWrongWord: boolean;
   setWrongChars: React.Dispatch<React.SetStateAction<number[]>>;
   trachWord: string[];
-  wrongWords:string[];
+  wrongWords:{start : number , end:number}[];
 }
 
 export const useTextRender = ({
@@ -25,7 +25,7 @@ export const useTextRender = ({
 }: TextRenderProps) => {
   const { isDarkMode } = useThemeHook();
    
-
+  console.log('wrong words' , wrongWords)
   useEffect(() => {
     if (inputValue === "") return;
     if (currentLetter.letter !== currentText[currentLetter.index]) {
@@ -59,10 +59,30 @@ export const useTextRender = ({
       indicator = "display-indicator";
     }
 
-    // uderline wrong word
+  
 
-    // underline wrongWords
-    
+    const range = wrongWords.find(r => r.start === index);
+    if(range){
+      return (
+          <span
+            key={index}
+            className="text-red-500 px-[1px]"
+            style={{
+            borderBottom: "1px solid red",    
+            lineHeight: 1,                      
+            display: "inline-block"            
+          }}
+          >
+            {currentText.slice(range!.start, range!.end + 1)}
+          </span>
+        );
+    }
+
+    // hehre the index isalready belongs to wrong word we dodnt return it again its returns with the compacted wordd 
+    if(wrongWords.some(obj => index >= obj.start && index <= obj.end)){
+        return null ;
+    }
+     
     return (
       <>
       {/* trach words */}
@@ -74,11 +94,16 @@ export const useTextRender = ({
             </span>
           )}
          {/* original text chars */}
-          <span key={index} className={`px-[1px]  ${className} ${indicator}`}
+         
+         { 
+
+        <span key={index} className={`px-[1px]  ${className} ${indicator}`}
         
-          >
+        >
           {char === " " ? "\u00A0" : char}
         </span>
+          
+         }
       </>
     );
   });

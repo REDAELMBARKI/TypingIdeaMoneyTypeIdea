@@ -9,6 +9,7 @@ import useAudio from "./customHooks/useAudio";
 import { allowedKeys } from "./data/allowdKeys";
 import useBlur from "./customHooks/useBlur";
 import type { currentLetterType } from "./types/maintyping";
+import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
 
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog near the riverbank.",
@@ -32,7 +33,9 @@ const TypingApp: React.FC = () => {
   const [trachChars, setTrachChars] = useState<string[]>([]);
   const [isWrongWord, setIsWrongWord] = useState<boolean>(false);
   const [trachWord, setTrachWord] = useState<string[]>([]);
-  const [wrongWords, setWrongWords] = useState<string[]>([]);
+  const [wrongWords, setWrongWords] = useState<
+    { start: number; end: number }[]
+  >([]);
   // refs
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   //hooks
@@ -44,35 +47,6 @@ const TypingApp: React.FC = () => {
     }
   }, []);
 
-  useEffect(()=>{
-    if(wrongChars.length === 0 || currentText[currentLetter.index ] !== ' ') return ;
-    // here now we are in the end of a word and the previous wordd has error 
-    // lets only add the word to the wrong words if space clicked 
-
-    const asignPreviousWordAsWrong = (e:KeyboardEvent) => {
-      if(e.key !== ' ') return ;
-      //  we get the last index of the char of the previous word with currentLetter.index - 1
-      //  we search for the first char index of the word after space 
-       let wordFirstIndex:number | null = null ;
-       let i:number = currentLetter.index - 1 ;
-       while(currentText[i] !== ' ' && i >= 0 ){
-         wordFirstIndex = i ;
-        i-- ;
-       }
-
-
-
-       // we splice the word starting from first index till currentLetter.index since slice exclude the last the last number we put currentLetter.index istead of currentLetter.index - 1
-     
-       setWrongWords(prev => [...prev , currentText.slice(wordFirstIndex! ,currentLetter.index)])
-
-       
-    }
-    window.addEventListener('keydown' , asignPreviousWordAsWrong)
-
-
-    return () => window.removeEventListener('keydown' , asignPreviousWordAsWrong)
-  },[wrongChars])
   const handleReset = () => {
     // Placeholder for reset functionality
     setCurrentLetter({ index: 0, letter: "", indexBeforeError: null });
@@ -122,6 +96,14 @@ const TypingApp: React.FC = () => {
   }, [inputValue, currentLetter.index, currentText]);
 
   // hooks call
+  useWrongWordsFinder({
+    currentLetter,
+    currentText,
+    setWrongWords,
+    wrongChars,
+    inputValue,
+  });
+
   const renderText = useTextRender({
     currentText,
     currentLetter,
@@ -130,7 +112,7 @@ const TypingApp: React.FC = () => {
     setWrongChars,
     isWrongWord,
     trachWord,
-    wrongWords
+    wrongWords,
   });
   const handleDeleteChar = useCharacterDeleteHook({
     currentText,
@@ -139,7 +121,7 @@ const TypingApp: React.FC = () => {
     wrongChars,
     setWrongChars,
     trachWord,
-    setTrachWord
+    setTrachWord,
   });
 
   // audio player
