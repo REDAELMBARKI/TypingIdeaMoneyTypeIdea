@@ -36,11 +36,25 @@ const TypingApp: React.FC = () => {
   const [wrongWords, setWrongWords] = useState<
     { start: number; end: number }[]
   >([]);
+
+  
   // refs
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   //hooks
   const { isDarkMode } = useThemeHook();
+
+
+
+  useEffect(()=>{console.log(currentLetter.index)},[currentLetter])
+
+
+
+
+
+
+
   // Focus the hidden input on component mount
+
   useEffect(() => {
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
@@ -51,6 +65,7 @@ const TypingApp: React.FC = () => {
     // Placeholder for reset functionality
     setCurrentLetter({ index: 0, letter: "", indexBeforeError: null });
     setInputValue("");
+    setWrongWords([])
     setWrongChars([]);
     const randomText =
       sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
@@ -109,7 +124,6 @@ const TypingApp: React.FC = () => {
     currentLetter,
     inputValue,
     wrongChars,
-    setWrongChars,
     isWrongWord,
     trachWord,
     wrongWords,

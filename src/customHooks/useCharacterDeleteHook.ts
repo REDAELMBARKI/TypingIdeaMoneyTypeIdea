@@ -29,24 +29,20 @@ function useCharacterDeleteHook({
     if (currentLetter.index > 0) {
       // check if this charactre was wrong already if wrong remove it from wrongindexes
       
-      //  console.log("calling delee func")
        if(trachWord.length > 0){
 
         setTrachWord( prev =>prev.slice(0,-1))
 
         return ;
       }
-  
-
+   
+    
+      console.log('wrong chars ' , wrongChars)
       if (wrongChars.includes(currentLetter.index - 1)) {
-        
-        const newArrayOfWrongs = wrongChars.filter(
+     
+        setWrongChars(prev => prev.filter(
           (i) => i !== currentLetter.index - 1
-        );
-        setWrongChars(newArrayOfWrongs);
-
-
-        
+        ));
       }
        
 

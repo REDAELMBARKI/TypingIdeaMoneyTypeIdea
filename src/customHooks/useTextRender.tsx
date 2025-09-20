@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import useThemeHook from "./useThemeHook";
 import type { currentLetterType } from "../types/maintyping";
 
@@ -9,7 +9,6 @@ interface TextRenderProps {
   wrongChars: number[];
 
   isWrongWord: boolean;
-  setWrongChars: React.Dispatch<React.SetStateAction<number[]>>;
   trachWord: string[];
   wrongWords:{start : number , end:number}[];
 }
@@ -19,22 +18,11 @@ export const useTextRender = ({
   currentLetter,
   inputValue,
   wrongChars,
-  setWrongChars,
   trachWord,
   wrongWords
 }: TextRenderProps) => {
   const { isDarkMode } = useThemeHook();
-   
-  console.log('wrong words' , wrongWords)
-  useEffect(() => {
-    if (inputValue === "") return;
-    if (currentLetter.letter !== currentText[currentLetter.index]) {
-      setWrongChars((prev) => {
-        if (prev.includes(currentLetter.index)) return prev;
-        return [...prev, currentLetter.index];
-      });
-    }
-  }, [currentLetter]);
+  
 
   return currentText.split("").map((char, index) => {
     let className = "transition-all duration-150 ";
@@ -84,7 +72,7 @@ export const useTextRender = ({
     }
      
     return (
-      <>
+      <React.Fragment key={index}>
       {/* trach words */}
         {char === " " &&
           index === currentLetter.index &&
@@ -104,7 +92,7 @@ export const useTextRender = ({
         </span>
           
          }
-      </>
+        </React.Fragment>
     );
   });
 };
