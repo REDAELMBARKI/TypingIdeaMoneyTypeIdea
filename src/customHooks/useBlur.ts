@@ -39,7 +39,9 @@ const useBlur = ({
   }, [currentLetter]);
 
   const handleBlurChange = (e: KeyboardEvent) => {
+   
     if (e.key === " ") {
+      
       setIsWrongWord(false);
       // this ref for add theis trached words to a state in case i wanna keep the trach in every word in before
       const word = trachWordRef.current.join("");
@@ -53,7 +55,10 @@ const useBlur = ({
 
     if (e.key === "Backspace") {
       setIsWrongWord(false);
-    } else if (e.key !== "Backspace" && e.key !== " ") {
+    } 
+    
+    else if (e.key !== "Backspace" && e.key !== " ") {
+      // we puch the trach 
       setTrachWord((prev) => [...prev, e.key]);
     }
   };
@@ -62,18 +67,22 @@ const useBlur = ({
     if (
       !hiddenInputRef.current ||
       wrongChars.length === 0 ||
-      currentText[currentLetter.index] !== " "
+      currentLetter.index === 0 ||
+      currentText[currentLetter.index ] !== " "
+      
     ) {
       return;
     }
 
-    // here we the indicator | sets on space before next word and there is wrong chars in before
-
-    setIsWrongWord(true);
-
+    // here  the indicator | sets on space before next word 
+    // and there is wrong chars in before
+      console.log('i m settin gis wrong to true')
+      setIsWrongWord(true);
+    
+    
     window.addEventListener("keydown", handleBlurChange);
     return () => window.removeEventListener("keydown", handleBlurChange);
-  }, [wrongChars, setIsWrongWord, currentLetter]);
+  }, [wrongChars , setIsWrongWord, currentLetter]);
 };
 
 export default useBlur;

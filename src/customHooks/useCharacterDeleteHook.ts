@@ -13,7 +13,11 @@ interface TextRenderProps {
   wrongChars: number[];
   setWrongChars: React.Dispatch<React.SetStateAction<number[]>>;
   trachWord:string[] ;
-  setTrachWord:React.Dispatch<React.SetStateAction<string[]>>
+  setTrachWord:React.Dispatch<React.SetStateAction<string[]>> ;
+  setWrongWords: React.Dispatch<React.SetStateAction<{
+    start: number;
+    end: number;
+}[]>>
 }
 
 function useCharacterDeleteHook({
@@ -23,7 +27,8 @@ function useCharacterDeleteHook({
   wrongChars,
   setWrongChars,
   trachWord ,
-  setTrachWord
+  setTrachWord ,
+  setWrongWords
 }: TextRenderProps) {
    const handleDeleteChar = () => {
     if (currentLetter.index > 0) {
@@ -36,10 +41,12 @@ function useCharacterDeleteHook({
         return ;
       }
    
-    
-      console.log('wrong chars ' , wrongChars)
+      
+      
+      setWrongWords(prev => prev.filter(el => el.end + 1 !== currentLetter.index - 1))
+      
+      
       if (wrongChars.includes(currentLetter.index - 1)) {
-     
         setWrongChars(prev => prev.filter(
           (i) => i !== currentLetter.index - 1
         ));

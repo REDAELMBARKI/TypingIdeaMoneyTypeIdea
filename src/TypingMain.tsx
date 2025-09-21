@@ -12,11 +12,11 @@ import type { currentLetterType } from "./types/maintyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
 
 const sampleTexts = [
-  "The quick brown fox jumps over the lazy dog near the riverbank.",
-  "Technology has revolutionized the way we communicate and share information across the globe.",
-  "Mountains rise majestically against the azure sky while gentle waves lap at the sandy shore below.",
-  "Programming languages evolve continuously to meet the demands of modern software development.",
-  "Nature provides endless inspiration for artists, writers, and creative minds throughout history.",
+  "The quick brown fox jumps over the lazy dog near the riverbank. ",
+  "Technology has revolutionized the way we communicate and share information across the globe. ",
+  "Mountains rise majestically against the azure sky while gentle waves lap at the sandy shore below. ",
+  "Programming languages evolve continuously to meet the demands of modern software development. ",
+  "Nature provides endless inspiration for artists, writers, and creative minds throughout history. ",
 ];
 
 const TypingApp: React.FC = () => {
@@ -45,7 +45,10 @@ const TypingApp: React.FC = () => {
 
 
 
-  useEffect(()=>{console.log(currentLetter.index)},[currentLetter])
+  useEffect(()=>{
+    console.log(currentLetter.index)
+    console.log('wrong words' , isWrongWord)
+  },[currentLetter])
 
 
 
@@ -82,6 +85,8 @@ const TypingApp: React.FC = () => {
       return;
     }
 
+
+    // optional code remove it latter 
     if (isWrongWord) {
       setCurrentLetter((prev) => ({
         ...prev,
@@ -136,6 +141,7 @@ const TypingApp: React.FC = () => {
     setWrongChars,
     trachWord,
     setTrachWord,
+    setWrongWords
   });
 
   // audio player
