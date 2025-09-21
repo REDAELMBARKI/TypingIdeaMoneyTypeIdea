@@ -7,9 +7,11 @@ import { useTextRender } from "./customHooks/useTextRender";
 import useCharacterDeleteHook from "./customHooks/useCharacterDeleteHook";
 import useAudio from "./customHooks/useAudio";
 import { allowedKeys } from "./data/allowdKeys";
-import useBlur from "./customHooks/useBlur";
+import useControlleBoundery from "./customHooks/useControlleBoundery";
 import type { currentLetterType } from "./types/maintyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
+import TypingOverModal from "./partials/typingEndModel";
+import useTypingEnd from "./customHooks/useTypingEnd";
 
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog near the riverbank. ",
@@ -26,10 +28,12 @@ const TypingApp: React.FC = () => {
     letter: "",
     indexBeforeError: null,
   });
-
+  // sound param (mute / activate)
+  const [isEnableSound] = useState<boolean>(false);
+  // game end controller state
+  const [isTypingEnds , setIsTypingEnds] = useState<boolean>(false) ;
   const [inputValue, setInputValue] = useState<string>("");
   const [wrongChars, setWrongChars] = useState<number[]>([]);
-  const [isEnableSound] = useState<boolean>(true);
   const [trachChars, setTrachChars] = useState<string[]>([]);
   const [isWrongWord, setIsWrongWord] = useState<boolean>(false);
   const [trachWord, setTrachWord] = useState<string[]>([]);
@@ -45,16 +49,7 @@ const TypingApp: React.FC = () => {
 
 
 
-  useEffect(()=>{
-    console.log(currentLetter.index)
-    console.log('wrong words' , isWrongWord)
-  },[currentLetter])
-
-
-
-
-
-
+ 
 
   // Focus the hidden input on component mount
 
@@ -86,7 +81,6 @@ const TypingApp: React.FC = () => {
     }
 
 
-    // optional code remove it latter 
     if (isWrongWord) {
       setCurrentLetter((prev) => ({
         ...prev,
@@ -145,8 +139,14 @@ const TypingApp: React.FC = () => {
   });
 
   // audio player
-  useAudio({ allowedKeys, isEnableSound });
-  useBlur({
+  useAudio({ allowedKeys, isEnableSound  });
+
+  // typing secion watcher 
+   
+   useTypingEnd({currentLetter , currentText , setIsTypingEnds})
+
+
+  useControlleBoundery({
     wrongChars,
     hiddenInputRef,
     currentLetter,
@@ -182,6 +182,12 @@ const TypingApp: React.FC = () => {
             <div className="mx-w-full break-words">
               {/* // text render */}
               {renderText}
+            </div>
+            <div>
+              {/* // typing over div model  */}
+              {
+                isTypingEnds && <TypingOverModal onReset={handleReset} />
+              }
             </div>
           </div>
         </div>
