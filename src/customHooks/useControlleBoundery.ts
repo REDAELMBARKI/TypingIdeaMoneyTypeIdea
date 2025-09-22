@@ -12,7 +12,6 @@ interface BlureType {
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   trachWord: string[];
   setTrachWord: React.Dispatch<React.SetStateAction<string[]>>;
-  setCurrentLetter : React.Dispatch<React.SetStateAction<currentLetterType>>
 }
 
 const useBlur = ({
@@ -24,8 +23,7 @@ const useBlur = ({
   setIsWrongWord,
   setInputValue,
   trachWord,
-  setTrachWord,
-  setCurrentLetter
+  setTrachWord
 }: BlureType) => {
   // this collects the extra trach chars and make a word of them
 

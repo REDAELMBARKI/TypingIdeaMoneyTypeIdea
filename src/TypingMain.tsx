@@ -74,40 +74,24 @@ const TypingApp: React.FC = () => {
   };
 
 
-  // space klick 
-  const handleSpaceClick  = () =>{
-       
-        let nextWordIndex:number = currentLetter.index;
-        while(currentText[nextWordIndex] !== " "){
-          
-          nextWordIndex++ ;
-        }
-  
-
-        // console.log(currentText[currentLetter.index] === ' ')
-        // return if the current index in the first letter of a word 
-
-        // set currentletter to the next word index and only if we skipped the first letter of a word
+  // space click  move to next word on ly in second char or more 
 
 
-        if(currentText[currentLetter.index - 1] !== ' ' && currentLetter.index > 0){
-          setCurrentLetter((prev) => ({
-                    ...prev,
-                    index: nextWordIndex,
-                    letter: currentText[nextWordIndex],
-                  }));
-        };
-  }
+
 
   // index incriment controller 
   useEffect(() => {
-    
-    // Only allow one character in input
+
+    if(currentText[currentLetter.index - 1] === " "){
+      setIsWrongWord(false)
+    }
+   // Only allow one character in input
     if (inputValue.length > 1) {
       setInputValue(inputValue.slice(-1));
       return;
     }
-   
+
+    
    
     const typedChar = inputValue;
     const expectedChar = currentText[currentLetter.index];
@@ -190,8 +174,7 @@ const TypingApp: React.FC = () => {
     setIsWrongWord,
     setInputValue,
     trachWord,
-    setTrachWord,
-    setCurrentLetter
+    setTrachWord
   });
   return (
     <div
@@ -247,7 +230,7 @@ const TypingApp: React.FC = () => {
             }
 
             if(e.key === " " ){
-              handleSpaceClick();
+              handleSpaceClickStartinOfSecondChar();
             }
           }}
           type="text"
