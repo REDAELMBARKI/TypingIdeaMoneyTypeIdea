@@ -12,6 +12,7 @@ interface BlureType {
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   trachWord: string[];
   setTrachWord: React.Dispatch<React.SetStateAction<string[]>>;
+  setCurrentLetter : React.Dispatch<React.SetStateAction<currentLetterType>>
 }
 
 const useBlur = ({
@@ -24,6 +25,7 @@ const useBlur = ({
   setInputValue,
   trachWord,
   setTrachWord,
+  setCurrentLetter
 }: BlureType) => {
   // this collects the extra trach chars and make a word of them
 
@@ -40,16 +42,20 @@ const useBlur = ({
 
   const handleBlurChange = (e: KeyboardEvent) => {
     // dont get forward if did not press space 
-    if(currentText[currentLetter.index] === " "){
-         if(e.key !== " "){
+    if(currentText[currentLetter.index] === " " &&
+       wrongChars.length > 0 &&
+       e.key !== " "
+      )
+      {
+        
           setIsWrongWord(true)
-         }
-    }
-    
+         
+      }
+
 
     if (e.key === " ") {
      
-      setIsWrongWord(false);
+        setIsWrongWord(false);
       // this ref for add theis trached words to a state in case i wanna keep the trach in every word in before
       const word = trachWordRef.current.join("");
 

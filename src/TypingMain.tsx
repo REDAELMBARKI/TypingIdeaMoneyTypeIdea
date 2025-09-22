@@ -73,27 +73,61 @@ const TypingApp: React.FC = () => {
     }
   };
 
+
+  // space klick 
+  const handleSpaceClick  = () =>{
+       
+        let nextWordIndex:number = currentLetter.index;
+        while(currentText[nextWordIndex] !== " "){
+          
+          nextWordIndex++ ;
+        }
+  
+
+        // console.log(currentText[currentLetter.index] === ' ')
+        // return if the current index in the first letter of a word 
+
+        // set currentletter to the next word index and only if we skipped the first letter of a word
+
+
+        if(currentText[currentLetter.index - 1] !== ' ' && currentLetter.index > 0){
+          setCurrentLetter((prev) => ({
+                    ...prev,
+                    index: nextWordIndex,
+                    letter: currentText[nextWordIndex],
+                  }));
+        };
+  }
+
+  // index incriment controller 
   useEffect(() => {
+    
     // Only allow one character in input
     if (inputValue.length > 1) {
       setInputValue(inputValue.slice(-1));
       return;
     }
+   
+   
+    const typedChar = inputValue;
+    const expectedChar = currentText[currentLetter.index];
+   
+    if (
+    currentText[currentLetter.index] === " " &&
+    wrongChars.length > 0 &&
+    typedChar !== " "
+  ) {
 
+    // block use to bypass space with any char rather then  space 
+    setIsWrongWord(true);
+    setInputValue(""); 
+    return;
+  }
 
-    if (isWrongWord) {
-      setCurrentLetter((prev) => ({
-        ...prev,
-        index: prev.index,
-        letter: prev.letter,
-      }));
-    }
-
-    // Compare input to currentText
+    // Compare input to currentText[current index]
     if (inputValue.length === 1) {
-      const typedChar = inputValue;
-      const expectedChar = currentText[currentLetter.index];
-
+      
+      //  incriment only if the previous word is correct !iswrongword  
       if (typedChar === expectedChar && !isWrongWord) {
         setCurrentLetter((prev) => ({
           ...prev,
@@ -157,6 +191,7 @@ const TypingApp: React.FC = () => {
     setInputValue,
     trachWord,
     setTrachWord,
+    setCurrentLetter
   });
   return (
     <div
@@ -209,6 +244,10 @@ const TypingApp: React.FC = () => {
           onKeyDown={(e) => {
             if (e.key === "Backspace" || e.key === "Delete") {
               handleDeleteChar();
+            }
+
+            if(e.key === " " ){
+              handleSpaceClick();
             }
           }}
           type="text"
