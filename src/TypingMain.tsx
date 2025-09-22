@@ -81,10 +81,12 @@ const TypingApp: React.FC = () => {
 
   // index incriment controller 
   useEffect(() => {
-
-    if(currentText[currentLetter.index - 1] === " "){
+    // reset is wrong if we are in the bigining of each word
+    if(currentText[currentLetter.index - 1] === " " || currentLetter.index === 0){
       setIsWrongWord(false)
     }
+
+
    // Only allow one character in input
     if (inputValue.length > 1) {
       setInputValue(inputValue.slice(-1));
@@ -229,9 +231,6 @@ const TypingApp: React.FC = () => {
               handleDeleteChar();
             }
 
-            if(e.key === " " ){
-              handleSpaceClickStartinOfSecondChar();
-            }
           }}
           type="text"
           className="absolute -left-9999px opacity-0 pointer-events-none"
