@@ -32,17 +32,16 @@ function useCharacterDeleteHook({
 }: TextRenderProps) {
    const handleDeleteChar = () => {
     if (currentLetter.index > 0) {
-      // check if this charactre was wrong already if wrong remove it from wrongindexes
       
-       if(trachWord.length > 0){
-
+      if(trachWord.length > 0){
+        // check if this charactre was wrong already if wrong remove it from wrongindexes
         setTrachWord( prev =>prev.slice(0,-1))
 
         return ;
       }
    
-      
-      
+
+      // ? 
       setWrongWords(prev => prev.filter(el => el.end + 1 !== currentLetter.index - 1))
       
       
@@ -55,7 +54,7 @@ function useCharacterDeleteHook({
 
       setCurrentLetter((prev) => ({
       index: prev.index - 1,
-      letter: currentText[prev.index - 1] || "",
+      letter: currentText[prev.index - 1] ,
       indexBeforeError: null,
       }));
       

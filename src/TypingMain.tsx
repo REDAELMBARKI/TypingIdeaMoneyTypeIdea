@@ -12,6 +12,7 @@ import type { currentLetterType } from "./types/maintyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
 import TypingOverModal from "./partials/typingEndModel";
 import useTypingEnd from "./customHooks/useTypingEnd";
+import useIndexIncrementer from "./customHooks/useIndexIncrementer";
 
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog near the riverbank. ",
@@ -74,62 +75,13 @@ const TypingApp: React.FC = () => {
   };
 
 
-  // space click  move to next word on ly in second char or more 
-
-
-
-
-  // index incriment controller 
-  useEffect(() => {
-    // reset is wrong if we are in the bigining of each word
-    if(currentText[currentLetter.index - 1] === " " || currentLetter.index === 0){
-      setIsWrongWord(false)
-    }
-
-
-   // Only allow one character in input
-    if (inputValue.length > 1) {
-      setInputValue(inputValue.slice(-1));
-      return;
-    }
-
-    
-   
-    const typedChar = inputValue;
-    const expectedChar = currentText[currentLetter.index];
-   
-    if (
-    currentText[currentLetter.index] === " " &&
-    wrongChars.length > 0 &&
-    typedChar !== " "
-  ) {
-
-    // block use to bypass space with any char rather then  space 
-    setIsWrongWord(true);
-    setInputValue(""); 
-    return;
-  }
-
-    // Compare input to currentText[current index]
-    if (inputValue.length === 1) {
-      
-      //  incriment only if the previous word is correct !iswrongword  
-      if (typedChar === expectedChar && !isWrongWord) {
-        setCurrentLetter((prev) => ({
-          ...prev,
-          index: prev.index + 1,
-          letter: typedChar,
-        }));
-      } else if (typedChar !== expectedChar && !isWrongWord) {
-        setWrongChars((prev) => [...prev, currentLetter.index]);
-        setCurrentLetter((prev) => ({ ...prev, index: prev.index + 1 }));
-      }
-
-      setInputValue(""); // clear for next char
-    }
-  }, [inputValue, currentLetter.index, currentText]);
-
   // hooks call
+
+  // console.log('wrongwords' ,  wrongWords) ;
+  // index incriment controller 
+  useIndexIncrementer({currentText , currentLetter , inputValue , setInputValue , wrongChars ,isWrongWord, setIsWrongWord , setWrongChars ,setCurrentLetter})
+  
+  // findes the wrong words 
   useWrongWordsFinder({
     currentLetter,
     currentText,
@@ -161,7 +113,7 @@ const TypingApp: React.FC = () => {
   // audio player
   useAudio({ allowedKeys, isEnableSound  });
 
-  // typing secion watcher 
+  // typing  watcher 
    
    useTypingEnd({currentLetter , currentText , setIsTypingEnds})
 
