@@ -10,7 +10,6 @@ interface useIncrimenterProps {
     React.SetStateAction<{
       index: number;
       letter: string;
-      indexBeforeError: number | null;
     }>
   >;
       setIsWrongWord: React.Dispatch<React.SetStateAction<boolean>>;
@@ -64,7 +63,10 @@ function useIndexIncrementer({currentText , currentLetter , inputValue , setInpu
           letter: typedChar,
         }));
       } else if (typedChar !== expectedChar && !isWrongWord) {
-        setWrongChars((prev) => [...prev, currentLetter.index]);
+        // skip spaces dont add then to wrong chars 
+        if(currentText[currentLetter.index] !== " "){
+          setWrongChars((prev) => [...prev, currentLetter.index]);
+        }
         setCurrentLetter((prev) => ({ ...prev, index: prev.index + 1 }));
       }
 

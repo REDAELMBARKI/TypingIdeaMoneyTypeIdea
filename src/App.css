@@ -73,3 +73,28 @@
    }
 
 }
+
+/* caps on */
+.caps-indicator {
+  position: absolute;
+  top: 13%;
+  right: 50%;
+  padding: 8px 14px;
+  transform: translateX(50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 225, 255, 0.15);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  color: #44aeff;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
+.caps-indicator .icon {
+  font-size: 16px;
+}
+
+/* end caps on */

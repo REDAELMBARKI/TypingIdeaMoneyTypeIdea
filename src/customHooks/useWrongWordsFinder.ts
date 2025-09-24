@@ -14,13 +14,11 @@ interface wrongWordsProps {
 
 export const useWrongWordsFinder = ({currentLetter , currentText , setWrongWords , wrongChars , inputValue}:wrongWordsProps) =>{
       useEffect(()=>{
-        console.log('current index ' , currentText[currentLetter.index] )
         if(currentText[currentLetter.index] !== ' ') return ;
         // here now we are in the end of a word and the previous wordd has error 
         // lets only add the word to the wrong words if space clicked 
         
         const asignPreviousWordAsWrong = (e:KeyboardEvent) => {
-          console.log("here i m")
           
           if(e.key !== ' ') return ;
           
@@ -43,7 +41,6 @@ export const useWrongWordsFinder = ({currentLetter , currentText , setWrongWords
                  }
             }
 
-            console.log("is wrong " , isInWrongChars )
             if(isInWrongChars){
                setWrongWords(prev => [...prev , {start: wordFirstIndex, end : currentLetter.index - 1}])
             }
@@ -54,7 +51,7 @@ export const useWrongWordsFinder = ({currentLetter , currentText , setWrongWords
     
     
         return () => window.removeEventListener('keydown' , asignPreviousWordAsWrong)
-      },[wrongChars,inputValue , currentLetter])
+      },[wrongChars,inputValue , currentLetter.index])
 
 
 

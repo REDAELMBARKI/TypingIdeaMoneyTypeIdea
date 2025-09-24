@@ -14,7 +14,7 @@ interface BlureType {
   setTrachWord: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const useBlur = ({
+const useControlleBoundery = ({
   wrongChars,
   hiddenInputRef,
   currentLetter,
@@ -97,4 +97,4 @@ const useBlur = ({
   }, [wrongChars , setIsWrongWord, currentLetter]);
 };
 
-export default useBlur;
+export default useControlleBoundery;

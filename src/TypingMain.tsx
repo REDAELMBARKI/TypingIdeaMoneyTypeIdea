@@ -13,6 +13,7 @@ import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
 import TypingOverModal from "./partials/typingEndModel";
 import useTypingEnd from "./customHooks/useTypingEnd";
 import useIndexIncrementer from "./customHooks/useIndexIncrementer";
+import CapsOnModel from "./components/CapsOnModel";
 
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog near the riverbank. ",
@@ -26,8 +27,7 @@ const TypingApp: React.FC = () => {
   const [currentText, setCurrentText] = useState<string>(sampleTexts[0]);
   const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
     index: 0,
-    letter: "",
-    indexBeforeError: null,
+    letter: ""
   });
   // sound param (mute / activate)
   const [isEnableSound] = useState<boolean>(false);
@@ -42,7 +42,9 @@ const TypingApp: React.FC = () => {
     { start: number; end: number }[]
   >([]);
 
-  
+  const [isCapsOn, setIsCapsOn] = useState<boolean>(false);
+
+
   // refs
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   //hooks
@@ -50,7 +52,15 @@ const TypingApp: React.FC = () => {
 
 
 
- 
+  // caps listener
+  useEffect(()=>{
+     const capsListner = (e:KeyboardEvent) => {
+         setIsCapsOn(e.getModifierState("CapsLock")) ;
+     }
+
+     window.addEventListener('keydown' , capsListner)
+     return () => window.removeEventListener('keydown' , capsListner)
+  },[])
 
   // Focus the hidden input on component mount
 
@@ -62,7 +72,7 @@ const TypingApp: React.FC = () => {
 
   const handleReset = () => {
     // Placeholder for reset functionality
-    setCurrentLetter({ index: 0, letter: "", indexBeforeError: null });
+    setCurrentLetter({ index: 0, letter: "" });
     setInputValue("");
     setWrongWords([])
     setWrongChars([]);
@@ -77,7 +87,6 @@ const TypingApp: React.FC = () => {
 
   // hooks call
 
-  // console.log('wrongwords' ,  wrongWords) ;
   // index incriment controller 
   useIndexIncrementer({currentText , currentLetter , inputValue , setInputValue , wrongChars ,isWrongWord, setIsWrongWord , setWrongChars ,setCurrentLetter})
   
@@ -138,6 +147,10 @@ const TypingApp: React.FC = () => {
     >
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pb-20">
+         {/* inform for caps on case  */}
+         {
+           isCapsOn && <CapsOnModel />
+         }
         {/* Text Display */}
         <div className="w-full max-w-screen mx-auto mt-5">
           <div
