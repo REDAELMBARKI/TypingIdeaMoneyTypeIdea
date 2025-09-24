@@ -23,6 +23,7 @@ interface useIncrimenterProps {
 
 function useIndexIncrementer({currentText , currentLetter , inputValue , setInputValue , wrongChars ,isWrongWord, setIsWrongWord , setWrongChars ,setCurrentLetter}:useIncrimenterProps) {
    useEffect(() => {
+    
     // reset is wrong if we are in the bigining of each word
     if(currentText[currentLetter.index - 1] === " " || currentLetter.index === 0){
       setIsWrongWord(false)
@@ -40,17 +41,27 @@ function useIndexIncrementer({currentText , currentLetter , inputValue , setInpu
     const typedChar = inputValue;
     const expectedChar = currentText[currentLetter.index];
    
+    // this cazing the indiacator free
+
+
     if (
     currentText[currentLetter.index] === " " &&
     wrongChars.length > 0 &&
     typedChar !== " "
   ) {
 
-    // block use to bypass space with any char rather then  space 
+    // block user to bypass space with any char rather then  space (the end of a word)
     setIsWrongWord(true);
     setInputValue(""); 
     return;
   }
+  else{
+       // make isworng false as we still eiditing the current word 
+       setIsWrongWord(false);
+  }
+
+
+
 
     // Compare input to currentText[current index]
     if (inputValue.length === 1) {
@@ -70,7 +81,7 @@ function useIndexIncrementer({currentText , currentLetter , inputValue , setInpu
         setCurrentLetter((prev) => ({ ...prev, index: prev.index + 1 }));
       }
 
-      setInputValue(""); // clear for next char
+      setInputValue(""); // clear the input 
     }
   }, [inputValue, currentLetter.index, currentText]);
 

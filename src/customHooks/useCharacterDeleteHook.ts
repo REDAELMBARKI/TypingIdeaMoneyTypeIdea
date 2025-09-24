@@ -50,6 +50,7 @@ function useCharacterDeleteHook({
         ));
       }
        
+      console.log("deleting " )
 
       setCurrentLetter((prev) => ({
       index: prev.index - 1,

@@ -50,7 +50,7 @@ const TypingApp: React.FC = () => {
   //hooks
   const { isDarkMode } = useThemeHook();
 
-
+ 
 
   // caps listener
   useEffect(()=>{
