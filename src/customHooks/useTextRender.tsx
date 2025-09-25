@@ -7,7 +7,7 @@ interface TextRenderProps {
   currentText: string;
   inputValue: string;
   wrongChars: number[];
-
+  isTypingActive :boolean ;
   isWrongWord: boolean;
   trachWord: string[];
   wrongWords:{start : number , end:number}[];
@@ -19,7 +19,8 @@ export const useTextRender = ({
   inputValue,
   wrongChars,
   trachWord,
-  wrongWords
+  wrongWords ,
+  isTypingActive
 }: TextRenderProps) => {
   const { isDarkMode } = useThemeHook();
   
@@ -29,13 +30,13 @@ export const useTextRender = ({
 
     if (index > currentLetter.index - 1) {
       // Untyped letters
-      className += isDarkMode ? "text-gray-400" : "text-gray-600";
+      className += isDarkMode ? "text-gray-700" : "text-gray-700";
     } else if (wrongChars.includes(index)) {
       // Wrong chars
-      className += "text-red-500";
+      className += "text-red-700";
     } else {
       // Correct typed chars
-      className += isDarkMode ? "text-white" : "text-black";
+      className += isDarkMode ? "text-slate-300" : "text-black";
     }
 
     // Custom indicator logic
@@ -51,17 +52,24 @@ export const useTextRender = ({
 
     const range = wrongWords.find(r => r.start === index);
     if(range){
-      return (
+       const word = currentText.slice(range.start, range.end + 1);
+
+        return (
           <span
             key={index}
-            className="text-red-500 px-[1px]"
-            style={{
-            borderBottom: "1px solid red",    
-            lineHeight: 1,                      
-            display: "inline-block"            
-          }}
+            className="px-[1px] underLineBefore"
+            style={{ display: "inline-block" }}
           >
-            {currentText.slice(range!.start, range!.end + 1)}
+            {word.split('').map((char, i) => (
+              <span
+                key={i}
+                style={{
+                  color: wrongChars.some(ch_index => currentText[ch_index] === char ) ? 'red' : 'white',
+                }}
+              >
+                {char}
+              </span>
+            ))}
           </span>
         );
     }
@@ -77,7 +85,7 @@ export const useTextRender = ({
         {char === " " &&
           index === currentLetter.index &&
           trachWord.length > 0 && (
-            <span className="trach-word text-red-400">
+            <span className="trach-word text-red-800">
               {trachWord.join("")}
             </span>
           )}
@@ -85,7 +93,7 @@ export const useTextRender = ({
          
          { 
 
-        <span key={index} className={`px-[1px]  ${className} ${indicator}`}
+        <span key={index} className={`px-[1px]  ${className} ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
         
         >
           {char === " " ? "\u00A0" : char}

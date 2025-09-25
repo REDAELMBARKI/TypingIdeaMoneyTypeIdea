@@ -38,6 +38,7 @@ const TypingApp: React.FC = () => {
   const [trachChars, setTrachChars] = useState<string[]>([]);
   const [isWrongWord, setIsWrongWord] = useState<boolean>(false);
   const [trachWord, setTrachWord] = useState<string[]>([]);
+  const [isTypingActive , setIsTypingActive] = useState<boolean>(false);
   const [wrongWords, setWrongWords] = useState<
     { start: number; end: number }[]
   >([]);
@@ -50,7 +51,7 @@ const TypingApp: React.FC = () => {
   //hooks
   const { isDarkMode } = useThemeHook();
 
- 
+  console.log("wrong words" , wrongWords)
 
   // caps listener
   useEffect(()=>{
@@ -84,7 +85,21 @@ const TypingApp: React.FC = () => {
     }
   };
 
+ 
+  useEffect(()=>{
+      const handleKeyDown = () =>  setIsTypingActive(true) ;
+      
+      const handleKeyUp = () => setIsTypingActive(false) ;
+      
+      window.addEventListener('keydown' ,handleKeyDown)
+      window.addEventListener('keyup' ,handleKeyUp)
 
+
+      return () => {
+         window.removeEventListener('keydown' , handleKeyDown)
+         window.removeEventListener('keyup' , handleKeyUp)
+      }
+  } ,[])
   // hooks call
 
   // index incriment controller 
@@ -107,6 +122,7 @@ const TypingApp: React.FC = () => {
     isWrongWord,
     trachWord,
     wrongWords,
+    isTypingActive
   });
   const handleDeleteChar = useCharacterDeleteHook({
     currentText,
