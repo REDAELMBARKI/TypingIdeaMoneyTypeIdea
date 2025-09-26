@@ -46,7 +46,7 @@ const useControlleBoundery = ({
       )
       {
         
-          setIsWrongWord(true)
+          setIsWrongWord(true) 
          
       }
 
@@ -58,8 +58,10 @@ const useControlleBoundery = ({
       const word = trachWordRef.current.join("");
 
       setInputValue((prev) => prev.replace(word, ""));
-
+      
+     
       setTrachChars((prev) => [...prev, word]);
+      
 
       setTrachWord([]);
     }

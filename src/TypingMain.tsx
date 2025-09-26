@@ -5,7 +5,7 @@ import States from "./partials/States";
 import Reseter from "./partials/Reseter";
 import { useTextRender } from "./customHooks/useTextRender";
 import useCharacterDeleteHook from "./customHooks/useCharacterDeleteHook";
-import useAudio from "./customHooks/useAudio";
+import useTypingSound from "./customHooks/useTypingSound";
 import { allowedKeys } from "./data/allowdKeys";
 import useControlleBoundery from "./customHooks/useControlleBoundery";
 import type { currentLetterType } from "./types/maintyping";
@@ -14,6 +14,8 @@ import TypingOverModal from "./partials/typingEndModel";
 import useTypingEnd from "./customHooks/useTypingEnd";
 import useIndexIncrementer from "./customHooks/useIndexIncrementer";
 import CapsOnModel from "./components/CapsOnModel";
+import useTypingWatcher from "./customHooks/useTypingWatcher";
+import useErrorTypingSound from "./customHooks/useErrorTypingSound";
 
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog near the riverbank. ",
@@ -30,7 +32,8 @@ const TypingApp: React.FC = () => {
     letter: ""
   });
   // sound param (mute / activate)
-  const [isEnableSound] = useState<boolean>(true);
+  const [isNormalTypingSoundEnabled] = useState<boolean>(true);
+  const [isErrorSoundEnabled] =  useState<boolean>(false);
   // game end controller state
   const [isTypingEnds , setIsTypingEnds] = useState<boolean>(false) ;
   const [inputValue, setInputValue] = useState<string>("");
@@ -85,22 +88,10 @@ const TypingApp: React.FC = () => {
   };
 
  
-  useEffect(()=>{
-      const handleKeyDown = () =>  setIsTypingActive(true) ;
-      
-      const handleKeyUp = () => setIsTypingActive(false) ;
-      
-      window.addEventListener('keydown' ,handleKeyDown)
-      window.addEventListener('keyup' ,handleKeyUp)
-
-
-      return () => {
-         window.removeEventListener('keydown' , handleKeyDown)
-         window.removeEventListener('keyup' , handleKeyUp)
-      }
-  } ,[])
+ 
   // hooks call
-
+   // typing watcher (typing active or not)
+   useTypingWatcher({setIsTypingActive})
   // index incriment controller 
   useIndexIncrementer({currentText , currentLetter , inputValue , setInputValue , wrongChars ,isWrongWord, setIsWrongWord , setWrongChars ,setCurrentLetter})
   
@@ -135,11 +126,15 @@ const TypingApp: React.FC = () => {
   });
 
   // audio player
-  useAudio({ allowedKeys, isEnableSound  });
+    // regular typing sound
+    useTypingSound({ allowedKeys, isNormalTypingSoundEnabled  });
+    //error sound
+    useErrorTypingSound({inputValue , currentLetter , currentText ,isErrorSoundEnabled})
+
 
   // typing  watcher 
-   
    useTypingEnd({currentLetter , currentText , setIsTypingEnds})
+
 
 
   useControlleBoundery({

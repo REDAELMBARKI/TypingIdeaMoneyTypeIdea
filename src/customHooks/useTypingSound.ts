@@ -2,12 +2,12 @@ import { useEffect } from "react";
 
 interface audioProps {
   allowedKeys: Set<string>;
-  isEnableSound: boolean;
+  isNormalTypingSoundEnabled: boolean;
 
 }
-const useAudio = ({ allowedKeys, isEnableSound }: audioProps) => {
+const useTypingSound = ({ allowedKeys, isNormalTypingSoundEnabled }: audioProps) => {
   useEffect(() => {
-    if (!isEnableSound) return;
+    if (!isNormalTypingSoundEnabled) return;
     const regularkey = new Audio("/sounds/keyboard-click.mp3");
     const del = new Audio("/sounds/del-key.mp3");
 
@@ -35,4 +35,4 @@ const useAudio = ({ allowedKeys, isEnableSound }: audioProps) => {
   return null;
 };
 
-export default useAudio;
+export default useTypingSound;
