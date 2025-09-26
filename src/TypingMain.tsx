@@ -30,7 +30,7 @@ const TypingApp: React.FC = () => {
     letter: ""
   });
   // sound param (mute / activate)
-  const [isEnableSound] = useState<boolean>(false);
+  const [isEnableSound] = useState<boolean>(true);
   // game end controller state
   const [isTypingEnds , setIsTypingEnds] = useState<boolean>(false) ;
   const [inputValue, setInputValue] = useState<string>("");
@@ -51,7 +51,6 @@ const TypingApp: React.FC = () => {
   //hooks
   const { isDarkMode } = useThemeHook();
 
-  console.log("wrong words" , wrongWords)
 
   // caps listener
   useEffect(()=>{
@@ -180,7 +179,7 @@ const TypingApp: React.FC = () => {
             }
           `}
           >
-            <div className="mx-w-full break-words">
+            <div className="mx-w-full hitespace-normal break-words break-keep ">
               {/* // text render */}
               {renderText}
             </div>

@@ -12,7 +12,19 @@ interface TextRenderProps {
   trachWord: string[];
   wrongWords:{start : number , end:number}[];
 }
+interface colors {
+  red : string
+  white  : string
+  gray : string
+  darkRed : string
+}
 
+const  colors:colors= {
+    red: 'text-red-400' ,
+    white: 'text-slate-400' ,
+    gray : 'text-gray-400' ,
+    darkRed: 'text-red-900' ,
+};
 export const useTextRender = ({
   currentText,
   currentLetter,
@@ -24,19 +36,21 @@ export const useTextRender = ({
 }: TextRenderProps) => {
   const { isDarkMode } = useThemeHook();
   
+  
+
 
   return currentText.split("").map((char, index) => {
     let className = "transition-all duration-150 ";
 
     if (index > currentLetter.index - 1) {
       // Untyped letters
-      className += isDarkMode ? "text-gray-700" : "text-gray-700";
+      className += isDarkMode ? "text-gray-700" : colors.gray;
     } else if (wrongChars.includes(index)) {
       // Wrong chars
-      className += "text-red-700";
+      className += colors.red;
     } else {
       // Correct typed chars
-      className += isDarkMode ? "text-slate-300" : "text-black";
+      className += isDarkMode ? colors.white : "text-black";
     }
 
     // Custom indicator logic
@@ -55,22 +69,35 @@ export const useTextRender = ({
        const word = currentText.slice(range.start, range.end + 1);
 
         return (
-          <span
-            key={index}
-            className="px-[1px] underLineBefore"
-            style={{ display: "inline-block" }}
-          >
-            {word.split('').map((char, i) => (
-              <span
-                key={i}
-                style={{
-                  color: wrongChars.some(ch_index => currentText[ch_index] === char ) ? 'red' : 'white',
-                }}
-              >
-                {char}
+         <span
+              key={`wrong-${range.start}`}
+              className="underLineBefore "
+              style={{ display: "inline-block", position: "relative", whiteSpace: "nowrap" }}
+            >
+              <span className="char-wrapper"   style={{whiteSpace : "nowrap"  }}
+                      >
+                {word.split("").map((char, charIndex) => {
+                  const globalCharIndex = range.start + charIndex;
+                  return (
+                    <span
+                      key={charIndex}
+                      className={`char-span text-3xl inline-block  ${wrongChars.includes(globalCharIndex) ? colors.red : colors.white} `}
+                      style={{letterSpacing:0.07 + "em" , whiteSpace : "nowrap"  }}
+                      
+                    
+                    >
+                      {char}
+                    </span>
+                  );
+                })}
               </span>
-            ))}
-          </span>
+
+              {/* Block underline below the word */}
+              <span className="underline-block"></span>
+            </span>
+
+
+
         );
     }
 
@@ -80,12 +107,15 @@ export const useTextRender = ({
     }
      
     return (
-      <React.Fragment key={index}>
+      <React.Fragment key={index} >
       {/* trach words */}
         {char === " " &&
           index === currentLetter.index &&
           trachWord.length > 0 && (
-            <span className="trach-word text-red-800">
+            <span className={`trach-word  text-3xl inline-block  ${colors.darkRed} `} 
+            
+            style={{ whiteSpace : "nowrap"  }} 
+            >
               {trachWord.join("")}
             </span>
           )}
@@ -93,7 +123,7 @@ export const useTextRender = ({
          
          { 
 
-        <span key={index} className={`px-[1px]  ${className} ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
+        <span key={index} style={{ whiteSpace : "nowrap"  }} className={`px-[1px] text-3xl inline-block   ${className} ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
         
         >
           {char === " " ? "\u00A0" : char}
