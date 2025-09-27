@@ -8,7 +8,7 @@ import useCharacterDeleteHook from "./customHooks/useCharacterDeleteHook";
 import useTypingSound from "./customHooks/useTypingSound";
 import { allowedKeys } from "./data/allowdKeys";
 import useControlleBoundery from "./customHooks/useControlleBoundery";
-import type { currentLetterType } from "./types/maintyping";
+import type { currentLetterType, WordHistoryItem } from "./types/maintyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
 import TypingOverModal from "./partials/typingEndModel";
 import useTypingEnd from "./customHooks/useTypingEnd";
@@ -16,6 +16,7 @@ import useIndexIncrementer from "./customHooks/useIndexIncrementer";
 import CapsOnModel from "./components/CapsOnModel";
 import useTypingWatcher from "./customHooks/useTypingWatcher";
 import useErrorTypingSound from "./customHooks/useErrorTypingSound";
+import useSpaceJump from "./customHooks/useSpaceJump";
 
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog near the riverbank. ",
@@ -29,25 +30,28 @@ const TypingApp: React.FC = () => {
   const [currentText, setCurrentText] = useState<string>(sampleTexts[0]);
   const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
     index: 0,
-    letter: ""
+    letter: "",
   });
+  // spaces tracker where the word left of before landing to next word
+  const [wordHistory, setWordHistory] = useState<WordHistoryItem[]>([]);
+  // ----------------------------------------------------------------------
   // sound param (mute / activate)
-  const [isNormalTypingSoundEnabled] = useState<boolean>(true);
-  const [isErrorSoundEnabled] =  useState<boolean>(false);
+  const [isNormalTypingSoundEnabled] = useState<boolean>(false);
+  const [isErrorSoundEnabled] = useState<boolean>(false);
   // game end controller state
-  const [isTypingEnds , setIsTypingEnds] = useState<boolean>(false) ;
+  const [isTypingEnds, setIsTypingEnds] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [wrongChars, setWrongChars] = useState<number[]>([]);
-  const [trachChars, setTrachChars] = useState<string[]>([]);
+
   const [isWrongWord, setIsWrongWord] = useState<boolean>(false);
+  // wrong chars is not preserving the chars its deletes them after jumping to next word
   const [trachWord, setTrachWord] = useState<string[]>([]);
-  const [isTypingActive , setIsTypingActive] = useState<boolean>(false);
+  const [isTypingActive, setIsTypingActive] = useState<boolean>(false);
   const [wrongWords, setWrongWords] = useState<
     { start: number; end: number }[]
   >([]);
 
   const [isCapsOn, setIsCapsOn] = useState<boolean>(false);
-
 
   // refs
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
@@ -55,15 +59,21 @@ const TypingApp: React.FC = () => {
   const { isDarkMode } = useThemeHook();
 
 
-  // caps listener
-  useEffect(()=>{
-     const capsListner = (e:KeyboardEvent) => {
-         setIsCapsOn(e.getModifierState("CapsLock")) ;
-     }
 
-     window.addEventListener('keydown' , capsListner)
-     return () => window.removeEventListener('keydown' , capsListner)
-  },[])
+ // console logs ////////////////
+ 
+ useEffect(()=>{console.log(wordHistory)}, [wordHistory])
+///////////////////////////////////
+
+  // caps listener
+  useEffect(() => {
+    const capsListner = (e: KeyboardEvent) => {
+      setIsCapsOn(e.getModifierState("CapsLock"));
+    };
+
+    window.addEventListener("keydown", capsListner);
+    return () => window.removeEventListener("keydown", capsListner);
+  }, []);
 
   // Focus the hidden input on component mount
 
@@ -77,7 +87,7 @@ const TypingApp: React.FC = () => {
     // Placeholder for reset functionality
     setCurrentLetter({ index: 0, letter: "" });
     setInputValue("");
-    setWrongWords([])
+    setWrongWords([]);
     setWrongChars([]);
     const randomText =
       sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
@@ -87,21 +97,40 @@ const TypingApp: React.FC = () => {
     }
   };
 
- 
- 
   // hooks call
-   // typing watcher (typing active or not)
-   useTypingWatcher({setIsTypingActive})
-  // index incriment controller 
-  useIndexIncrementer({currentText , currentLetter , inputValue , setInputValue , wrongChars ,isWrongWord, setIsWrongWord , setWrongChars ,setCurrentLetter})
-  
-  // findes the wrong words 
+
+  // jumps to next word in space clicking (before the current word ends)
+  useSpaceJump({
+    inputValue,
+    currentLetter,
+    currentText,
+    setCurrentLetter,
+    setWordHistory,
+  });
+
+  // typing watcher (typing active or not)
+  useTypingWatcher({ setIsTypingActive });
+  // index incriment controller
+  useIndexIncrementer({
+    currentText,
+    currentLetter,
+    inputValue,
+    setInputValue,
+    wrongChars,
+    isWrongWord,
+    setIsWrongWord,
+    setWrongChars,
+    setCurrentLetter,
+  });
+
+  // findes the wrong words
   useWrongWordsFinder({
     currentLetter,
     currentText,
     setWrongWords,
     wrongChars,
     inputValue,
+    wrongWords,
   });
 
   const renderText = useTextRender({
@@ -112,7 +141,7 @@ const TypingApp: React.FC = () => {
     isWrongWord,
     trachWord,
     wrongWords,
-    isTypingActive
+    isTypingActive,
   });
   const handleDeleteChar = useCharacterDeleteHook({
     currentText,
@@ -122,32 +151,34 @@ const TypingApp: React.FC = () => {
     setWrongChars,
     trachWord,
     setTrachWord,
-    setWrongWords
+    setWrongWords,
+    wrongWords,
+    wordHistory
   });
 
   // audio player
-    // regular typing sound
-    useTypingSound({ allowedKeys, isNormalTypingSoundEnabled  });
-    //error sound
-    useErrorTypingSound({inputValue , currentLetter , currentText ,isErrorSoundEnabled})
+  // regular typing sound
+  useTypingSound({ allowedKeys, isNormalTypingSoundEnabled });
+  //error sound
+  useErrorTypingSound({
+    inputValue,
+    currentLetter,
+    currentText,
+    isErrorSoundEnabled,
+  });
 
-
-  // typing  watcher 
-   useTypingEnd({currentLetter , currentText , setIsTypingEnds})
-
-
+  // typing  watcher
+  useTypingEnd({ currentLetter, currentText, setIsTypingEnds });
 
   useControlleBoundery({
     wrongChars,
     hiddenInputRef,
     currentLetter,
     currentText,
-    setTrachChars,
-    trachChars,
     setIsWrongWord,
     setInputValue,
     trachWord,
-    setTrachWord
+    setTrachWord,
   });
   return (
     <div
@@ -157,10 +188,8 @@ const TypingApp: React.FC = () => {
     >
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pb-20">
-         {/* inform for caps on case  */}
-         {
-           isCapsOn && <CapsOnModel />
-         }
+        {/* inform for caps on case  */}
+        {isCapsOn && <CapsOnModel />}
         {/* Text Display */}
         <div className="w-full max-w-screen mx-auto mt-5">
           <div
@@ -180,9 +209,7 @@ const TypingApp: React.FC = () => {
             </div>
             <div>
               {/* // typing over div model  */}
-              {
-                isTypingEnds && <TypingOverModal onReset={handleReset} />
-              }
+              {isTypingEnds && <TypingOverModal onReset={handleReset} />}
             </div>
           </div>
         </div>
@@ -205,7 +232,6 @@ const TypingApp: React.FC = () => {
             if (e.key === "Backspace" || e.key === "Delete") {
               handleDeleteChar();
             }
-
           }}
           type="text"
           className="absolute -left-9999px opacity-0 pointer-events-none"

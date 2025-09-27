@@ -1,7 +1,8 @@
 import type { currentLetterType } from "../types/maintyping";
 
 import { useEffect } from "react";
-
+// Import just the function
+// import isEqual from 'lodash/isEqual';
 
 interface wrongWordsProps {
         currentText: string;
@@ -9,19 +10,26 @@ interface wrongWordsProps {
         setWrongWords: React.Dispatch<React.SetStateAction<{ start: number;end: number;}[]>> ;
        wrongChars: number[];
        inputValue : string ;
+       wrongWords : { start: number;end: number;}[] ;
 
 }
 
+
+
+
 export const useWrongWordsFinder = ({currentLetter , currentText , setWrongWords , wrongChars , inputValue}:wrongWordsProps) =>{
+
       useEffect(()=>{
+
         if(currentText[currentLetter.index] !== ' ') return ;
         // here now we are in the end of a word and the previous wordd has error 
         // lets only add the word to the wrong words if space clicked 
         
         const asignPreviousWordAsWrong = (e:KeyboardEvent) => {
           
-          if(e.key !== ' ') return ;
+          if(e.key !== ' ' ) return ;
           
+
 
           //  we get the last index of the char of the previous word with currentLetter.index - 1
           //  we search for the first char index of the word after space 
@@ -32,20 +40,16 @@ export const useWrongWordsFinder = ({currentLetter , currentText , setWrongWords
             i-- ;
            }
        
-            let isInWrongChars:boolean = false ;
-            for(let i = wordFirstIndex ; i <=  currentLetter.index - 1 ; i++){
-                 if(wrongChars.includes(i)){
-                  
-                   isInWrongChars  =  true ;
-                   break ;
-                 }
-            }
-
-
-            if(isInWrongChars){
-               setWrongWords(prev => [...prev , {start: wordFirstIndex, end : currentLetter.index - 1}])
-            }
-    
+            // check if the word range first index letter - last index letter is in wrongchars array
+            const isInWrongChars = wrongChars.some(el_index =>  el_index >= wordFirstIndex && el_index <= currentLetter.index - 1 )
+         
+          
+            if (isInWrongChars) {
+                setWrongWords((prev) => [
+                  ...prev,
+                  { start: wordFirstIndex, end: currentLetter.index - 1 }
+                ]);  
+             }
         }
 
         window.addEventListener('keydown' , asignPreviousWordAsWrong)
@@ -58,3 +62,5 @@ export const useWrongWordsFinder = ({currentLetter , currentText , setWrongWords
 
 
 }
+
+

@@ -6,8 +6,7 @@ interface BlureType {
   wrongChars: number[];
   currentLetter: currentLetterType;
   currentText: string;
-  trachChars: string[];
-  setTrachChars: React.Dispatch<React.SetStateAction<string[]>>;
+
   setIsWrongWord: React.Dispatch<React.SetStateAction<boolean>>;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   trachWord: string[];
@@ -19,7 +18,6 @@ const useControlleBoundery = ({
   hiddenInputRef,
   currentLetter,
   currentText,
-  setTrachChars,
   setIsWrongWord,
   setInputValue,
   trachWord,
@@ -58,11 +56,8 @@ const useControlleBoundery = ({
       const word = trachWordRef.current.join("");
 
       setInputValue((prev) => prev.replace(word, ""));
-      
-     
-      setTrachChars((prev) => [...prev, word]);
-      
 
+      // empty traches extra chars in space click 
       setTrachWord([]);
     }
 
@@ -74,7 +69,10 @@ const useControlleBoundery = ({
     else if (e.key !== "Backspace" && e.key !== " ") {
       
       // we puch the trach 
-      setTrachWord((prev) => [...prev, e.key]);
+      if(trachWord.length < 7){
+        setTrachWord((prev) => [...prev, e.key]);
+      }
+      
     }
   };
 

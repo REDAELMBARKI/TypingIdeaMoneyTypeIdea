@@ -1,0 +1,54 @@
+import { useEffect } from "react";
+import type { currentLetterType, WordHistoryItem } from "../types/maintyping";
+
+
+interface spaceJumpPropps {
+   inputValue : string ;
+   currentLetter : currentLetterType ;
+   currentText :string ;
+   setCurrentLetter: React.Dispatch<React.SetStateAction<currentLetterType>> ;
+   setWordHistory: React.Dispatch<React.SetStateAction<WordHistoryItem[]>> ;
+}
+
+ 
+const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentLetter ,setWordHistory}:spaceJumpPropps) => {
+  
+      useEffect(()=>{
+                        
+                if(inputValue !== " ") return ;
+                //prevent executning this hook in case theindicator at the start of a word |
+                if(currentLetter.index === 0)  return ;
+                
+                // prevent executning this hook in case the indicator at the start of a word after the first word (skips the first word of the text);
+                if(currentText[currentLetter.index - 1] === " ") return ;
+ 
+              
+                // the start of the next word   
+                let nextWordFirstIndexStarts:number = currentLetter.index ;
+
+                while(nextWordFirstIndexStarts < currentText.length &&  currentText[nextWordFirstIndexStarts] !== " "){
+                    nextWordFirstIndexStarts++
+                }
+
+                    
+                // preserve where we left of the previous word  so we get back to it diireclty after spaace clicking ; 
+                let wordStart = currentLetter.index;
+                while(wordStart > 0 && currentText[wordStart - 1] !== ' ') {
+                wordStart--;
+                }
+             
+                setWordHistory(prev => ([...prev , {start: wordStart ,lastTypedIndex:currentLetter.index}]))
+            
+                
+                // set current index to next word begining
+                setCurrentLetter({
+                    index: nextWordFirstIndexStarts,
+                    letter: currentText[nextWordFirstIndexStarts] ?? "",
+                });
+                 
+      },[currentLetter ,inputValue , currentLetter.index])
+
+}
+
+
+export default useSpaceJump ;
