@@ -24,6 +24,8 @@ interface useIncrimenterProps {
 function useIndexIncrementer({currentText , currentLetter , inputValue , setInputValue , wrongChars ,isWrongWord, setIsWrongWord , setWrongChars ,setCurrentLetter}:useIncrimenterProps) {
    useEffect(() => {
     
+    // prevent space click to be treated as wrongchar (eather jump to next word or stick) as we are not in space position 
+    if(currentText[currentLetter.index] !== " "  && inputValue === " " ) return ;
     // reset is wrong if we are in the bigining of each word
     if(currentText[currentLetter.index - 1] === " " || currentLetter.index === 0){
       setIsWrongWord(false)
@@ -74,6 +76,7 @@ function useIndexIncrementer({currentText , currentLetter , inputValue , setInpu
           letter: typedChar,
         }));
       } else if (typedChar !== expectedChar && !isWrongWord) {
+
         // skip spaces dont add then to wrong chars 
         if(currentText[currentLetter.index] !== " "){
           setWrongChars((prev) => [...prev, currentLetter.index]);

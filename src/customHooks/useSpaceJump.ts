@@ -8,10 +8,11 @@ interface spaceJumpPropps {
    currentText :string ;
    setCurrentLetter: React.Dispatch<React.SetStateAction<currentLetterType>> ;
    setWordHistory: React.Dispatch<React.SetStateAction<WordHistoryItem[]>> ;
+   setWrongWords: React.Dispatch<React.SetStateAction<{start: number;end: number;}[]>>
 }
 
  
-const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentLetter ,setWordHistory}:spaceJumpPropps) => {
+const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentLetter ,setWordHistory , setWrongWords}:spaceJumpPropps) => {
   
       useEffect(()=>{
                         
@@ -21,8 +22,11 @@ const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentL
                 
                 // prevent executning this hook in case the indicator at the start of a word after the first word (skips the first word of the text);
                 if(currentText[currentLetter.index - 1] === " ") return ;
- 
-              
+   
+                // prevent executning this hook in case the indicator at the the end of the word its completed so we dont have to make a history for it 
+                if(currentText[currentLetter.index] === " ") return ;
+            
+            
                 // the start of the next word   
                 let nextWordFirstIndexStarts:number = currentLetter.index ;
 
@@ -33,12 +37,17 @@ const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentL
                     
                 // preserve where we left of the previous word  so we get back to it diireclty after spaace clicking ; 
                 let wordStart = currentLetter.index;
+
                 while(wordStart > 0 && currentText[wordStart - 1] !== ' ') {
                 wordStart--;
                 }
              
                 setWordHistory(prev => ([...prev , {start: wordStart ,lastTypedIndex:currentLetter.index}]))
-            
+                
+                // asign the word as wrong after we jump it ;
+                setWrongWords(prev => ([...prev , 
+                    {start :wordStart , end:nextWordFirstIndexStarts - 1}
+                ]))
                 
                 // set current index to next word begining
                 setCurrentLetter({

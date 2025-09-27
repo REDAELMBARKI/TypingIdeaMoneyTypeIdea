@@ -56,8 +56,7 @@ export const useTextRender = ({
     // Custom indicator logic
     let indicator = "";
     if (
-      (inputValue !== "" && index === currentLetter.index + 1) ||
-      (inputValue === "" && index === currentLetter.index)
+      (inputValue !== "" && index === currentLetter.index + 1) || (inputValue === "" && index === currentLetter.index) 
     ) {
       indicator = "display-indicator";
     }

@@ -62,7 +62,9 @@ const TypingApp: React.FC = () => {
 
  // console logs ////////////////
  
- useEffect(()=>{console.log(wordHistory)}, [wordHistory])
+ useEffect(()=>{
+  console.log('index' , wrongWords)
+ }, [currentLetter.index])
 ///////////////////////////////////
 
   // caps listener
@@ -106,6 +108,7 @@ const TypingApp: React.FC = () => {
     currentText,
     setCurrentLetter,
     setWordHistory,
+    setWrongWords
   });
 
   // typing watcher (typing active or not)
@@ -153,7 +156,8 @@ const TypingApp: React.FC = () => {
     setTrachWord,
     setWrongWords,
     wrongWords,
-    wordHistory
+    wordHistory ,
+    setWordHistory
   });
 
   // audio player
@@ -219,6 +223,8 @@ const TypingApp: React.FC = () => {
           onPaste={(e) => e.preventDefault()}
           ref={hiddenInputRef}
           onChange={(e) => {
+
+            if((currentText[currentLetter.index - 1] === " " || currentLetter.index === 0) && e.target.value === " ") return ;
             // Only allow one character
             const value = e.target.value;
             if (value.length > 1) {

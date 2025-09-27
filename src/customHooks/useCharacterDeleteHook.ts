@@ -16,7 +16,7 @@ interface TextRenderProps {
   setWrongWords: React.Dispatch<React.SetStateAction<{start: number;end: number;}[]>>
   wrongWords :{start: number;end: number;}[];
    wordHistory: WordHistoryItem[] ;
-
+  setWordHistory : React.Dispatch<React.SetStateAction<WordHistoryItem[]>>
 
 }
 
@@ -29,13 +29,15 @@ function useCharacterDeleteHook({
   trachWord ,
   setTrachWord ,
   setWrongWords ,
-  wrongWords
+  wrongWords ,
+  wordHistory ,
+  setWordHistory
 }: TextRenderProps) {
    const handleDeleteChar = () => {
        // pprevent deletin if we pass to next word (no go back if the previous word wass correct )
        //currentText[currentLetter.index - 2] is the last char in previous if that last char index === the last wrongWord then ppreviuos word is wrong 
      
-      const isPreviousWordWrong = wrongWords[wrongWords.length - 1] ?.end === currentLetter.index - 2
+      const isPreviousWordWrong =  wrongWords[wrongWords.length - 1]?.end === currentLetter.index - 2;
    
       
       if((currentText[currentLetter.index - 1] === " " && ! isPreviousWordWrong )|| currentLetter.index === 0 ) return ;
@@ -50,23 +52,52 @@ function useCharacterDeleteHook({
         return ;
       }
       
-      // removes the word from wrong words as its now the current word
-      setWrongWords(prev => prev.filter(el => el.end + 1 !== currentLetter.index - 1))
-      
-      
+     
+
       if (wrongChars.includes(currentLetter.index - 1)) {
-        setWrongChars(prev => prev.filter(
-          (i) => i !== currentLetter.index - 1
-        ));
+          setWrongChars(prev => prev.filter(
+            (i) => i !== currentLetter.index - 1
+          ));
       }
 
 
-     
+      // go back to index where we left off the previous word
+      if (wordHistory.length > 0 &&
+     (currentText[currentLetter.index - 1] === " " ||
+      currentLetter.index === wordHistory[wordHistory.length - 1].lastTypedIndex)) {
+        setWordHistory(prev => {
+          const copy = [...prev] 
+          const lastBreakedWord = copy.pop();
+
+          if(  lastBreakedWord &&
+        currentLetter.index !== lastBreakedWord.lastTypedIndex &&
+        currentLetter.index !== lastBreakedWord.lastTypedIndex + 1){
+            setCurrentLetter({
+                  index: lastBreakedWord!.lastTypedIndex,
+                  letter: currentText[lastBreakedWord!.lastTypedIndex]  || ""
+                  });
+          
+            return copy;
+          }
+          
+          return copy ;
+          
+        })
        
+        // removes the word from wrong words as its now the current word
+        setWrongWords(prev => prev.filter(el => el.end < currentLetter.index - 1))
+
+        return;
+      }
+
+
       setCurrentLetter((prev) => ({
-      index: prev.index - 1,
-      letter: currentText[prev.index - 1] 
-      }));
+        index: prev.index - 1,
+        letter: currentText[prev.index - 1] 
+        }));
+      
+       // removes the word from wrong words as its now the current word
+      // setWrongWords(prev => prev.filter(el => el.end + 1 !== currentLetter.index - 1))
       
     
   };
