@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import type { currentLetterType, WordHistoryItem } from "../types/maintyping";
 
-
 interface spaceJumpPropps {
    inputValue : string ;
    currentLetter : currentLetterType ;
@@ -41,8 +40,18 @@ const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentL
                 while(wordStart > 0 && currentText[wordStart - 1] !== ' ') {
                 wordStart--;
                 }
+
+
+
+                //get he word end this is for coloring the non typed chars to gray color
+                let wordEnd = currentLetter.index;
+
+                while(wordEnd > 0 && currentText[wordEnd + 1] !== ' ') {
+                wordEnd++;
+                }
+
              
-                setWordHistory(prev => ([...prev , {start: wordStart ,lastTypedIndex:currentLetter.index}]))
+                setWordHistory(prev => ([...prev , {start: wordStart ,lastTypedIndex:currentLetter.index , end : wordEnd}]))
                 
                 // asign the word as wrong after we jump it ;
                 setWrongWords(prev => ([...prev , 

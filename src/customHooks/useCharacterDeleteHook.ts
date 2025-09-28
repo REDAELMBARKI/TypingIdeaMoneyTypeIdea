@@ -53,7 +53,7 @@ function useCharacterDeleteHook({
       }
       
      
-
+  
       if (wrongChars.includes(currentLetter.index - 1)) {
           setWrongChars(prev => prev.filter(
             (i) => i !== currentLetter.index - 1
@@ -76,7 +76,15 @@ function useCharacterDeleteHook({
                   index: lastBreakedWord!.lastTypedIndex,
                   letter: currentText[lastBreakedWord!.lastTypedIndex]  || ""
                   });
-          
+                
+              
+            // removes the word from wrong words as its now the current word
+           
+             
+            setWrongWords(prev => prev.filter(el => !(el.start <= lastBreakedWord!.lastTypedIndex && el.end >=  lastBreakedWord!.lastTypedIndex)) )
+            
+            
+           
             return copy;
           }
           
@@ -84,22 +92,30 @@ function useCharacterDeleteHook({
           
         })
        
-        // removes the word from wrong words as its now the current word
-        setWrongWords(prev => prev.filter(el => el.end < currentLetter.index - 1))
-
+      
         return;
       }
 
-
+      
+       
+          
+      // is thihs ok adding this layer so the lefted or upoped onse be poped here i m afraid this to be a bad code 
+        const misPopedWrongWords =  wrongWords.filter(el => el.start >= currentLetter.index ) ;
+            
+              if(misPopedWrongWords.length > 0){
+                  setWrongWords(prev => prev.filter(el => ! (misPopedWrongWords.some(misPoped => misPoped.start === el.start )) ))
+              }
+  
+      
       setCurrentLetter((prev) => ({
         index: prev.index - 1,
         letter: currentText[prev.index - 1] 
         }));
       
        // removes the word from wrong words as its now the current word
-      // setWrongWords(prev => prev.filter(el => el.end + 1 !== currentLetter.index - 1))
-      
+      setWrongWords(prev => prev.filter(el => el.end + 1 !== currentLetter.index - 1))
     
+          
   };
 
   

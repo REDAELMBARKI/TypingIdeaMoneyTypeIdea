@@ -62,9 +62,11 @@ const TypingApp: React.FC = () => {
 
  // console logs ////////////////
  
- useEffect(()=>{
-  console.log('index' , wrongWords)
- }, [currentLetter.index])
+//  useEffect(()=>{
+//   console.log('wrongWords' , wrongWords)
+//   console.log('index' , currentLetter.index)
+
+//  }, [currentLetter.index,wrongWords])
 ///////////////////////////////////
 
   // caps listener
@@ -199,7 +201,7 @@ const TypingApp: React.FC = () => {
           <div
             className={`
             text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
-            font-mono text-center p-6 sm:p-8 lg:p-12 rounded-2xl shadow-sm
+            font-mono text-center p-6 sm:p-8 lg:p-12 rounded-2xl shadow-sm text-slate-400
             ${
               isDarkMode
                 ? "bg-gray-800/50 backdrop-blur-sm border border-gray-700/50"
