@@ -1,6 +1,7 @@
 import React from "react";
 import useThemeHook from "./useThemeHook";
 import type { currentLetterType, WordHistoryItem } from "../types/maintyping";
+import splitIntoLines from "../functions/textToLinesFunc";
 
 interface TextRenderProps {
   currentLetter: currentLetterType;
@@ -11,7 +12,9 @@ interface TextRenderProps {
   isWrongWord: boolean;
   trachWord: string[];
   wrongWords:{start : number , end:number}[];
-   wordHistory: WordHistoryItem[]
+  wordHistory: WordHistoryItem[] ;
+  containerRef: React.RefObject<HTMLDivElement | null> ;
+  containerWidth : number ;
 }
 interface colors {
   red : string
@@ -34,12 +37,21 @@ export const useTextRender = ({
   trachWord,
   wrongWords ,
   isTypingActive ,
-  wordHistory
+  wordHistory ,
+  containerRef ,
+  containerWidth
 }: TextRenderProps) => {
   const { isDarkMode } = useThemeHook();
-  
-  
+  let lines ;
+  if (containerRef.current) {
+  const style = window.getComputedStyle(containerRef.current);
+  const font = `${style.fontSize} ${style.fontFamily}`;
+  console.log("Font used:", font);
 
+  
+  lines = splitIntoLines(currentText, containerWidth, font);
+}
+console.log(lines)
 
   return currentText.split("").map((char, index) => {
 
@@ -127,7 +139,7 @@ export const useTextRender = ({
                     // the compacted words the ones who are underlined also the untyped ones
                     <span
                       key={charIndex}
-                      className={`char-span text-3xl inline-block ${compactedwordColor}  ${wrongChars.includes(globalCharIndex) ? colors.red : ''} `}
+                      className={`char-spa inline-block ${compactedwordColor}  ${wrongChars.includes(globalCharIndex) ? colors.red : ''} `}
                       style={{letterSpacing:0.07 + "em" , whiteSpace : "nowrap"  }}
                       
                     
@@ -158,7 +170,7 @@ export const useTextRender = ({
         {char === " " &&
           index === currentLetter.index &&
           trachWord.length > 0 && (
-            <span className={`trach-word  text-3xl inline-block  ${colors.darkRed} `} 
+            <span className={`trach-word inline-block  ${colors.darkRed} `} 
             
             style={{ whiteSpace : "nowrap"  }} 
             >
@@ -169,7 +181,7 @@ export const useTextRender = ({
          
          { 
 
-        <span key={index} style={{ whiteSpace : "nowrap"  }} className={`px-[1px] text-3xl inline-block   ${className} ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
+        <span key={index} style={{ whiteSpace : "nowrap"   }} className={`px-[1px inline-block   ${className} ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
         
         >
           {char === " " ? "\u00A0" : char}

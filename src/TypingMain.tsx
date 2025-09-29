@@ -17,6 +17,7 @@ import CapsOnModel from "./components/CapsOnModel";
 import useTypingWatcher from "./customHooks/useTypingWatcher";
 import useErrorTypingSound from "./customHooks/useErrorTypingSound";
 import useSpaceJump from "./customHooks/useSpaceJump";
+import useWindowResize from "./customHooks/useWindowResize";
 
 const sampleTexts = [
   // "The quick brown fox jumps over the lazy dog near the riverbank.Technology has revolutionized the way we communicate and share information across the globe.Programming languages evolve continuously to meet the demands of modern software developmen Nature provides endless inspiration for artists writers and creative minds throughout history" ,
@@ -53,20 +54,21 @@ const TypingApp: React.FC = () => {
   >([]);
 
   const [isCapsOn, setIsCapsOn] = useState<boolean>(false);
+  //text conatiner width
+  const [containerWidth  ,setContainerWidth] =  useState<number>(0);
 
   // refs
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
+  // text container
+  const containerRef = useRef<HTMLDivElement | null>(null) ;
+
   //hooks
   const { isDarkMode } = useThemeHook();
 
 
 
  // console logs ////////////////
- 
-//  useEffect(()=>{
-//   console.log('history words' , wordHistory)
 
-//  }, [wordHistory])
 ///////////////////////////////////
 
   // caps listener
@@ -89,7 +91,7 @@ const TypingApp: React.FC = () => {
 
   const handleReset = () => {
     // Placeholder for reset functionality
-    setCurrentLetter({ index: 0, letter: "" });
+    setCurrentLetter({ index: 0, letter: currentText[currentLetter.index] });
     setInputValue("");
     setWrongWords([]);
     setWrongChars([]);
@@ -102,6 +104,8 @@ const TypingApp: React.FC = () => {
   };
 
   // hooks call
+  // window resize 
+  useWindowResize({containerRef  ,setContainerWidth})
 
   // jumps to next word in space clicking (before the current word ends)
   useSpaceJump({
@@ -147,7 +151,9 @@ const TypingApp: React.FC = () => {
     trachWord,
     wrongWords,
     isTypingActive,
-    wordHistory
+    wordHistory ,
+    containerRef ,
+    containerWidth
   });
   const handleDeleteChar = useCharacterDeleteHook({
     currentText,
@@ -198,19 +204,19 @@ const TypingApp: React.FC = () => {
         {/* inform for caps on case  */}
         {isCapsOn && <CapsOnModel />}
         {/* Text Display */}
-        <div className="w-full max-w-screen mx-auto mt-5">
+        <div className="w-[80%] max-w-screen mx-auto mt-[100px]">
           <div
             className={`
             text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
             font-mono text-center p-6 sm:p-8 lg:p-12 rounded-2xl shadow-sm text-slate-400
             ${
               isDarkMode
-                ? "bg-gray-800/50 backdrop-blur-sm border border-gray-700/50"
-                : "bg-white/70 backdrop-blur-sm border border-gray-200/50"
+                ? "backdrop-blur-sm border border-gray-700/50"
+                : " backdrop-blur-sm border border-gray-200/50"
             }
           `}
           >
-            <div className="mx-w-full hitespace-normal break-words break-keep ">
+            <div className="mx-w-full hitespace-normal break-words break-keep text-3xl"    ref={containerRef} style={{textAlign:"left" }}>
               {/* // text render */}
               {renderText}
             </div>
