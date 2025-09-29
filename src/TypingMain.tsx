@@ -62,10 +62,10 @@ const TypingApp: React.FC = () => {
 
  // console logs ////////////////
  
- useEffect(()=>{
-  console.log('history words' , wordHistory)
+//  useEffect(()=>{
+//   console.log('history words' , wordHistory)
 
- }, [wordHistory])
+//  }, [wordHistory])
 ///////////////////////////////////
 
   // caps listener
