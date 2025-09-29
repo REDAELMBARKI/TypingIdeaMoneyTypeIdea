@@ -1,6 +1,6 @@
 import React from "react";
 import useThemeHook from "./useThemeHook";
-import type { currentLetterType } from "../types/maintyping";
+import type { currentLetterType, WordHistoryItem } from "../types/maintyping";
 
 interface TextRenderProps {
   currentLetter: currentLetterType;
@@ -11,6 +11,7 @@ interface TextRenderProps {
   isWrongWord: boolean;
   trachWord: string[];
   wrongWords:{start : number , end:number}[];
+   wordHistory: WordHistoryItem[]
 }
 interface colors {
   red : string
@@ -32,7 +33,8 @@ export const useTextRender = ({
   wrongChars,
   trachWord,
   wrongWords ,
-  isTypingActive
+  isTypingActive ,
+  wordHistory
 }: TextRenderProps) => {
   const { isDarkMode } = useThemeHook();
   

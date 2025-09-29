@@ -62,11 +62,10 @@ const TypingApp: React.FC = () => {
 
  // console logs ////////////////
  
-//  useEffect(()=>{
-//   console.log('wrongWords' , wrongWords)
-//   console.log('index' , currentLetter.index)
+ useEffect(()=>{
+  console.log('history words' , wordHistory)
 
-//  }, [currentLetter.index,wrongWords])
+ }, [wordHistory])
 ///////////////////////////////////
 
   // caps listener
@@ -147,6 +146,7 @@ const TypingApp: React.FC = () => {
     trachWord,
     wrongWords,
     isTypingActive,
+    wordHistory
   });
   const handleDeleteChar = useCharacterDeleteHook({
     currentText,
