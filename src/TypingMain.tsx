@@ -19,6 +19,7 @@ import useErrorTypingSound from "./customHooks/useErrorTypingSound";
 import useSpaceJump from "./customHooks/useSpaceJump";
 
 const sampleTexts = [
+  // "The quick brown fox jumps over the lazy dog near the riverbank.Technology has revolutionized the way we communicate and share information across the globe.Programming languages evolve continuously to meet the demands of modern software developmen Nature provides endless inspiration for artists writers and creative minds throughout history" ,
   "The quick brown fox jumps over the lazy dog near the riverbank. ",
   "Technology has revolutionized the way we communicate and share information across the globe. ",
   "Mountains rise majestically against the azure sky while gentle waves lap at the sandy shore below. ",

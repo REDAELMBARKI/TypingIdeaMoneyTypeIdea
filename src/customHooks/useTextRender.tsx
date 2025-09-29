@@ -105,6 +105,7 @@ export const useTextRender = ({
                                                             self + the number of thelast chars to gray = the full word's lenght  
                                                           */    
                                                          // quick for example "quick" the lenght == 5
+                                                         // number of elements should be colored -> ( wordHistoryIndexing.end -  wordHistoryIndexing.lastTypedIndex) ;
                                                           // q 0 + [numberof elements shold be colored = 4] = 4 # length // should not be colored stays eather white or red 
 
                                                           // u 1 + [numberof elements shold be colored = 4] = 5 === length  -> start coloring from thisi index so on //gray     
@@ -112,16 +113,15 @@ export const useTextRender = ({
                                                           // c 3 + [numberof elements shold be colored = 4]    // gray        
                                                           // k 4 + [numberof elements shold be colored = 4]    // gray        
                             
+                    if (wordHistoryIndexing) {
+                      const remaining = wordHistoryIndexing.end - wordHistoryIndexing.lastTypedIndex;
+                      const grayStart = wordlen - remaining - 1;
 
-                    if(wordHistoryIndexing){
-                             if(charIndex + ( wordHistoryIndexing.end -  wordHistoryIndexing.lastTypedIndex) + 1 >=  wordlen){
-                                 compactedwordColor = colors.gray
-                             }  
+                      if (charIndex >= grayStart) {
+                          compactedwordColor = colors.gray;
+                      }
 
                     }
-
-                  
-                        
                   const globalCharIndex = range.start + charIndex;
                   return (
                     // the compacted words the ones who are underlined also the untyped ones
