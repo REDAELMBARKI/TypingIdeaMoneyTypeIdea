@@ -17,7 +17,8 @@ import CapsOnModel from "./components/CapsOnModel";
 import useTypingWatcher from "./customHooks/useTypingWatcher";
 import useErrorTypingSound from "./customHooks/useErrorTypingSound";
 import useSpaceJump from "./customHooks/useSpaceJump";
-import useWindowResize from "./customHooks/useWindowResize";
+// import useWindowResize from "./customHooks/useWindowResize";
+import NextText from "./partials/NextText";
 
 const sampleTexts = [
   // "The quick brown fox jumps over the lazy dog near the riverbank.Technology has revolutionized the way we communicate and share information across the globe.Programming languages evolve continuously to meet the demands of modern software developmen Nature provides endless inspiration for artists writers and creative minds throughout history" ,
@@ -55,13 +56,14 @@ const TypingApp: React.FC = () => {
 
   const [isCapsOn, setIsCapsOn] = useState<boolean>(false);
   //text conatiner width
-  const [containerWidth  ,setContainerWidth] =  useState<number>(0);
+  // const [containerWidth  ,setContainerWidth] =  useState<number>(0);
 
   // refs
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   // text container
   const containerRef = useRef<HTMLDivElement | null>(null) ;
-
+  // timer accum
+  const TimerRef = useRef<number>(0) ;
   //hooks
   const { isDarkMode } = useThemeHook();
 
@@ -90,8 +92,28 @@ const TypingApp: React.FC = () => {
   }, []);
 
   const handleReset = () => {
+    if(currentLetter.index === 0) return ;
+
     // Placeholder for reset functionality
-    setCurrentLetter({ index: 0, letter: currentText[currentLetter.index] });
+    setCurrentLetter({ index: 0, letter: ''});
+    setInputValue("");
+    setWrongWords([]);
+    setWrongChars([]);
+    
+    setCurrentText(currentText);
+    if (hiddenInputRef.current) {
+      hiddenInputRef.current.focus();
+    }
+
+
+    if(isTypingEnds){
+        setIsTypingEnds(false) ;
+    }
+  };
+
+  const nextText = () => {
+    // Placeholder for reset functionality
+    setCurrentLetter({ index: 0, letter: ''});
     setInputValue("");
     setWrongWords([]);
     setWrongChars([]);
@@ -101,11 +123,17 @@ const TypingApp: React.FC = () => {
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
+
+
+    if(isTypingEnds){
+        setIsTypingEnds(false) ;
+    }
   };
+
 
   // hooks call
   // window resize 
-  useWindowResize({containerRef  ,setContainerWidth})
+  // useWindowResize({containerRef  ,setContainerWidth})
 
   // jumps to next word in space clicking (before the current word ends)
   useSpaceJump({
@@ -151,9 +179,7 @@ const TypingApp: React.FC = () => {
     trachWord,
     wrongWords,
     isTypingActive,
-    wordHistory ,
-    containerRef ,
-    containerWidth
+    wordHistory 
   });
   const handleDeleteChar = useCharacterDeleteHook({
     currentText,
@@ -216,7 +242,7 @@ const TypingApp: React.FC = () => {
             }
           `}
           >
-            <div className="mx-w-full hitespace-normal break-words break-keep text-3xl"    ref={containerRef} style={{textAlign:"left" }}>
+            <div className="mx-w-full hitespace-normal break-words break-keep text-3xl"    ref={containerRef} style={{textAlign:"center" }}>
               {/* // text render */}
               {renderText}
             </div>
@@ -259,7 +285,13 @@ const TypingApp: React.FC = () => {
 
         {/* Controls */}
         <div className="flex items-center justify-center mt-8 space-x-4">
-          <Reseter isDarkMode={isDarkMode} handleReset={handleReset} />
+          {
+
+          <>
+          <Reseter isBlured={currentLetter.index === 0 ? true : false} isDarkMode={isDarkMode} handleReset={handleReset} />
+          <NextText isDarkMode={isDarkMode} nextText={nextText} />
+          </>
+          }
         </div>
 
         {/* Stats Placeholder */}

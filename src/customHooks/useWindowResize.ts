@@ -17,7 +17,7 @@ const  useWindowResize = ({containerRef  ,setContainerWidth }:windowResizeProps)
 
 
          window.addEventListener('resize' , resize) ;
-         return window.removeEventListener('resize' , resize) ;
+         return () => window.removeEventListener('resize' , resize) ;
     } ,[containerRef])
  
 

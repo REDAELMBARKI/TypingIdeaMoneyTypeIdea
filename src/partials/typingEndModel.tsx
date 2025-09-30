@@ -10,12 +10,20 @@ const TypingOverModal: React.FC<{ onReset: () => void }> = ({ onReset }) => (
         You reached the end of the paragraph.<br />
         Try again or choose a new text!
       </p>
-      <button
-        className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-        onClick={onReset}
-      >
-        Restart
-      </button>
+       <div className="flex gap-2 flex justify-center">
+              <button
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+              onClick={onReset}
+            >
+              reset
+            </button>
+            <button
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+              
+            >
+              next
+            </button>
+       </div>
     </div>
   </div>
 );

@@ -13,7 +13,7 @@ const useTypingEnd = ({currentLetter , currentText , setIsTypingEnds}:typingEndP
     // shows end typing model 
     if(currentLetter.index < currentText.length) return ;
     
-    setIsTypingEnds(false) ;
+    setIsTypingEnds(true) ;
 
   },[currentLetter.index])
 

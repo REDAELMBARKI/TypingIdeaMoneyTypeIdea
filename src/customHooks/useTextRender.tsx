@@ -1,7 +1,6 @@
 import React from "react";
 import useThemeHook from "./useThemeHook";
 import type { currentLetterType, WordHistoryItem } from "../types/maintyping";
-import splitIntoLines from "../functions/textToLinesFunc";
 
 interface TextRenderProps {
   currentLetter: currentLetterType;
@@ -13,8 +12,7 @@ interface TextRenderProps {
   trachWord: string[];
   wrongWords:{start : number , end:number}[];
   wordHistory: WordHistoryItem[] ;
-  containerRef: React.RefObject<HTMLDivElement | null> ;
-  containerWidth : number ;
+
 }
 interface colors {
   red : string
@@ -38,24 +36,13 @@ export const useTextRender = ({
   wrongWords ,
   isTypingActive ,
   wordHistory ,
-  containerRef ,
-  containerWidth
+
 }: TextRenderProps) => {
   const { isDarkMode } = useThemeHook();
-  let lines ;
-  if (containerRef.current) {
-  const style = window.getComputedStyle(containerRef.current);
-  const font = `${style.fontSize} ${style.fontFamily}`;
-  console.log("Font used:", font);
-
+ 
   
-  lines = splitIntoLines(currentText, containerWidth, font);
-}
-console.log(lines)
-
   return currentText.split("").map((char, index) => {
-
-
+      
     let className = "transition-all duration-150 ";
 
     if (index > currentLetter.index - 1) {
@@ -140,7 +127,7 @@ console.log(lines)
                     <span
                       key={charIndex}
                       className={`char-spa inline-block ${compactedwordColor}  ${wrongChars.includes(globalCharIndex) ? colors.red : ''} `}
-                      style={{letterSpacing:0.07 + "em" , whiteSpace : "nowrap"  }}
+                      style={{letterSpacing:0.00 + "em" , whiteSpace : "nowrap"  }}
                       
                     
                     >
@@ -180,6 +167,8 @@ console.log(lines)
          {/* original text chars */}
          
          { 
+         
+
 
         <span key={index} style={{ whiteSpace : "nowrap"   }} className={`px-[1px inline-block   ${className} ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
         

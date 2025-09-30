@@ -3,7 +3,8 @@ import React from 'react'
 function States({isDarkMode}: {isDarkMode: boolean}) {
   return (
     <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 w-full max-w-2xl">
-          {[
+          {[ 
+            
             { label: 'WPM', value: '0' },
             { label: 'Accuracy', value: '100%' },
             { label: 'Time', value: '0s' },
