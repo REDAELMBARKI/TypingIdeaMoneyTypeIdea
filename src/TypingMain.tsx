@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import useThemeHook from "./customHooks/useThemeHook";
 import Footer from "./partials/Footer";
 import States from "./partials/States";
@@ -19,6 +19,7 @@ import useErrorTypingSound from "./customHooks/useErrorTypingSound";
 import useSpaceJump from "./customHooks/useSpaceJump";
 // import useWindowResize from "./customHooks/useWindowResize";
 import NextText from "./partials/NextText";
+import TypingBoardControls from "./components/TypingBoardControls";
 
 const sampleTexts = [
   // "The quick brown fox jumps over the lazy dog near the riverbank.Technology has revolutionized the way we communicate and share information across the globe.Programming languages evolve continuously to meet the demands of modern software developmen Nature provides endless inspiration for artists writers and creative minds throughout history" ,
@@ -55,6 +56,9 @@ const TypingApp: React.FC = () => {
   >([]);
 
   const [isCapsOn, setIsCapsOn] = useState<boolean>(false);
+  const [timer,setTimer] = useState<number>(1) ;
+    const [selectedTime, setSelectedTime] = useState<number>(1);
+
   //text conatiner width
   // const [containerWidth  ,setContainerWidth] =  useState<number>(0);
 
@@ -63,7 +67,8 @@ const TypingApp: React.FC = () => {
   // text container
   const containerRef = useRef<HTMLDivElement | null>(null) ;
   // timer accum
-  const TimerRef = useRef<number>(0) ;
+  const TimeEndRef = useRef<number | null>(null)
+  const startTypingTimeRef = useRef<number>(0) ;
   //hooks
   const { isDarkMode } = useThemeHook();
 
@@ -72,6 +77,49 @@ const TypingApp: React.FC = () => {
  // console logs ////////////////
 
 ///////////////////////////////////
+const isStartedTyping:()=> boolean = useCallback(()=>{
+      if(currentLetter.index){
+        return true ;
+      }
+      return false ;
+},[])
+
+
+  
+  
+
+
+
+  // time calculation
+  useEffect(()=>{
+    if(isStartedTyping()){
+       startTypingTimeRef.current = Date.now() ;
+    }
+
+    
+    const dt = new Date() ;
+    setInterval(()=>{
+      //  const seconds = dt.getSeconds();
+      //  setTimer(timer /seconds);
+     },100);
+
+
+   
+  } , [currentLetter.index]) ;
+
+
+
+
+
+
+
+
+  useEffect(()=>{
+    if(! isTypingEnds) return ;
+    
+    TimeEndRef.current = Date.now() - startTypingTimeRef.current;
+    console.log('elapsed' , TimeEndRef.current.toLocaleString())
+  },[isTypingEnds])
 
   // caps listener
   useEffect(() => {
@@ -229,8 +277,15 @@ const TypingApp: React.FC = () => {
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pb-20">
         {/* inform for caps on case  */}
         {isCapsOn && <CapsOnModel />}
+        {/* cntrolls  */}
+        
         {/* Text Display */}
         <div className="w-[80%] max-w-screen mx-auto mt-[100px]">
+
+
+           <section>
+              <TypingBoardControls selectedTime={selectedTime} setSelectedTime={setSelectedTime} />
+          </section>
           <div
             className={`
             text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
@@ -242,7 +297,10 @@ const TypingApp: React.FC = () => {
             }
           `}
           >
+
+           
             <div className="mx-w-full hitespace-normal break-words break-keep text-3xl"    ref={containerRef} style={{textAlign:"center" }}>
+ 
               {/* // text render */}
               {renderText}
             </div>
