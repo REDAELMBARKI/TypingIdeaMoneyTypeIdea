@@ -14,18 +14,23 @@ import {
 interface TypingBoardControlsProps {
  selectedTime:number ;
  setSelectedTime:React.Dispatch<React.SetStateAction<number>>;
+ elapsedTime: number ;
+ isTypingStarted:boolean
 }
 
-export default function TypingBoardControls({selectedTime , setSelectedTime}:TypingBoardControlsProps) {
+export default function TypingBoardControls({selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
   const [showTimes, setShowTimes] = useState(false);
 
-  const times = [1, 2,3,4,5];
+  const times = [30, 60, 120];
 
   return (
     <div className="w-full relative flex items-center gap-6 px-4 py-2 ">
       {/* Elapsed Time */}
-      <div className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-bold shadow-md cursor-default select-none">
-        {"00:00"}
+      <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none
+              ${isTypingStarted ? 'bg-green-600' : 'bg-indigo-500'}
+              ${elapsedTime < 10 ? 'bg-red-500' : elapsedTime < 15 ? 'bg-orange-500' : ''}
+                `}>
+        {elapsedTime}
       </div>
 
       {/* Time Selector + Expanding Times */}
@@ -54,7 +59,7 @@ export default function TypingBoardControls({selectedTime , setSelectedTime}:Typ
               className="flex items-center gap-2 text-xs text-gray-700 hover:text-slate-700 transition"
             >
               <Clock size={18} className="text-slate-700" />
-              <span>{t}m</span>
+              <span>{t}s</span>
             </button>
           ))}
         </div>

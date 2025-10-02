@@ -14,7 +14,7 @@ const useTypingEnd = ({currentLetter , currentText , setIsTypingEnds}:typingEndP
     if(currentLetter.index < currentText.length) return ;
     
     // set it to true 
-    setIsTypingEnds(false) ;
+    setIsTypingEnds(true) ;
 
   },[currentLetter.index])
 

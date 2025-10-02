@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import useThemeHook from "./customHooks/useThemeHook";
 import Footer from "./partials/Footer";
 import States from "./partials/States";
@@ -20,6 +20,8 @@ import useSpaceJump from "./customHooks/useSpaceJump";
 // import useWindowResize from "./customHooks/useWindowResize";
 import NextText from "./partials/NextText";
 import TypingBoardControls from "./components/TypingBoardControls";
+import { ElapsedTimeHandler } from "./functions/elapsedTimeHandler";
+import useSessionTimerCountDown from "./customHooks/useSessionTimerCountDown";
 
 const sampleTexts = [
   // "The quick brown fox jumps over the lazy dog near the riverbank.Technology has revolutionized the way we communicate and share information across the globe.Programming languages evolve continuously to meet the demands of modern software developmen Nature provides endless inspiration for artists writers and creative minds throughout history" ,
@@ -56,70 +58,47 @@ const TypingApp: React.FC = () => {
   >([]);
 
   const [isCapsOn, setIsCapsOn] = useState<boolean>(false);
-  const [timer,setTimer] = useState<number>(1) ;
-    const [selectedTime, setSelectedTime] = useState<number>(1);
+  // select time fo session typing 
+  const [selectedTime, setSelectedTime] = useState<number>(30);
+  // time elased or count down realstate
+  const [elapsedTime, setElapsedTime] = useState<number>(selectedTime);
+  // typign begin listener
+  const [isTypingStarted, setIsTypingStarted] = useState(false);
 
+  // 
+  const [amountOfTime , setAmountOfTime] = useState<number>() ;
   //text conatiner width
   // const [containerWidth  ,setContainerWidth] =  useState<number>(0);
 
   // refs
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   // text container
-  const containerRef = useRef<HTMLDivElement | null>(null) ;
+  const containerRef = useRef<HTMLDivElement | null>(null);
   // timer accum
-  const TimeEndRef = useRef<number | null>(null)
-  const startTypingTimeRef = useRef<number>(0) ;
+  const TimeEndRef = useRef<number | null>(null);
+  const startTypingTimeRef = useRef<number>(0);
   //hooks
   const { isDarkMode } = useThemeHook();
 
+  // console logs ////////////////
 
+  ///////////////////////////////////
 
- // console logs ////////////////
+  // starting timer listener (typing session start listener)
+  useSessionTimerCountDown({startTypingTimeRef,setIsTypingStarted,allowedKeys,currentLetter}) ;
 
-///////////////////////////////////
-const isStartedTyping:()=> boolean = useCallback(()=>{
-      if(currentLetter.index){
-        return true ;
-      }
-      return false ;
-},[])
-
+  useEffect(() => {
+    if (!isTypingStarted) return;
+    ElapsedTimeHandler({selectedTime , setElapsedTime});
+  }, [isTypingStarted]);
 
   
-  
+  useEffect(() => {
+    if (!isTypingEnds) return;
 
-
-
-  // time calculation
-  useEffect(()=>{
-    if(isStartedTyping()){
-       startTypingTimeRef.current = Date.now() ;
-    }
-
-    
-    const dt = new Date() ;
-    setInterval(()=>{
-      //  const seconds = dt.getSeconds();
-      //  setTimer(timer /seconds);
-     },100);
-
-
-   
-  } , [currentLetter.index]) ;
-
-
-
-
-
-
-
-
-  useEffect(()=>{
-    if(! isTypingEnds) return ;
-    
-    TimeEndRef.current = Date.now() - startTypingTimeRef.current;
-    console.log('elapsed' , TimeEndRef.current.toLocaleString())
-  },[isTypingEnds])
+    const sessionTime =  TimeEndRef.current = Date.now() - startTypingTimeRef.current;
+    setAmountOfTime(sessionTime) ;
+  }, [isTypingEnds]);
 
   // caps listener
   useEffect(() => {
@@ -140,28 +119,27 @@ const isStartedTyping:()=> boolean = useCallback(()=>{
   }, []);
 
   const handleReset = () => {
-    if(currentLetter.index === 0) return ;
+    if (currentLetter.index === 0) return;
 
     // Placeholder for reset functionality
-    setCurrentLetter({ index: 0, letter: ''});
+    setCurrentLetter({ index: 0, letter: "" });
     setInputValue("");
     setWrongWords([]);
     setWrongChars([]);
-    
+
     setCurrentText(currentText);
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
 
-
-    if(isTypingEnds){
-        setIsTypingEnds(false) ;
+    if (isTypingEnds) {
+      setIsTypingEnds(false);
     }
   };
 
   const nextText = () => {
     // Placeholder for reset functionality
-    setCurrentLetter({ index: 0, letter: ''});
+    setCurrentLetter({ index: 0, letter: "" });
     setInputValue("");
     setWrongWords([]);
     setWrongChars([]);
@@ -172,15 +150,13 @@ const isStartedTyping:()=> boolean = useCallback(()=>{
       hiddenInputRef.current.focus();
     }
 
-
-    if(isTypingEnds){
-        setIsTypingEnds(false) ;
+    if (isTypingEnds) {
+      setIsTypingEnds(false);
     }
   };
 
-
   // hooks call
-  // window resize 
+  // window resize
   // useWindowResize({containerRef  ,setContainerWidth})
 
   // jumps to next word in space clicking (before the current word ends)
@@ -190,7 +166,7 @@ const isStartedTyping:()=> boolean = useCallback(()=>{
     currentText,
     setCurrentLetter,
     setWordHistory,
-    setWrongWords
+    setWrongWords,
   });
 
   // typing watcher (typing active or not)
@@ -227,7 +203,7 @@ const isStartedTyping:()=> boolean = useCallback(()=>{
     trachWord,
     wrongWords,
     isTypingActive,
-    wordHistory 
+    wordHistory,
   });
   const handleDeleteChar = useCharacterDeleteHook({
     currentText,
@@ -239,8 +215,8 @@ const isStartedTyping:()=> boolean = useCallback(()=>{
     setTrachWord,
     setWrongWords,
     wrongWords,
-    wordHistory ,
-    setWordHistory
+    wordHistory,
+    setWordHistory,
   });
 
   // audio player
@@ -278,13 +254,16 @@ const isStartedTyping:()=> boolean = useCallback(()=>{
         {/* inform for caps on case  */}
         {isCapsOn && <CapsOnModel />}
         {/* cntrolls  */}
-        
+
         {/* Text Display */}
         <div className="w-[80%] max-w-screen mx-auto mt-[100px]">
-
-
-           <section>
-              <TypingBoardControls selectedTime={selectedTime} setSelectedTime={setSelectedTime} />
+          <section>
+            <TypingBoardControls
+              isTypingStarted={isTypingStarted}
+              selectedTime={selectedTime}
+              setSelectedTime={setSelectedTime}
+              elapsedTime={elapsedTime}
+            />
           </section>
           <div
             className={`
@@ -297,10 +276,11 @@ const isStartedTyping:()=> boolean = useCallback(()=>{
             }
           `}
           >
-
-           
-            <div className="mx-w-full hitespace-normal break-words break-keep text-3xl"    ref={containerRef} style={{textAlign:"center" }}>
- 
+            <div
+              className="mx-w-full hitespace-normal break-words break-keep text-3xl"
+              ref={containerRef}
+              style={{ textAlign: "center" }}
+            >
               {/* // text render */}
               {renderText}
             </div>
@@ -316,8 +296,12 @@ const isStartedTyping:()=> boolean = useCallback(()=>{
           onPaste={(e) => e.preventDefault()}
           ref={hiddenInputRef}
           onChange={(e) => {
-
-            if((currentText[currentLetter.index - 1] === " " || currentLetter.index === 0) && e.target.value === " ") return ;
+            if (
+              (currentText[currentLetter.index - 1] === " " ||
+                currentLetter.index === 0) &&
+              e.target.value === " "
+            )
+              return;
             // Only allow one character
             const value = e.target.value;
             if (value.length > 1) {
@@ -344,11 +328,14 @@ const isStartedTyping:()=> boolean = useCallback(()=>{
         {/* Controls */}
         <div className="flex items-center justify-center mt-8 space-x-4">
           {
-
-          <>
-          <Reseter isBlured={currentLetter.index === 0 ? true : false} isDarkMode={isDarkMode} handleReset={handleReset} />
-          <NextText isDarkMode={isDarkMode} nextText={nextText} />
-          </>
+            <>
+              <Reseter
+                isBlured={currentLetter.index === 0 ? true : false}
+                isDarkMode={isDarkMode}
+                handleReset={handleReset}
+              />
+              <NextText isDarkMode={isDarkMode} nextText={nextText} />
+            </>
           }
         </div>
 
