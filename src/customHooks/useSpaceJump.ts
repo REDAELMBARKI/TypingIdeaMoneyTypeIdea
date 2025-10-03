@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { currentLetterType, WordHistoryItem } from "../types/maintyping";
+import type { currentLetterType, WordHistoryItem } from "../types/experementTyping";
 
 interface spaceJumpPropps {
    inputValue : string ;

@@ -1,4 +1,4 @@
-import type { currentLetterType } from "../types/maintyping";
+import type { currentLetterType } from "../types/experementTyping";
 
 import { useEffect } from "react";
 // Import just the function

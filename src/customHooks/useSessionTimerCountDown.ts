@@ -1,6 +1,6 @@
 
 import { useEffect } from "react";
-import type { currentLetterType } from "../types/maintyping";
+import type { currentLetterType } from "../types/experementTyping";
 
 interface  sessionTimerCountDownProps {
     startTypingTimeRef: React.RefObject<number> ;

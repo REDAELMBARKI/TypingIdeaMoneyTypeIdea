@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import type { currentLetterType } from "../types/maintyping";
+import type { currentLetterType } from "../types/experementTyping";
 
 interface BlureType {
   hiddenInputRef: React.RefObject<HTMLInputElement | null>;

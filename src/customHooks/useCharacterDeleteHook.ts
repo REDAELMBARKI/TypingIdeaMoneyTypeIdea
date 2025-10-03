@@ -1,4 +1,4 @@
-import type { currentLetterType, WordHistoryItem } from "../types/maintyping";
+import type { currentLetterType, WordHistoryItem } from "../types/experementTyping";
 
 interface TextRenderProps {
   currentLetter: currentLetterType;

@@ -8,9 +8,9 @@ import useCharacterDeleteHook from "./customHooks/useCharacterDeleteHook";
 import useTypingSound from "./customHooks/useTypingSound";
 import { allowedKeys } from "./data/allowdKeys";
 import useControlleBoundery from "./customHooks/useControlleBoundery";
-import type { currentLetterType, WordHistoryItem } from "./types/maintyping";
+import type { currentLetterType, Mode, WordHistoryItem } from "./types/experementTyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
-import TypingOverModal from "./partials/typingEndModel";
+import TypingOverModal from "./partials/TypingOverModal";
 import useTypingEnd from "./customHooks/useTypingEnd";
 import useIndexIncrementer from "./customHooks/useIndexIncrementer";
 import CapsOnModel from "./components/CapsOnModel";
@@ -22,6 +22,8 @@ import NextText from "./partials/NextText";
 import TypingBoardControls from "./components/TypingBoardControls";
 import { ElapsedTimeHandler } from "./functions/elapsedTimeHandler";
 import useSessionTimerCountDown from "./customHooks/useSessionTimerCountDown";
+import useCapsLockListener from "./customHooks/useCapsLockListener";
+import useTypingControlleFunctions from "./functions/useTypingControlleFunctions";
 
 const sampleTexts = [
   // "The quick brown fox jumps over the lazy dog near the riverbank.Technology has revolutionized the way we communicate and share information across the globe.Programming languages evolve continuously to meet the demands of modern software developmen Nature provides endless inspiration for artists writers and creative minds throughout history" ,
@@ -58,15 +60,18 @@ const TypingApp: React.FC = () => {
   >([]);
 
   const [isCapsOn, setIsCapsOn] = useState<boolean>(false);
-  // select time fo session typing 
+  // select time fo session typing
   const [selectedTime, setSelectedTime] = useState<number>(30);
   // time elased or count down realstate
   const [elapsedTime, setElapsedTime] = useState<number>(selectedTime);
   // typign begin listener
   const [isTypingStarted, setIsTypingStarted] = useState(false);
-
-  // 
-  const [amountOfTime , setAmountOfTime] = useState<number>() ;
+  // typing mode (words | time )
+  const [typingModeSelected , setTypingModeSelected] = useState<Mode>('words') ;
+  // the amount of time the typing session took
+  const [amountOfTime, setAmountOfTime] = useState<number>();
+  // words typed
+  const [typedWordsAmount, setTypedWordsAmount] = useState<number>(0);
   //text conatiner width
   // const [containerWidth  ,setContainerWidth] =  useState<number>(0);
 
@@ -82,82 +87,70 @@ const TypingApp: React.FC = () => {
 
   // console logs ////////////////
 
+  useEffect(() => {
+  }, []);
+
   ///////////////////////////////////
 
-  // starting timer listener (typing session start listener)
-  useSessionTimerCountDown({startTypingTimeRef,setIsTypingStarted,allowedKeys,currentLetter}) ;
+  // the amount if words typed handler
+  useEffect(() => {
+    if (inputValue !== " ") return;
 
+    setTypedWordsAmount((prev) => prev + 1);
+  }, [inputValue]);
+
+  // typing start lister (envocking ellapsed time calculation)
   useEffect(() => {
     if (!isTypingStarted) return;
-    ElapsedTimeHandler({selectedTime , setElapsedTime});
+    ElapsedTimeHandler({ selectedTime, setElapsedTime });
   }, [isTypingStarted]);
 
-  
+
+  //  the start date of the typing session setter
   useEffect(() => {
     if (!isTypingEnds) return;
 
-    const sessionTime =  TimeEndRef.current = Date.now() - startTypingTimeRef.current;
-    setAmountOfTime(sessionTime) ;
+    const sessionTime = (TimeEndRef.current =
+      Date.now() - startTypingTimeRef.current);
+    setAmountOfTime(sessionTime);
   }, [isTypingEnds]);
 
   // caps listener
-  useEffect(() => {
-    const capsListner = (e: KeyboardEvent) => {
-      setIsCapsOn(e.getModifierState("CapsLock"));
-    };
-
-    window.addEventListener("keydown", capsListner);
-    return () => window.removeEventListener("keydown", capsListner);
-  }, []);
+  useCapsLockListener({ setIsCapsOn });
 
   // Focus the hidden input on component mount
-
   useEffect(() => {
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
   }, []);
 
-  const handleReset = () => {
-    if (currentLetter.index === 0) return;
-
-    // Placeholder for reset functionality
-    setCurrentLetter({ index: 0, letter: "" });
-    setInputValue("");
-    setWrongWords([]);
-    setWrongChars([]);
-
-    setCurrentText(currentText);
-    if (hiddenInputRef.current) {
-      hiddenInputRef.current.focus();
-    }
-
-    if (isTypingEnds) {
-      setIsTypingEnds(false);
-    }
-  };
-
-  const nextText = () => {
-    // Placeholder for reset functionality
-    setCurrentLetter({ index: 0, letter: "" });
-    setInputValue("");
-    setWrongWords([]);
-    setWrongChars([]);
-    const randomText =
-      sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
-    setCurrentText(randomText);
-    if (hiddenInputRef.current) {
-      hiddenInputRef.current.focus();
-    }
-
-    if (isTypingEnds) {
-      setIsTypingEnds(false);
-    }
-  };
+  const { nextText, handleReset } = useTypingControlleFunctions({
+    sampleTexts,
+    isTypingEnds,
+    hiddenInputRef,
+    currentText,
+    setWrongChars,
+    setCurrentLetter,
+    setWrongWords,
+    setIsTypingEnds,
+    setCurrentText,
+    currentLetter,
+    setInputValue,
+    setTypedWordsAmount
+  });
 
   // hooks call
   // window resize
   // useWindowResize({containerRef  ,setContainerWidth})
+
+  // starting timer listener (typing session start listener)
+  useSessionTimerCountDown({
+    startTypingTimeRef,
+    setIsTypingStarted,
+    allowedKeys,
+    currentLetter,
+  });
 
   // jumps to next word in space clicking (before the current word ends)
   useSpaceJump({
@@ -171,6 +164,7 @@ const TypingApp: React.FC = () => {
 
   // typing watcher (typing active or not)
   useTypingWatcher({ setIsTypingActive });
+
   // index incriment controller
   useIndexIncrementer({
     currentText,
@@ -259,6 +253,10 @@ const TypingApp: React.FC = () => {
         <div className="w-[80%] max-w-screen mx-auto mt-[100px]">
           <section>
             <TypingBoardControls
+              setTypingModeSelected={setTypingModeSelected}
+              currentText={currentText}
+              typingModeSelected={typingModeSelected}
+              typedWordsAmount={typedWordsAmount}
               isTypingStarted={isTypingStarted}
               selectedTime={selectedTime}
               setSelectedTime={setSelectedTime}
@@ -286,7 +284,7 @@ const TypingApp: React.FC = () => {
             </div>
             <div>
               {/* // typing over div model  */}
-              {isTypingEnds && <TypingOverModal onReset={handleReset} />}
+              {isTypingEnds && <TypingOverModal nextText={nextText} handleReset={handleReset} />}
             </div>
           </div>
         </div>
@@ -296,12 +294,14 @@ const TypingApp: React.FC = () => {
           onPaste={(e) => e.preventDefault()}
           ref={hiddenInputRef}
           onChange={(e) => {
+            
             if (
               (currentText[currentLetter.index - 1] === " " ||
                 currentLetter.index === 0) &&
               e.target.value === " "
             )
-              return;
+            return; // dont allow space as in the begening of each word
+
             // Only allow one character
             const value = e.target.value;
             if (value.length > 1) {

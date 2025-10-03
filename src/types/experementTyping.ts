@@ -11,3 +11,6 @@ export type WordHistoryItem = {
   end : number ;  // the end index of the word 
 };
 
+
+
+export type Mode = "time" | "words";
