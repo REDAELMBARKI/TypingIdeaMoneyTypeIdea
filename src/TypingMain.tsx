@@ -24,6 +24,7 @@ import { ElapsedTimeHandler } from "./functions/elapsedTimeHandler";
 import useSessionTimerCountDown from "./customHooks/useSessionTimerCountDown";
 import useCapsLockListener from "./customHooks/useCapsLockListener";
 import useTypingControlleFunctions from "./functions/useTypingControlleFunctions";
+import useCorrectTypedCharsCounter from "./customHooks/useCorrectTypedCharsCounter";
 
 const sampleTexts = [
   // "The quick brown fox jumps over the lazy dog near the riverbank.Technology has revolutionized the way we communicate and share information across the globe.Programming languages evolve continuously to meet the demands of modern software developmen Nature provides endless inspiration for artists writers and creative minds throughout history" ,
@@ -49,6 +50,7 @@ const TypingApp: React.FC = () => {
   // game end controller state
   const [isTypingEnds, setIsTypingEnds] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
+  // chars that are worong and colored in red 
   const [wrongChars, setWrongChars] = useState<number[]>([]);
 
   const [isWrongWord, setIsWrongWord] = useState<boolean>(false);
@@ -69,9 +71,11 @@ const TypingApp: React.FC = () => {
   // typing mode (words | time )
   const [typingModeSelected , setTypingModeSelected] = useState<Mode>('words') ;
   // the amount of time the typing session took
-  const [amountOfTime, setAmountOfTime] = useState<number>();
+  const [,setAmountOfTime] = useState<number>();
   // words typed
   const [typedWordsAmount, setTypedWordsAmount] = useState<number>(0);
+  // correct words final result 
+  const [totalCorrectedChars , setTotalCorrectedChars] =  useState<number>();
   //text conatiner width
   // const [containerWidth  ,setContainerWidth] =  useState<number>(0);
 
@@ -88,9 +92,12 @@ const TypingApp: React.FC = () => {
   // console logs ////////////////
 
   useEffect(() => {
-  }, []);
+    console.log('correct chars' , totalCorrectedChars)
+  }, [totalCorrectedChars]);
 
   ///////////////////////////////////
+
+
 
   // the amount if words typed handler
   useEffect(() => {
@@ -144,6 +151,17 @@ const TypingApp: React.FC = () => {
   // window resize
   // useWindowResize({containerRef  ,setContainerWidth})
 
+  
+  // totall characters typed correctly 
+  useCorrectTypedCharsCounter({  
+  isTypingEnds,
+  wordHistory,
+  wrongChars,
+  currentText,
+  setTotalCorrectedChars,})
+
+
+  
   // starting timer listener (typing session start listener)
   useSessionTimerCountDown({
     startTypingTimeRef,
@@ -188,6 +206,7 @@ const TypingApp: React.FC = () => {
     wrongWords,
   });
 
+  // text chars render function
   const renderText = useTextRender({
     currentText,
     currentLetter,
@@ -199,6 +218,9 @@ const TypingApp: React.FC = () => {
     isTypingActive,
     wordHistory,
   });
+
+
+   // delete click handler
   const handleDeleteChar = useCharacterDeleteHook({
     currentText,
     currentLetter,
