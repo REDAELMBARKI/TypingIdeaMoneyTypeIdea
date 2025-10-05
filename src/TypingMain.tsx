@@ -24,7 +24,8 @@ import { ElapsedTimeHandler } from "./functions/elapsedTimeHandler";
 import useSessionTimerCountDown from "./customHooks/useSessionTimerCountDown";
 import useCapsLockListener from "./customHooks/useCapsLockListener";
 import useTypingControlleFunctions from "./functions/useTypingControlleFunctions";
-import useCorrectTypedCharsCounter from "./customHooks/useCorrectTypedCharsCounter";
+import useWpmServiceReset from "./customHooks/useWpmServiceReset";
+import correctTypedCharsCounterHandler from "./functions/correctTypedCharsCounterHandler";
 
 const sampleTexts = [
   // "The quick brown fox jumps over the lazy dog near the riverbank.Technology has revolutionized the way we communicate and share information across the globe.Programming languages evolve continuously to meet the demands of modern software developmen Nature provides endless inspiration for artists writers and creative minds throughout history" ,
@@ -71,20 +72,26 @@ const TypingApp: React.FC = () => {
   // typing mode (words | time )
   const [typingModeSelected , setTypingModeSelected] = useState<Mode>('words') ;
   // the amount of time the typing session took
-  const [,setAmountOfTime] = useState<number>();
+  // const [amountOfTime,setAmountOfTime] = useState<number>();
   // words typed
   const [typedWordsAmount, setTypedWordsAmount] = useState<number>(0);
   // correct words final result 
-  const [totalCorrectedChars , setTotalCorrectedChars] =  useState<number>();
+  // const [totalCorrectedChars , setTotalCorrectedChars] =  useState<number>();
+
+    // wpm ref
+  const wpmFinalRef = useRef<number | null>(null) ;
+ 
+  const totalCorrectedCharsRef =  useRef<number | null>(null);
   //text conatiner width
   // const [containerWidth  ,setContainerWidth] =  useState<number>(0);
-
+  
   // refs
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
+  const amountOfTimeRef = useRef<number | null>(null);
   // text container
   const containerRef = useRef<HTMLDivElement | null>(null);
   // timer accum
-  const TimeEndRef = useRef<number | null>(null);
+ 
   const startTypingTimeRef = useRef<number>(0);
   //hooks
   const { isDarkMode } = useThemeHook();
@@ -92,12 +99,35 @@ const TypingApp: React.FC = () => {
   // console logs ////////////////
 
   useEffect(() => {
-    console.log('correct chars' , totalCorrectedChars)
-  }, [totalCorrectedChars]);
+    //  setTimeout(()=> console.log(wpmFinalRef.current) , 1000)
+  }, [isTypingEnds]);
 
   ///////////////////////////////////
 
 
+  const timeAmountCountHandler = () => {
+    const sessionTime =  Date.now() - startTypingTimeRef.current;
+    amountOfTimeRef.current = sessionTime / 1000  ;
+  }
+  // wpm Calculations 
+  useEffect(()=>{
+
+    // totall characters typed correctly 
+    correctTypedCharsCounterHandler({  
+    wordHistory,
+    wrongChars,
+    currentText,
+    totalCorrectedCharsRef})
+
+    // time amount 
+    timeAmountCountHandler();
+
+    if(! totalCorrectedCharsRef.current || ! amountOfTimeRef.current  ) return ;
+   
+    const finalWpm = (totalCorrectedCharsRef.current / 5) / amountOfTimeRef.current ;
+    wpmFinalRef.current = Math.max(finalWpm , 0);
+    console.log("wpm" , wpmFinalRef) ;
+  },[isTypingEnds])
 
   // the amount if words typed handler
   useEffect(() => {
@@ -106,21 +136,12 @@ const TypingApp: React.FC = () => {
     setTypedWordsAmount((prev) => prev + 1);
   }, [inputValue]);
 
-  // typing start lister (envocking ellapsed time calculation)
+  // typing start listener (envocking ellapsed time calculation)
   useEffect(() => {
     if (!isTypingStarted) return;
     ElapsedTimeHandler({ selectedTime, setElapsedTime });
   }, [isTypingStarted]);
 
-
-  //  the start date of the typing session setter
-  useEffect(() => {
-    if (!isTypingEnds) return;
-
-    const sessionTime = (TimeEndRef.current =
-      Date.now() - startTypingTimeRef.current);
-    setAmountOfTime(sessionTime);
-  }, [isTypingEnds]);
 
   // caps listener
   useCapsLockListener({ setIsCapsOn });
@@ -150,15 +171,11 @@ const TypingApp: React.FC = () => {
   // hooks call
   // window resize
   // useWindowResize({containerRef  ,setContainerWidth})
-
   
-  // totall characters typed correctly 
-  useCorrectTypedCharsCounter({  
-  isTypingEnds,
-  wordHistory,
-  wrongChars,
-  currentText,
-  setTotalCorrectedChars,})
+  // wpm services and calculations reset
+
+  useWpmServiceReset({totalCorrectedCharsRef , amountOfTimeRef , startTypingTimeRef , wpmFinalRef , setTypedWordsAmount})
+
 
 
   

@@ -15,10 +15,11 @@ currentText:string ;
  hiddenInputRef: React.RefObject<HTMLInputElement | null>
 isTypingEnds : boolean ;
 sampleTexts : string[];
-setTypedWordsAmount: React.Dispatch<React.SetStateAction<number>>
+setTypedWordsAmount: React.Dispatch<React.SetStateAction<number>>  ;
+
 }
 
-export default function useTypingControlleFunctions({setTypedWordsAmount , sampleTexts , isTypingEnds,hiddenInputRef,currentText,setWrongChars,setCurrentLetter,setWrongWords,setIsTypingEnds ,setCurrentText , currentLetter ,setInputValue}:typingControlleFunctionsProps){
+export default function useTypingControlleFunctions({ setTypedWordsAmount , sampleTexts , isTypingEnds,hiddenInputRef,currentText,setWrongChars,setCurrentLetter,setWrongWords,setIsTypingEnds ,setCurrentText , currentLetter ,setInputValue}:typingControlleFunctionsProps){
    const handleReset = () => {
     if (currentLetter.index === 0) return;
 

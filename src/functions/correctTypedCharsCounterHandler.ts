@@ -1,22 +1,19 @@
-import { useEffect } from "react";
 import type { WordHistoryItem } from "../types/experementTyping";
 
 interface correctTypedCharsCounterProps {
-  isTypingEnds:boolean ;
   wordHistory:WordHistoryItem[] ;
   wrongChars: number[] ;
   currentText: string ;
-  setTotalCorrectedChars: React.Dispatch<React.SetStateAction<number | undefined>>
+  totalCorrectedCharsRef: React.RefObject<number | null>
 }
 
-const useCorrectTypedCharsCounter = ({
-  isTypingEnds,
+const correctTypedCharsCounterHandler = ({
   wordHistory,
   wrongChars,
   currentText,
-  setTotalCorrectedChars,
+  totalCorrectedCharsRef,
 }: correctTypedCharsCounterProps) => {
-useEffect(()=>{
+
       const  skippedCharsCount =  wordHistory.reduce((wrongCharsTotal , wH) => {
            
            for(let i = wH.lastTypedIndex ; i <= wH.end ; i++) ++wrongCharsTotal
@@ -27,9 +24,9 @@ useEffect(()=>{
       // total wring chars in wrongchars the red chars and those are skipped 
       const totallWrongChars = skippedCharsCount + wrongChars.length ;
       const  originalTextCharsAmount:number = currentText.replaceAll(" " , '').split('').length;
-     const correctCharsTotal = Math.max(originalTextCharsAmount - totallWrongChars , 0)
-      setTotalCorrectedChars(correctCharsTotal);
-  },[isTypingEnds])
+      const correctCharsTotal = Math.max(originalTextCharsAmount - totallWrongChars , 0)
+      
+      totalCorrectedCharsRef.current = correctCharsTotal;
 };
 
-export default useCorrectTypedCharsCounter;
+export default correctTypedCharsCounterHandler;
