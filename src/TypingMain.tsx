@@ -77,9 +77,11 @@ const TypingApp: React.FC = () => {
   const [typedWordsAmount, setTypedWordsAmount] = useState<number>(0);
   // correct words final result 
   // const [totalCorrectedChars , setTotalCorrectedChars] =  useState<number>();
-
+  // typing ends model togller
+  const [isShowTypingOverModal , setIsShowTypingOverModal] = useState<boolean>(false)
     // wpm ref
-  const wpmFinalRef = useRef<number | null>(null) ;
+  const [wpmFinal, setWpmFinal] = useState<number>(0);
+
  
   const totalCorrectedCharsRef =  useRef<number | null>(null);
   //text conatiner width
@@ -91,16 +93,18 @@ const TypingApp: React.FC = () => {
   // text container
   const containerRef = useRef<HTMLDivElement | null>(null);
   // timer accum
- 
+
+
   const startTypingTimeRef = useRef<number>(0);
   //hooks
   const { isDarkMode } = useThemeHook();
 
   // console logs ////////////////
 
-  useEffect(() => {
-    //  setTimeout(()=> console.log(wpmFinalRef.current) , 1000)
-  }, [isTypingEnds]);
+  // useEffect(() => {
+  //     if (! isTypingEnds) return ;
+      
+  // }, [isTypingEnds]);
 
   ///////////////////////////////////
 
@@ -111,22 +115,25 @@ const TypingApp: React.FC = () => {
   }
   // wpm Calculations 
   useEffect(()=>{
+    if(!isTypingEnds) return ;
 
-    // totall characters typed correctly 
-    correctTypedCharsCounterHandler({  
-    wordHistory,
-    wrongChars,
-    currentText,
-    totalCorrectedCharsRef})
+    setTimeout(() => {
+        // totall characters typed correctly 
+        correctTypedCharsCounterHandler({  
+        wordHistory,
+        wrongChars,
+        currentText,
+        totalCorrectedCharsRef})
 
-    // time amount 
-    timeAmountCountHandler();
+        // time amount 
+        timeAmountCountHandler();
 
-    if(! totalCorrectedCharsRef.current || ! amountOfTimeRef.current  ) return ;
-   
-    const finalWpm = (totalCorrectedCharsRef.current / 5) / amountOfTimeRef.current ;
-    wpmFinalRef.current = Math.max(finalWpm , 0);
-    console.log("wpm" , wpmFinalRef) ;
+        if(! totalCorrectedCharsRef.current || ! amountOfTimeRef.current  ) return ;
+       
+         
+        console.log("wpm" , Math.max(Math.ceil(finalWpm) , 0))
+        setIsShowTypingOverModal(true);
+     }, 100);
   },[isTypingEnds])
 
   // the amount if words typed handler
@@ -155,7 +162,6 @@ const TypingApp: React.FC = () => {
 
   const { nextText, handleReset } = useTypingControlleFunctions({
     sampleTexts,
-    isTypingEnds,
     hiddenInputRef,
     currentText,
     setWrongChars,
@@ -163,9 +169,9 @@ const TypingApp: React.FC = () => {
     setWrongWords,
     setIsTypingEnds,
     setCurrentText,
-    currentLetter,
     setInputValue,
-    setTypedWordsAmount
+    setTypedWordsAmount ,
+    setIsShowTypingOverModal
   });
 
   // hooks call
@@ -174,7 +180,7 @@ const TypingApp: React.FC = () => {
   
   // wpm services and calculations reset
 
-  useWpmServiceReset({totalCorrectedCharsRef , amountOfTimeRef , startTypingTimeRef , wpmFinalRef , setTypedWordsAmount})
+  useWpmServiceReset({totalCorrectedCharsRef , amountOfTimeRef , startTypingTimeRef , setWpmFinal , setTypedWordsAmount})
 
 
 
@@ -321,9 +327,9 @@ const TypingApp: React.FC = () => {
               {/* // text render */}
               {renderText}
             </div>
-            <div>
+            <div className="">
               {/* // typing over div model  */}
-              {isTypingEnds && <TypingOverModal nextText={nextText} handleReset={handleReset} />}
+              {isShowTypingOverModal && <TypingOverModal wpmFinal={wpmFinal}  nextText={nextText} handleReset={handleReset} />}
             </div>
           </div>
         </div>

@@ -1,62 +1,99 @@
+import { useCallback } from "react";
 import type { currentLetterType } from "../types/experementTyping";
 
-interface typingControlleFunctionsProps {
-setCurrentText: React.Dispatch<React.SetStateAction<string>> ;
-setCurrentLetter: React.Dispatch<React.SetStateAction<currentLetterType>> ;
-currentLetter: currentLetterType
-setWrongChars: React.Dispatch<React.SetStateAction<number[]>>
-setIsTypingEnds: React.Dispatch<React.SetStateAction<boolean>> ;
-setWrongWords: React.Dispatch<React.SetStateAction<{
-    start: number;
-    end: number;
-}[]>> ;
-setInputValue: React.Dispatch<React.SetStateAction<string>>
-currentText:string ;
- hiddenInputRef: React.RefObject<HTMLInputElement | null>
-isTypingEnds : boolean ;
-sampleTexts : string[];
-setTypedWordsAmount: React.Dispatch<React.SetStateAction<number>>  ;
+interface VarsResterProps {
+  setCurrentLetter: React.Dispatch<React.SetStateAction<currentLetterType>>;
+  setInputValue: React.Dispatch<React.SetStateAction<string>>;
+  setWrongWords: React.Dispatch<
+    React.SetStateAction<
+      {
+        start: number;
+        end: number;
+      }[]
+    >
+  >;
+  setTypedWordsAmount: React.Dispatch<React.SetStateAction<number>>;
+  setWrongChars: React.Dispatch<React.SetStateAction<number[]>>;
+  setIsShowTypingOverModal: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+interface TypingControlleFunctionsProps extends VarsResterProps {
+  setCurrentText: React.Dispatch<React.SetStateAction<string>>;
+  // currentLetter: currentLetterType;
+  setIsTypingEnds: React.Dispatch<React.SetStateAction<boolean>>;
+  currentText: string;
+  hiddenInputRef: React.RefObject<HTMLInputElement | null>;
+  sampleTexts: string[];
 
 }
 
-export default function useTypingControlleFunctions({ setTypedWordsAmount , sampleTexts , isTypingEnds,hiddenInputRef,currentText,setWrongChars,setCurrentLetter,setWrongWords,setIsTypingEnds ,setCurrentText , currentLetter ,setInputValue}:typingControlleFunctionsProps){
-   const handleReset = () => {
-    if (currentLetter.index === 0) return;
+export default function useTypingControlleFunctions({
+  setTypedWordsAmount,
+  sampleTexts,
+  hiddenInputRef,
+  currentText,
+  setWrongChars,
+  setCurrentLetter,
+  setWrongWords,
+  setIsTypingEnds,
+  setCurrentText,
+  setInputValue,
+  setIsShowTypingOverModal
+}: TypingControlleFunctionsProps) {
 
-    // Placeholder for reset functionality
-    setCurrentLetter({ index: 0, letter: "" });
-    setInputValue("");
-    setWrongWords([]);
-    setWrongChars([]);
-    setTypedWordsAmount(0); 
-    setCurrentText(currentText);
-    if (hiddenInputRef.current) {
-      hiddenInputRef.current.focus();
-    }
-
-    if (isTypingEnds) {
-      setIsTypingEnds(false);
-    }
-  };
-
-
-   const nextText = () => {
-    // Placeholder for reset functionality
+  // --- Define varsRester FIRST ---
+  const varsRester = useCallback(({
+    setCurrentLetter,
+    setInputValue,
+    setWrongWords,
+    setTypedWordsAmount,
+    setWrongChars,
+    setIsShowTypingOverModal
+  }: VarsResterProps) => {
     setCurrentLetter({ index: 0, letter: "" });
     setInputValue("");
     setWrongWords([]);
     setWrongChars([]);
     setTypedWordsAmount(0);
-    const randomText =
-      sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
-    setCurrentText(randomText);
+    setIsShowTypingOverModal(false) ; 
+  }, []);
+
+  const handleReset = useCallback(() => {
+    varsRester({
+      setCurrentLetter,
+      setInputValue,
+      setWrongWords,
+      setTypedWordsAmount,
+      setWrongChars,
+      setIsShowTypingOverModal 
+    });
+
+    setCurrentText(currentText);
+    setIsTypingEnds(false);
+
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
+  }, [sampleTexts,hiddenInputRef]);
 
-    if (isTypingEnds) {
-      setIsTypingEnds(false);
+  const nextText = useCallback(() => {
+    varsRester({
+      setCurrentLetter,
+      setInputValue,
+      setWrongWords,
+      setTypedWordsAmount,
+      setWrongChars,
+      setIsShowTypingOverModal
+    });
+
+    const randomText = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
+    setCurrentText(randomText);
+    setIsTypingEnds(false);
+
+    if (hiddenInputRef.current) {
+      hiddenInputRef.current.focus();
     }
-  };
-  return {nextText , handleReset}
+  }, [sampleTexts,hiddenInputRef]);
+
+  return { nextText, handleReset };
 }
