@@ -72,7 +72,7 @@ themColors
               className="underLineBefore "
               style={{ display: "inline-block", position: "relative", whiteSpace: "nowrap" }}
             >
-              <span className="char-wrapper"   style={{whiteSpace : "nowrap"  }}
+              <span className={`char-wrapper `}   style={{whiteSpace : "nowrap" ,  }}
                       >
                 {word.split("").map((char, charIndex) => {
                     let compactedwordColor = '' ;     
@@ -112,7 +112,7 @@ themColors
                     <span
                       key={charIndex}
                       className={`char-spa inline-block ${compactedwordColor}  ${wrongChars.includes(globalCharIndex) ? themColors.red : ''} `}
-                      style={{letterSpacing:0.00 + "em" , whiteSpace : "nowrap"  }}
+                      style={{whiteSpace : "nowrap"  }}
                       
                     
                     >
@@ -122,8 +122,7 @@ themColors
                 })}
               </span>
 
-              {/* Block underline below the word */}
-              <span className="underline-block"></span>
+           
             </span>
 
 

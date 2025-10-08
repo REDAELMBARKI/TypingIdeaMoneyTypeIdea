@@ -19,9 +19,7 @@ export const Navbar = () => {
 
 
   return (
-    <nav className={`relative after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-white/10  ${
-                        isDarkMode ? 'bg-blue-600' : 'bg-blue-500'
-                      }`}>
+    <nav className={`fixed w-full h-[100px]  top-0  pt-[25px] `}>
       <div className="mx-auto max-w-full  sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           {/* Mobile menu button */}

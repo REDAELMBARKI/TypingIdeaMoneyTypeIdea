@@ -39,7 +39,7 @@ const sampleTexts = [
 
 const TypingApp: React.FC = () => {
 
-   const [themColors] =  useState<ThemColors>(colorThemes[4])
+   const [themColors] =  useState<ThemColors>(colorThemes[5])
   const [currentText, setCurrentText] = useState<string>(sampleTexts[0]);
   const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
     index: 0,

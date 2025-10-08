@@ -1,6 +1,6 @@
 #root {
   max-width: 100vw;
-  
+  --underlineColor : #ca4754 ;
   
 }
 
@@ -110,7 +110,7 @@
   bottom: 0;
   width: 100%;           /* full width */
   height: 0.05em;        /* thin underline */
-  background-color:#ca4754;
+  background-color: var(--underlineColor);
   transform-origin: left;
   transform: scaleX(0);   /* start collapsed */
   opacity: 0.1;           /* start low opacity */
