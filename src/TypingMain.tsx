@@ -8,7 +8,7 @@ import useCharacterDeleteHook from "./customHooks/useCharacterDeleteHook";
 import useTypingSound from "./customHooks/useTypingSound";
 import { allowedKeys } from "./data/allowdKeys";
 import useControlleBoundery from "./customHooks/useControlleBoundery";
-import type { currentLetterType, Mode, WordHistoryItem } from "./types/experementTyping";
+import type { currentLetterType, Mode, ThemColors, WordHistoryItem } from "./types/experementTyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
 import TypingOverModal from "./partials/TypingOverModal";
 import useTypingEnd from "./customHooks/useTypingEnd";
@@ -26,6 +26,7 @@ import useCapsLockListener from "./customHooks/useCapsLockListener";
 import useTypingControlleFunctions from "./functions/useTypingControlleFunctions";
 import useWpmServiceReset from "./customHooks/useWpmServiceReset";
 import correctTypedCharsCounterHandler from "./functions/correctTypedCharsCounterHandler";
+import { colorThemes } from "./data/themColors";
 
 const sampleTexts = [
   // "The quick brown fox jumps over the lazy dog near the riverbank.Technology has revolutionized the way we communicate and share information across the globe.Programming languages evolve continuously to meet the demands of modern software developmen Nature provides endless inspiration for artists writers and creative minds throughout history" ,
@@ -37,6 +38,8 @@ const sampleTexts = [
 ];
 
 const TypingApp: React.FC = () => {
+
+   const [themColors] =  useState<ThemColors>(colorThemes[4])
   const [currentText, setCurrentText] = useState<string>(sampleTexts[0]);
   const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
     index: 0,
@@ -249,6 +252,7 @@ const TypingApp: React.FC = () => {
 
   // text chars render function
   const renderText = useTextRender({
+    themColors ,
     currentText,
     currentLetter,
     inputValue,
@@ -303,7 +307,7 @@ const TypingApp: React.FC = () => {
   return (
     <div
       className={`min-h-screen transition-colors duration-300  ${
-        isDarkMode ? "bg-gray-900" : "bg-gray-50"
+        themColors.page_bg
       }`}
     >
       {/* Main Content */}
@@ -329,12 +333,8 @@ const TypingApp: React.FC = () => {
           <div
             className={`
             text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
-            font-mono text-center p-6 sm:p-8 lg:p-12 rounded-2xl shadow-sm text-slate-400
-            ${
-              isDarkMode
-                ? "backdrop-blur-sm border border-gray-700/50"
-                : " backdrop-blur-sm border border-gray-200/50"
-            }
+            font-mono text-center p-6 sm:p-8 lg:p-12 rounded-2xl shadow-sm 
+            backdrop-blur-sm border border-gray-200/50
           `}
           >
             <div

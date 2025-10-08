@@ -1,6 +1,5 @@
-import React from "react";
-import useThemeHook from "./useThemeHook";
-import type { currentLetterType, WordHistoryItem } from "../types/experementTyping";
+import React, {  } from "react";
+import type { currentLetterType, ThemColors, WordHistoryItem } from "../types/experementTyping";
 
 interface TextRenderProps {
   currentLetter: currentLetterType;
@@ -12,21 +11,9 @@ interface TextRenderProps {
   trachWord: string[];
   wrongWords:{start : number , end:number}[];
   wordHistory: WordHistoryItem[] ;
-
-}
-interface colors {
-  red : string
-  white  : string
-  gray : string
-  darkRed : string
+   themColors: ThemColors
 }
 
-const  colors:colors= {
-    red: 'text-red-400' ,
-    white: 'text-slate-400' ,
-    gray : 'text-gray-700' ,
-    darkRed: 'text-red-900' ,
-};
 export const useTextRender = ({
   currentText,
   currentLetter,
@@ -36,24 +23,22 @@ export const useTextRender = ({
   wrongWords ,
   isTypingActive ,
   wordHistory ,
-
+themColors
 }: TextRenderProps) => {
-  const { isDarkMode } = useThemeHook();
- 
-  
+
   return currentText.split("").map((char, index) => {
       
     let className = "transition-all duration-150 ";
 
     if (index > currentLetter.index - 1) {
       // Untyped letters
-      className += isDarkMode ? colors.gray : colors.gray;
+      className +=  themColors.gray ;
     } else if (wrongChars.includes(index)) {
       // Wrong chars
-      className += colors.red;
+      className += themColors.red;
     } else {
       // Correct typed chars
-      className += isDarkMode ? colors.white : "text-black";
+      className +=  themColors.white ;
     }
 
     // Custom indicator logic
@@ -117,7 +102,7 @@ export const useTextRender = ({
                       const grayStart = wordlen - remaining - 1;
 
                       if (charIndex >= grayStart) {
-                          compactedwordColor = colors.gray;
+                          compactedwordColor = themColors.gray;
                       }
 
                     }
@@ -126,7 +111,7 @@ export const useTextRender = ({
                     // the compacted words the ones who are underlined also the untyped ones
                     <span
                       key={charIndex}
-                      className={`char-spa inline-block ${compactedwordColor}  ${wrongChars.includes(globalCharIndex) ? colors.red : ''} `}
+                      className={`char-spa inline-block ${compactedwordColor}  ${wrongChars.includes(globalCharIndex) ? themColors.red : ''} `}
                       style={{letterSpacing:0.00 + "em" , whiteSpace : "nowrap"  }}
                       
                     
@@ -157,7 +142,7 @@ export const useTextRender = ({
         {char === " " &&
           index === currentLetter.index &&
           trachWord.length > 0 && (
-            <span className={`trach-word inline-block  ${colors.darkRed} `} 
+            <span className={`trach-word inline-block  ${themColors.darkRed} `} 
             
             style={{ whiteSpace : "nowrap"  }} 
             >
