@@ -11,19 +11,28 @@ interface  sessionTimerCountDownProps {
 
 const  useSessionTimerCountDown = ({startTypingTimeRef,setIsTypingStarted,allowedKeys,currentLetter}:sessionTimerCountDownProps) => {
       useEffect(() => {
-         if (currentLetter.index > 0) return;
+        
          const isStartedTyping = (e: KeyboardEvent) => {
+           if (e.repeat) return;
            if (!["Enter", "Backspace", "Tab", "CapsLock"].includes(e.key)) {
              if (allowedKeys.has(e.key)) {
                startTypingTimeRef.current = Date.now();
                setIsTypingStarted(true);
              }
            }
+
+
+           if (!startTypingTimeRef.current && currentLetter.index === 0) {
+             if (!startTypingTimeRef.current) startTypingTimeRef.current = Date.now();
+              setIsTypingStarted(true);
+            }
+
          };
-     
+         
+
          window.addEventListener("keydown", isStartedTyping);
          return () => window.removeEventListener("keydown", isStartedTyping);
-       }, [currentLetter.index]);
+       }, [currentLetter.index ,allowedKeys]);
      
        
 }

@@ -101,17 +101,21 @@ const TypingApp: React.FC = () => {
 
   // console logs ////////////////
 
-  // useEffect(() => {
-  //     if (! isTypingEnds) return ;
+  useEffect(() => {
+    if(wpmFinal === 0) return ;
+      console.log('wpm' , wpmFinal)
       
-  // }, [isTypingEnds]);
+  }, [wpmFinal]);
 
   ///////////////////////////////////
 
-
+  
   const timeAmountCountHandler = () => {
+    if(! startTypingTimeRef.current) {
+       console.warn("starting date is not set ")  ;
+    }
     const sessionTime =  Date.now() - startTypingTimeRef.current;
-    amountOfTimeRef.current = sessionTime / 1000  ;
+    amountOfTimeRef.current = sessionTime / 1000  / 60  ;
   }
   // wpm Calculations 
   useEffect(()=>{
@@ -127,12 +131,26 @@ const TypingApp: React.FC = () => {
 
         // time amount 
         timeAmountCountHandler();
+        console.log('time' , amountOfTimeRef.current)
 
-        if(! totalCorrectedCharsRef.current || ! amountOfTimeRef.current  ) return ;
-       
-         
-        console.log("wpm" , Math.max(Math.ceil(finalWpm) , 0))
-        setIsShowTypingOverModal(true);
+        if (amountOfTimeRef.current != null && amountOfTimeRef.current < 0.05) { 
+          console.warn("Session too short, skipping WPM calculation");
+          return;
+        }
+
+
+
+         if (
+          !totalCorrectedCharsRef.current ||
+          !amountOfTimeRef.current ||
+          amountOfTimeRef.current < 0.05 // guard against tiny times
+        )
+        return;
+        const finalWpm = (totalCorrectedCharsRef.current / 5)  / (amountOfTimeRef.current)
+        setWpmFinal(Math.floor(finalWpm));
+        // alert( )
+
+         setIsShowTypingOverModal(true);
      }, 100);
   },[isTypingEnds])
 
@@ -180,7 +198,7 @@ const TypingApp: React.FC = () => {
   
   // wpm services and calculations reset
 
-  useWpmServiceReset({totalCorrectedCharsRef , amountOfTimeRef , startTypingTimeRef , setWpmFinal , setTypedWordsAmount})
+  useWpmServiceReset({wpmFinal ,totalCorrectedCharsRef , amountOfTimeRef , startTypingTimeRef , setWpmFinal , setTypedWordsAmount , isTypingEnds})
 
 
 
@@ -329,7 +347,8 @@ const TypingApp: React.FC = () => {
             </div>
             <div className="">
               {/* // typing over div model  */}
-              {isShowTypingOverModal && <TypingOverModal wpmFinal={wpmFinal}  nextText={nextText} handleReset={handleReset} />}
+              {isShowTypingOverModal  && <TypingOverModal
+                    wpmFinal={wpmFinal}  nextText={nextText} handleReset={handleReset} />}
             </div>
           </div>
         </div>
