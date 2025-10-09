@@ -22,6 +22,8 @@ export default function ThemeModal({setIsThemeModalOpen} :ThemeModalProps) {
   );
 
 
+
+
  
  
   const onClose = () => setIsThemeModalOpen(false) ;
@@ -73,9 +75,10 @@ function FilteredModals({ themes, onClose, onSelect, search, setSearch }: ChildM
 
 // Common base modal to avoid duplication
 function BaseModal({ themes, onClose, onSelect, search, setSearch }: ChildModalProps) {
+  const {selectedTheme} = useThemeHook() ;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-gray-900 rounded-xl w-96 max-w-full p-4 shadow-lg">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center  `}>
+      <div className={`${selectedTheme.page_bg} border ${selectedTheme.border} rounded-xl w-96 max-w-full p-4 shadow-lg `}>
         {/* Search Bar */}
         <input
           type="text"
@@ -98,8 +101,8 @@ function BaseModal({ themes, onClose, onSelect, search, setSearch }: ChildModalP
                 {theme.colors.map((color, index) => (
                   <div
                     key={index}
-                    className="w-5 h-5 rounded-sm border border-gray-300 dark:border-gray-700"
-                    style={{ backgroundColor: color }}
+                    className={`w-5 h-5 rounded-sm border border-gray-300 dark:border-gray-700 ${color}`}
+                    style={{background : color.slice(color.indexOf('#') , color.indexOf("]"))}}
                   />
                 ))}
               </div>

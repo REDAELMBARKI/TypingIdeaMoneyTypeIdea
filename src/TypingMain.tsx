@@ -96,21 +96,20 @@ const TypingApp: React.FC = () => {
   // text container
   const containerRef = useRef<HTMLDivElement | null>(null);
   // timer accum
-
+  // underline ref
 
   const startTypingTimeRef = useRef<number>(0);
   //hooks
   const { selectedTheme } = useThemeHook();
   
-
-
+ 
   // console logs ////////////////
 
   ///////////////////////////////////
 
   /// theme setter   
   useEffect(() => {
-    setCurrentTheme(selectedTheme)
+    setCurrentTheme(selectedTheme) ;
   }, [selectedTheme]);
   // end theme setter 
 
@@ -335,7 +334,7 @@ const TypingApp: React.FC = () => {
             className={`
             text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
             font-mono text-center p-6 sm:p-8 lg:p-12 rounded-2xl shadow-sm 
-            backdrop-blur-sm border border-gray-200/50
+            backdrop-blur-sm 
           `}
           >
             <div

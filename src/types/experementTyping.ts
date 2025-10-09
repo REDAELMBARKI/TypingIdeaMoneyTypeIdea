@@ -18,7 +18,9 @@ export type Mode = "time" | "words";
 
 export interface ThemeColors {
   id:number
+  isDarkModed : boolean
   name :string
+  border:string
   page_bg : string
   red : string
   white  : string

@@ -1,4 +1,4 @@
-import React, {  } from "react";
+import React, { useEffect } from "react";
 import type { currentLetterType, ThemeColors, WordHistoryItem } from "../types/experementTyping";
 
 interface TextRenderProps {
@@ -11,7 +11,7 @@ interface TextRenderProps {
   trachWord: string[];
   wrongWords:{start : number , end:number}[];
   wordHistory: WordHistoryItem[] ;
-  currentTheme: ThemeColors
+  currentTheme: ThemeColors ;
 }
 
 export const useTextRender = ({
@@ -23,8 +23,19 @@ export const useTextRender = ({
   wrongWords ,
   isTypingActive ,
   wordHistory ,
- currentTheme
+ currentTheme , 
 }: TextRenderProps) => {
+  
+  
+useEffect(() => {
+  if (currentTheme.isDarkModed) {
+    document.documentElement.style.removeProperty('color-scheme');
+  } else {
+    document.documentElement.style.setProperty('color-scheme', 'normal');
+  }
+}, [currentTheme.isDarkModed]);
+
+
 
   return currentText.split("").map((char, index) => {
       
@@ -49,16 +60,6 @@ export const useTextRender = ({
       indicator = "display-indicator";
     }
 
-    
-  
-
-
-
-
-
-
-  
-
     const range = wrongWords.find(r => r.start === index);
     if(range){
        const word = currentText.slice(range.start, range.end + 1);
@@ -69,8 +70,8 @@ export const useTextRender = ({
         return (
          <span
               key={`wrong-${range.start}`}
-              className="underLineBefore "
-              style={{ display: "inline-block", position: "relative", whiteSpace: "nowrap" }}
+              className="underLineBefore " 
+              style={{ display: "inline-block", position: "relative", whiteSpace: "nowrap" ,  ["--underlineColor" as string] : currentTheme.red.slice(currentTheme.red.indexOf("#") , currentTheme.red.indexOf("]")) }}
             >
               <span className={`char-wrapper `}   style={{whiteSpace : "nowrap" ,  }}
                       >
