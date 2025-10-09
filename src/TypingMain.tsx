@@ -8,7 +8,7 @@ import useCharacterDeleteHook from "./customHooks/useCharacterDeleteHook";
 import useTypingSound from "./customHooks/useTypingSound";
 import { allowedKeys } from "./data/allowdKeys";
 import useControlleBoundery from "./customHooks/useControlleBoundery";
-import type { currentLetterType, Mode, ThemColors, WordHistoryItem } from "./types/experementTyping";
+import type { currentLetterType, Mode, ThemeColors, WordHistoryItem } from "./types/experementTyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
 import TypingOverModal from "./partials/TypingOverModal";
 import useTypingEnd from "./customHooks/useTypingEnd";
@@ -39,7 +39,7 @@ const sampleTexts = [
 
 const TypingApp: React.FC = () => {
 
-   const [themColors] =  useState<ThemColors>(colorThemes[5])
+   const [currentTheme , setCurrentTheme] =  useState<ThemeColors>(colorThemes[5])
   const [currentText, setCurrentText] = useState<string>(sampleTexts[0]);
   const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
     index: 0,
@@ -100,19 +100,20 @@ const TypingApp: React.FC = () => {
 
   const startTypingTimeRef = useRef<number>(0);
   //hooks
-  const { isDarkMode } = useThemeHook();
+  const { selectedTheme } = useThemeHook();
+  
+
 
   // console logs ////////////////
 
-  useEffect(() => {
-    if(wpmFinal === 0) return ;
-      console.log('wpm' , wpmFinal)
-      
-  }, [wpmFinal]);
-
   ///////////////////////////////////
 
-  
+  /// theme setter   
+  useEffect(() => {
+    setCurrentTheme(selectedTheme)
+  }, [selectedTheme]);
+  // end theme setter 
+
   const timeAmountCountHandler = () => {
     if(! startTypingTimeRef.current) {
        console.warn("starting date is not set ")  ;
@@ -252,7 +253,7 @@ const TypingApp: React.FC = () => {
 
   // text chars render function
   const renderText = useTextRender({
-    themColors ,
+    currentTheme ,
     currentText,
     currentLetter,
     inputValue,
@@ -307,7 +308,7 @@ const TypingApp: React.FC = () => {
   return (
     <div
       className={`min-h-screen transition-colors duration-300  ${
-        themColors.page_bg
+        currentTheme.page_bg
       }`}
     >
       {/* Main Content */}
@@ -395,20 +396,20 @@ const TypingApp: React.FC = () => {
             <>
               <Reseter
                 isBlured={currentLetter.index === 0 ? true : false}
-                isDarkMode={isDarkMode}
+          
                 handleReset={handleReset}
               />
-              <NextText isDarkMode={isDarkMode} nextText={nextText} />
+              <NextText  nextText={nextText} />
             </>
           }
         </div>
 
         {/* Stats Placeholder */}
-        <States isDarkMode={isDarkMode} />
+        <States />
       </main>
 
       {/* Footer */}
-      <Footer isDarkMode={isDarkMode} />
+      <Footer  />
     </div>
   );
 };

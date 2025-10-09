@@ -6,13 +6,13 @@ import { ThemeContext } from "../contexts/themeContext";
 
 
 export default function useThemeHook(){
-      const theme = useContext(ThemeContext) ;
+      const selectedTheme = useContext(ThemeContext) ;
 
 
-      if(!theme){
-        throw new Error("useThemeContext must be used within a ThemeProvider");
+      if(!selectedTheme){
+        throw new Error("selectedThem  must be used within a themContextProvider");
       }
 
 
-        return theme;
+      return selectedTheme;
 }

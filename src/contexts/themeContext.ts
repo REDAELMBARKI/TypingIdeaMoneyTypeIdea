@@ -1,10 +1,11 @@
 
 
 import React from "react";
+import type { ThemeColors } from "../types/experementTyping";
 
 interface themeType {
-    isDarkMode: boolean;
-    setIsDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedTheme: ThemeColors ;
+    setSelectedTheme : React.Dispatch<React.SetStateAction<ThemeColors>>
 }
 
 

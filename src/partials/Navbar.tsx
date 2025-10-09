@@ -1,7 +1,7 @@
 import {  useState } from "react";
 import { Link } from "react-router-dom";
-import { Moon, Sun } from "lucide-react";
-import useThemeHook from "../customHooks/useThemeHook";
+import {  Sun } from "lucide-react";
+import ThemeModal from "../modals/colorThemes";
 
 
 export const Navbar = () => {
@@ -9,17 +9,22 @@ export const Navbar = () => {
   const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
  
 
-  const {isDarkMode , setIsDarkMode} =  useThemeHook();
+  const [isThemeModalOpen , setIsThemeModalOpen] =  useState<boolean>(false);
 
 
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
+    setIsThemeModalOpen(!isThemeModalOpen);
   };
 
 
 
+
   return (
-    <nav className={`fixed w-full h-[100px]  top-0  pt-[25px] `}>
+     <>
+     {
+      isThemeModalOpen && <ThemeModal setIsThemeModalOpen={setIsThemeModalOpen}  />
+     }
+     <nav className={`fixed w-full h-[100px]  top-0  pt-[25px] `}>
       <div className="mx-auto max-w-full  sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           {/* Mobile menu button */}
@@ -86,14 +91,10 @@ export const Navbar = () => {
               <div className="ms-auto flex items-center space-x-4">
                  <button
                       onClick={toggleDarkMode}
-                      className={`p-2 rounded-lg transition-colors duration-200 ${
-                        isDarkMode 
-                          ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white'
-                          : 'bg-white hover:bg-gray-100 text-gray-600 hover:text-gray-900'
-                      } shadow-sm`}
+                      className={`p-2 rounded-lg transition-colors duration-200  `}
                       aria-label="Toggle dark mode"
                     >
-                      {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                      <Sun size={20} />
                     </button>
               </div>
           </div>
@@ -153,6 +154,8 @@ export const Navbar = () => {
         </div>
       )}
     </nav>
+     
+     </>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, {  } from "react";
-import type { currentLetterType, ThemColors, WordHistoryItem } from "../types/experementTyping";
+import type { currentLetterType, ThemeColors, WordHistoryItem } from "../types/experementTyping";
 
 interface TextRenderProps {
   currentLetter: currentLetterType;
@@ -11,7 +11,7 @@ interface TextRenderProps {
   trachWord: string[];
   wrongWords:{start : number , end:number}[];
   wordHistory: WordHistoryItem[] ;
-   themColors: ThemColors
+  currentTheme: ThemeColors
 }
 
 export const useTextRender = ({
@@ -23,7 +23,7 @@ export const useTextRender = ({
   wrongWords ,
   isTypingActive ,
   wordHistory ,
-themColors
+ currentTheme
 }: TextRenderProps) => {
 
   return currentText.split("").map((char, index) => {
@@ -32,13 +32,13 @@ themColors
 
     if (index > currentLetter.index - 1) {
       // Untyped letters
-      className +=  themColors.gray ;
+      className +=  currentTheme.gray ;
     } else if (wrongChars.includes(index)) {
       // Wrong chars
-      className += themColors.red;
+      className += currentTheme.red;
     } else {
       // Correct typed chars
-      className +=  themColors.white ;
+      className +=  currentTheme.white ;
     }
 
     // Custom indicator logic
@@ -102,7 +102,7 @@ themColors
                       const grayStart = wordlen - remaining - 1;
 
                       if (charIndex >= grayStart) {
-                          compactedwordColor = themColors.gray;
+                          compactedwordColor = currentTheme.gray;
                       }
 
                     }
@@ -111,7 +111,7 @@ themColors
                     // the compacted words the ones who are underlined also the untyped ones
                     <span
                       key={charIndex}
-                      className={`char-spa inline-block ${compactedwordColor}  ${wrongChars.includes(globalCharIndex) ? themColors.red : ''} `}
+                      className={`char-spa inline-block ${compactedwordColor}  ${wrongChars.includes(globalCharIndex) ? currentTheme.red : ''} `}
                       style={{whiteSpace : "nowrap"  }}
                       
                     
@@ -141,7 +141,7 @@ themColors
         {char === " " &&
           index === currentLetter.index &&
           trachWord.length > 0 && (
-            <span className={`trach-word inline-block  ${themColors.darkRed} `} 
+            <span className={`trach-word inline-block  ${currentTheme.darkRed} `} 
             
             style={{ whiteSpace : "nowrap"  }} 
             >

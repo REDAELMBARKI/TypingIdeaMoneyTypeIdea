@@ -16,10 +16,13 @@ export type WordHistoryItem = {
 export type Mode = "time" | "words";
 
 
-export interface ThemColors {
+export interface ThemeColors {
+  id:number
+  name :string
   page_bg : string
   red : string
   white  : string
   gray : string
   darkRed : string
+  colors : string[]
 }
