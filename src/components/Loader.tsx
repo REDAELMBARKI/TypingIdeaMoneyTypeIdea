@@ -1,12 +1,32 @@
-import { ImpulseSpinner } from "react-spinners-kit";
+import React from "react";
+import {
+  ClipLoader,
+  BeatLoader,
+  CircleLoader,
+  RingLoader,
+  ScaleLoader,
+} from "react-spinners";
 
+type LoaderProps = {
+  style?: "clip" | "beat" | "circle" | "ring" | "scale";
+  size?: number;
+  color?: string;
+};
 
+const Loader: React.FC<LoaderProps> = ({
+  style = "clip",
+  size = 40,
+  color = "#00bfff",
+}) => {
+  const loaderMap = {
+    clip: <ClipLoader size={size} color={color} />,
+    beat: <BeatLoader size={size / 4} color={color} />,
+    circle: <CircleLoader size={size} color={color} />,
+    ring: <RingLoader size={size} color={color} />,
+    scale: <ScaleLoader height={size} width={6} color={color} />,
+  };
 
+  return <div className="flex items-center justify-center">{loaderMap[style]}</div>;
+};
 
-export default function Loader() {
-  return (
-    <div className="flex items-center justify-center h-screen bg-gray-950">
-      <ImpulseSpinner frontColor="#4FD1C5" backColor="#2C7A7B" />
-    </div>
-  );
-}
+export default Loader;

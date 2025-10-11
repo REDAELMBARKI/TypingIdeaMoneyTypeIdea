@@ -1,4 +1,4 @@
-import React ,  { createContext, useCallback, useState } from "react";
+import React ,  { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { ThemeColors } from "../types/experementTyping";
 import { colorThemes } from "../data/themColors";
 import useThemeHook from "../customHooks/useThemeHook";
@@ -12,16 +12,29 @@ interface ThemeModalProps {
 
 type BaseModalContextType =  {
   setIsLoadingTheme: React.Dispatch<React.SetStateAction<boolean>>
-  isLoadingTheme : boolean
+  isLoadingTheme : boolean 
 }
+
+const BaseModelContext = createContext<BaseModalContextType | undefined>(undefined)
+
+
+const useBaseModelContext : () => BaseModalContextType = () => {
+   const context = useContext(BaseModelContext) ;
+
+    if(! context){
+      throw new  Error('you should past baseMoel data in provider')
+    }
+
+
+    return context ;
+}
+
 export default function ThemeModal({ setIsThemeModalOpen , setPreviewTheme ,isThemeConfirmed }: ThemeModalProps) {
   const [search, setSearch] = useState("");
   const [themes] = useState<ThemeColors[]>(colorThemes);
   const [isLoadingTheme, setIsLoadingTheme] = useState<boolean>(false);
-  
-  // this is the context sends data to base model
-  const BaseModelContext = createContext<BaseModalContextType | undefined>(undefined)
 
+  // this is the context sends data to base model
 
   const {  setIsThemeConfirmed  , setSelectedTheme , previewTheme } = useThemeHook();
   const filteredThemes = themes.filter((t) =>
@@ -35,10 +48,15 @@ export default function ThemeModal({ setIsThemeModalOpen , setPreviewTheme ,isTh
 
   const onConfirm = useCallback(() => {
     if(!previewTheme) return ;
-    setIsThemeConfirmed(true) ;
-    setSelectedTheme(previewTheme) ;
-    setPreviewTheme(null);
-    setIsThemeModalOpen(false) 
+    setIsLoadingTheme(true) ;
+    
+    setTimeout(() => {
+      setIsThemeConfirmed(true) ;
+      setSelectedTheme(previewTheme) ;
+      setPreviewTheme(null);
+      setIsThemeModalOpen(false) 
+      setIsLoadingTheme(false)
+    },2000)
     
   }, [setIsThemeConfirmed, setPreviewTheme , previewTheme , setSelectedTheme , isThemeConfirmed , setIsThemeModalOpen]) ;
 
@@ -133,12 +151,20 @@ const  BaseModal : React.FC<ChildModalProps> = React.memo(({
   onConfirm ,
 
 }) => {
+
   const { selectedTheme  } = useThemeHook();
 
-   
+  const {isLoadingTheme} = useBaseModelContext() ;
+  
+
+  useEffect(() => {
+     console.log("is loading " , isLoadingTheme)
+  }, [isLoadingTheme]);
+  
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center `}>
-      {isLoadingTheme && <Loader />}
+      
+     
       <div
         className={`${selectedTheme.page_bg} border ${selectedTheme.border} rounded-xl w-96 max-w-full p-4 shadow-lg `}
       >
@@ -197,7 +223,7 @@ const  BaseModal : React.FC<ChildModalProps> = React.memo(({
                 ),
               }}
             >
-              confirm
+              {isLoadingTheme  ? <Loader style="scale" size={20}/> :  "confirm"}
             </button>
             {/* Close Button */}
             <button
@@ -215,6 +241,9 @@ const  BaseModal : React.FC<ChildModalProps> = React.memo(({
             </button>
         </section>
       </div>
+
+            
     </div>
+            
   );
 })
