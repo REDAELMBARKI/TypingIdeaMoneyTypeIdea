@@ -1,7 +1,8 @@
 import {  useState } from "react";
 import { Link } from "react-router-dom";
 import {  Sun } from "lucide-react";
-import ThemeModal from "../modals/colorThemes";
+import ThemeModal from "../modals/ThemeModal";
+import useThemeHook from "../customHooks/useThemeHook";
 
 
 export const Navbar = () => {
@@ -10,7 +11,7 @@ export const Navbar = () => {
  
 
   const [isThemeModalOpen , setIsThemeModalOpen] =  useState<boolean>(false);
-
+   const { setPreviewTheme  , isThemeConfirmed  } = useThemeHook();
 
   const toggleDarkMode = () => {
     setIsThemeModalOpen(!isThemeModalOpen);
@@ -22,7 +23,7 @@ export const Navbar = () => {
   return (
      <>
      {
-      isThemeModalOpen && <ThemeModal setIsThemeModalOpen={setIsThemeModalOpen}  />
+      isThemeModalOpen && <ThemeModal isThemeConfirmed={isThemeConfirmed} setPreviewTheme={setPreviewTheme} setIsThemeModalOpen={setIsThemeModalOpen}  />
      }
      <nav className={`fixed w-full h-[100px]  top-0  pt-[25px] `}>
       <div className="mx-auto max-w-full  sm:px-6 lg:px-8">

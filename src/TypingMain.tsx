@@ -26,7 +26,7 @@ import useCapsLockListener from "./customHooks/useCapsLockListener";
 import useTypingControlleFunctions from "./functions/useTypingControlleFunctions";
 import useWpmServiceReset from "./customHooks/useWpmServiceReset";
 import correctTypedCharsCounterHandler from "./functions/correctTypedCharsCounterHandler";
-import { colorThemes } from "./data/themColors";
+
 
 const sampleTexts = [
   // "The quick brown fox jumps over the lazy dog near the riverbank.Technology has revolutionized the way we communicate and share information across the globe.Programming languages evolve continuously to meet the demands of modern software developmen Nature provides endless inspiration for artists writers and creative minds throughout history" ,
@@ -39,7 +39,7 @@ const sampleTexts = [
 
 const TypingApp: React.FC = () => {
 
-   const [currentTheme , setCurrentTheme] =  useState<ThemeColors>(colorThemes[5])
+  // current text state
   const [currentText, setCurrentText] = useState<string>(sampleTexts[0]);
   const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
     index: 0,
@@ -49,8 +49,8 @@ const TypingApp: React.FC = () => {
   const [wordHistory, setWordHistory] = useState<WordHistoryItem[]>([]);
   // ----------------------------------------------------------------------
   // sound param (mute / activate)
-  const [isNormalTypingSoundEnabled] = useState<boolean>(false);
-  const [isErrorSoundEnabled] = useState<boolean>(false);
+  const [isNormalTypingSoundEnabled] = useState<boolean>(true);
+  const [isErrorSoundEnabled] = useState<boolean>(true);
   // game end controller state
   const [isTypingEnds, setIsTypingEnds] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -100,19 +100,34 @@ const TypingApp: React.FC = () => {
 
   const startTypingTimeRef = useRef<number>(0);
   //hooks
-  const { selectedTheme } = useThemeHook();
-  
+  const { selectedTheme , isThemeConfirmed , previewTheme  } = useThemeHook();
+  // theme state
+
+  // console.log(previewTheme , 'preview theme in main');
+  const [currentTheme , setCurrentTheme] =  useState<ThemeColors>(previewTheme ?? selectedTheme) ;
  
+
   // console logs ////////////////
 
   ///////////////////////////////////
-
+  useEffect(() => {
+    setCurrentTheme(previewTheme ?? selectedTheme) ;
+  }, [previewTheme]);
   /// theme setter   
   useEffect(() => {
-    setCurrentTheme(selectedTheme) ;
-  }, [selectedTheme]);
+    if(!selectedTheme) return ;
+    if(! isThemeConfirmed) return ;
+    if(previewTheme) return ;
+    setCurrentTheme(selectedTheme);
+    localStorage.setItem("selectedTheme", JSON.stringify(selectedTheme))
+  }, [selectedTheme , isThemeConfirmed]);
   // end theme setter 
 
+
+
+
+
+  // wpm calculations handlers
   const timeAmountCountHandler = () => {
     if(! startTypingTimeRef.current) {
        console.warn("starting date is not set ")  ;
@@ -171,6 +186,7 @@ const TypingApp: React.FC = () => {
   }, [isTypingStarted]);
 
 
+  
   // caps listener
   useCapsLockListener({ setIsCapsOn });
 

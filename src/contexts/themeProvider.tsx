@@ -5,11 +5,18 @@ import type { ThemeColors } from "../types/experementTyping";
 import { colorThemes } from "../data/themColors";
 
 export const ThemeProvider: React.FC<{children: React.ReactNode}> = ({children}) => {   
-    const [selectedTheme, setSelectedTheme] = React.useState<ThemeColors>(colorThemes[5]);
+    const [selectedTheme, setSelectedTheme] = React.useState<ThemeColors>(localStorage.getItem("selectedTheme") ? 
+           JSON.parse(localStorage.getItem("selectedTheme") as string) : colorThemes[0] );
+     // theme confirmation boo
+   const [ isThemeConfirmed , setIsThemeConfirmed] =  React.useState<boolean>(false) ;
+   const [previewTheme , setPreviewTheme] =  React.useState<ThemeColors | null>(null) ;
+   const [ isPreviewTheme , setIsPreviewTheme] =  React.useState<boolean>(false) ;
+
+   
 
 
     return (
-        <ThemeContext.Provider value={{selectedTheme, setSelectedTheme}} >
+        <ThemeContext.Provider value={{ isPreviewTheme , setIsPreviewTheme ,selectedTheme, setSelectedTheme , isThemeConfirmed , setIsThemeConfirmed , previewTheme , setPreviewTheme}} >
                 {children}
         </ThemeContext.Provider>
     )
