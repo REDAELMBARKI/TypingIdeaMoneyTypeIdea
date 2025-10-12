@@ -43,13 +43,13 @@ useEffect(() => {
 
     if (index > currentLetter.index - 1) {
       // Untyped letters
-      className +=  currentTheme.gray ;
+      className +=  `text-[${currentTheme.gray}]` ;
     } else if (wrongChars.includes(index)) {
       // Wrong chars
-      className += currentTheme.red;
+      className += `text-[${currentTheme.red}]`;
     } else {
       // Correct typed chars
-      className +=  currentTheme.white ;
+      className += `text-[${currentTheme.white}]`;
     }
 
     // Custom indicator logic
@@ -71,7 +71,7 @@ useEffect(() => {
          <span
               key={`wrong-${range.start}`}
               className="underLineBefore " 
-              style={{ display: "inline-block", position: "relative", whiteSpace: "nowrap" ,  ["--underlineColor" as string] : currentTheme.red.slice(currentTheme.red.indexOf("#") , currentTheme.red.indexOf("]")) }}
+              style={{ display: "inline-block", position: "relative", whiteSpace: "nowrap" ,  ["--underlineColor" as string] : currentTheme.red }}
             >
               <span className={`char-wrapper `}   style={{whiteSpace : "nowrap" ,  }}
                       >
@@ -112,8 +112,8 @@ useEffect(() => {
                     // the compacted words the ones who are underlined also the untyped ones
                     <span
                       key={charIndex}
-                      className={`char-spa inline-block ${compactedwordColor}  ${wrongChars.includes(globalCharIndex) ? currentTheme.red : ''} `}
-                      style={{whiteSpace : "nowrap"  }}
+                      className={`char-spa inline-block text-[${compactedwordColor}]  text-[${wrongChars.includes(globalCharIndex) && currentTheme.red}] `}
+                      style={{whiteSpace : "nowrap" ,  }}
                       
                     
                     >
@@ -142,7 +142,7 @@ useEffect(() => {
         {char === " " &&
           index === currentLetter.index &&
           trachWord.length > 0 && (
-            <span className={`trach-word inline-block  ${currentTheme.darkRed} `} 
+            <span className={`trach-word inline-block  text-[${currentTheme.darkRed}] `} 
             
             style={{ whiteSpace : "nowrap"  }} 
             >
@@ -155,7 +155,7 @@ useEffect(() => {
          
 
 
-        <span key={index} style={{ whiteSpace : "nowrap"   }} className={`px-[1px inline-block   ${className} ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
+        <span key={index} style={{ whiteSpace : "nowrap"   }} className={`px-[1px inline-block   ${className}  ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
         
         >
           {char === " " ? "\u00A0" : char}

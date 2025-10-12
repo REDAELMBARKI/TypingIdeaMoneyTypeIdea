@@ -1,163 +1,202 @@
-import {  useState } from "react";
-import { Link } from "react-router-dom";
-import {  Sun } from "lucide-react";
+import { useState } from "react";
+import { Palette, Keyboard } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import ThemeModal from "../modals/ThemeModal";
 import useThemeHook from "../customHooks/useThemeHook";
 
-
 export const Navbar = () => {
-  const [mobileOpen, setMobileOpen] = useState<boolean>(false);
-  const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
- 
-
-  const [isThemeModalOpen , setIsThemeModalOpen] =  useState<boolean>(false);
-   const { setPreviewTheme  , isThemeConfirmed  } = useThemeHook();
-
-  const toggleDarkMode = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+  const {currentTheme} =  useThemeHook() ;
+  const location = useLocation();
+  const {setPreviewTheme,isThemeConfirmed} = useThemeHook()
+  const toggleThemeModal = () => {
     setIsThemeModalOpen(!isThemeModalOpen);
   };
 
-
-
+  const NavLink = ({ href , children, highlight = false }:{href : string , children :string  , highlight : boolean }) => (
+    <a
+      href={href}
+      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+        highlight
+          ? `text-[${currentTheme.red}] hover:bg-indigo-50 dark:hover:bg-indigo-950`
+          : "text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+      }`}
+    >
+      {children}
+    </a>
+  );
 
   return (
-     <>
-     {
-      isThemeModalOpen && <ThemeModal isThemeConfirmed={isThemeConfirmed} setPreviewTheme={setPreviewTheme} setIsThemeModalOpen={setIsThemeModalOpen}  />
-     }
-     <nav className={`fixed w-full h-[100px]  top-0  pt-[25px] `}>
-      <div className="mx-auto max-w-full  sm:px-6 lg:px-8">
-        <div className="relative flex h-16 items-center justify-between">
-          {/* Mobile menu button */}
-          <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            <button
-              type="button"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-white/5 hover:text-white focus:outline-2 focus:-outline-offset-1 focus:outline-indigo-500"
-            >
-              <span className="sr-only">Open main menu</span>
-              {mobileOpen ? (
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                  className="h-6 w-6"
-                >
-                  <path d="M6 18 18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              ) : (
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                  className="h-6 w-6"
-                >
-                  <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
-            </button>
-          </div>
-
-          {/* Logo + Links */}
-          <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-            <div className="flex shrink-0 items-center">
-              <img
-                src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-                alt="Your Company"
-                className="h-8 w-auto"
-              />
-            </div>
-            <div className="hidden sm:ml-6 sm:block flex ">
-
-                    <div className="flex space-x-4">
-                      <Link to="/dashboard" className="rounded-md bg-gray-950/50 px-3 py-2 text-sm font-medium text-white">
-                        Dashboard
-                      </Link>
-                      <Link to="/team" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white">
-                        Team
-                      </Link>
-                      <Link to="/projects" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white">
-                        Projects
-                      </Link>
-                      <Link to="/calendar" className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white">
-                        Calendar
-                      </Link>
-                    </div>
-
-                    
-              </div>
-
-              <div className="ms-auto flex items-center space-x-4">
-                 <button
-                      onClick={toggleDarkMode}
-                      className={`p-2 rounded-lg transition-colors duration-200  `}
-                      aria-label="Toggle dark mode"
-                    >
-                      <Sun size={20} />
-                    </button>
-              </div>
-          </div>
-
-          {/* Right side */}
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            <button className="relative rounded-full p-1 text-gray-400 hover:text-white focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500">
-              <span className="sr-only">View notifications</span>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                className="h-6 w-6"
-              >
-                <path
-                  d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-
-            {/* User menu */}
-            <div className="relative ml-3">
+    <>
+      {isThemeModalOpen && (
+        <ThemeModal setIsThemeModalOpen={setIsThemeModalOpen}  setPreviewTheme={setPreviewTheme} isThemeConfirmed={isThemeConfirmed}  />
+      )}
+      
+      <nav className="fixed w-full top-0 z-40 px-4 sm:px-6 lg:px-8 py-4">
+        <div className="mx-auto max-w-7xl">
+          <div className="relative flex h-16 items-center justify-between">
+            
+            {/* Mobile menu button */}
+            <div className="flex items-center sm:hidden">
               <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="relative flex rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                type="button"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="inline-flex items-center justify-center rounded-lg p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
-                <span className="sr-only">Open user menu</span>
-                <img
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"
-                  alt=""
-                  className="h-8 w-8 rounded-full"
-                />
+                <span className="sr-only">Open menu</span>
+                {mobileOpen ? (
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
+            </div>
+
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg">
+                <Keyboard className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+                KeyFlow
+              </span>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden sm:flex items-center space-x-1">
+              <NavLink href="/learn" highlight={location.pathname === "/learn"}>Learn</NavLink>
+              <NavLink href="/" highlight={location.pathname === "/"}>Practice</NavLink>
+              <NavLink href="/test" highlight={false}>Test</NavLink>
+              <NavLink href="/games" highlight={false} >Games</NavLink>
+              <NavLink href="/custom" highlight={false}>Custom Practice</NavLink>
+            </div>
+
+            {/* Right side actions */}
+            <div className="flex items-center space-x-2">
+              {/* Theme button */}
+              <button
+                onClick={toggleThemeModal}
+                className="p-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-label="Change theme"
+              >
+                <Palette className="w-5 h-5" />
               </button>
 
-              {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5">
-                  <Link to="/profile" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5">Your profile</Link>
-                  <Link to="/settings" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5">Settings</Link>
-                  <Link to="/signout" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5">Sign out</Link>
-                </div>
-              )}
+              {/* Notifications */}
+              <button className="hidden sm:block p-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative">
+                <span className="sr-only">Notifications</span>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  />
+                </svg>
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+              </button>
+
+              {/* User menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                >
+                  <span className="sr-only">Open user menu</span>
+                  <img
+                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"
+                    alt="User"
+                    className="h-9 w-9 rounded-full border-2 border-gray-200 dark:border-gray-700"
+                  />
+                </button>
+
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-3 w-56 origin-top-right rounded-xl bg-white dark:bg-gray-800 shadow-xl ring-1 ring-black ring-opacity-5 z-50 py-2">
+                    <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">John Doe</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">john@example.com</p>
+                    </div>
+                    <div className="py-2">
+                      <a
+                        href="#profile"
+                        className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        Your Profile
+                      </a>
+                      <a
+                        href="#stats"
+                        className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        Statistics
+                      </a>
+                      <a
+                        href="#settings"
+                        className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        Settings
+                      </a>
+                    </div>
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
+                      <a
+                        href="#signout"
+                        className="block px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+                      >
+                        Sign Out
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="sm:hidden px-2 pt-2 pb-3 space-y-1">
-          <Link to="/dashboard" className="block rounded-md bg-gray-950/50 px-3 py-2 text-base font-medium text-white">Dashboard</Link>
-          <Link to="/team" className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-white/5 hover:text-white">Team</Link>
-          <Link to="/projects" className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-white/5 hover:text-white">Projects</Link>
-          <Link to="/calendar" className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-white/5 hover:text-white">Calendar</Link>
-        </div>
-      )}
-    </nav>
-     
-     </>
+        {/* Mobile menu */}
+        {mobileOpen && (
+          <div className="sm:hidden mt-4 p-4 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg shadow-lg">
+            <div className="space-y-1">
+              <a
+                href="#learn"
+                className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                Learn
+              </a>
+              <a
+                href="#practice"
+                className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                Practice
+              </a>
+              <a
+                href="#test"
+                className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                Test
+              </a>
+              <a
+                href="#games"
+                className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                Games
+              </a>
+              <a
+                href="#custom"
+                className="block px-4 py-3 rounded-lg text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 transition-colors"
+              >
+                Custom Practice
+              </a>
+            </div>
+          </div>
+        )}
+      </nav>
+    </>
   );
 };
 
-export default Navbar ;
+export default Navbar;

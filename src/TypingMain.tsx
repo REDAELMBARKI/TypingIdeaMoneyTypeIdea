@@ -8,7 +8,7 @@ import useCharacterDeleteHook from "./customHooks/useCharacterDeleteHook";
 import useTypingSound from "./customHooks/useTypingSound";
 import { allowedKeys } from "./data/allowdKeys";
 import useControlleBoundery from "./customHooks/useControlleBoundery";
-import type { currentLetterType, Mode, ThemeColors, WordHistoryItem } from "./types/experementTyping";
+import type { currentLetterType, Mode, WordHistoryItem } from "./types/experementTyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
 import TypingOverModal from "./partials/TypingOverModal";
 import useTypingEnd from "./customHooks/useTypingEnd";
@@ -49,8 +49,8 @@ const TypingApp: React.FC = () => {
   const [wordHistory, setWordHistory] = useState<WordHistoryItem[]>([]);
   // ----------------------------------------------------------------------
   // sound param (mute / activate)
-  const [isNormalTypingSoundEnabled] = useState<boolean>(true);
-  const [isErrorSoundEnabled] = useState<boolean>(true);
+  const [isNormalTypingSoundEnabled] = useState<boolean>(false);
+  const [isErrorSoundEnabled] = useState<boolean>(false);
   // game end controller state
   const [isTypingEnds, setIsTypingEnds] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -104,16 +104,22 @@ const TypingApp: React.FC = () => {
   // theme state
 
   // console.log(previewTheme , 'preview theme in main');
-  const [currentTheme , setCurrentTheme] =  useState<ThemeColors>(previewTheme ?? selectedTheme) ;
+  const {currentTheme , setCurrentTheme } =  useThemeHook() ;
  
 
   // console logs ////////////////
-
+   useEffect(() => {
+      console.log('wpmFinal' , wpmFinal)
+   }, [wpmFinal]);
   ///////////////////////////////////
+
+
+//////////////////////////////////////////////////////
+   // theme previewer
   useEffect(() => {
     setCurrentTheme(previewTheme ?? selectedTheme) ;
   }, [previewTheme]);
-  /// theme setter   
+ /// theme setter   
   useEffect(() => {
     if(!selectedTheme) return ;
     if(! isThemeConfirmed) return ;
@@ -123,7 +129,7 @@ const TypingApp: React.FC = () => {
   }, [selectedTheme , isThemeConfirmed]);
   // end theme setter 
 
-
+//////////////////////////////////////////////////////////
 
 
 
@@ -137,7 +143,7 @@ const TypingApp: React.FC = () => {
   }
   // wpm Calculations 
   useEffect(()=>{
-    if(!isTypingEnds) return ;
+    if(!isTypingEnds ) return ;
 
     setTimeout(() => {
         // totall characters typed correctly 
@@ -149,22 +155,17 @@ const TypingApp: React.FC = () => {
 
         // time amount 
         timeAmountCountHandler();
-        console.log('time' , amountOfTimeRef.current)
+        // console.log('start time ' , startTypingTimeRef)
+        // console.log("end typinf time " , Date.now())
+        // console.log('current chars ' , totalCorrectedCharsRef.current)
+        // console.log('time' , amountOfTimeRef.current)
 
-        if (amountOfTimeRef.current != null && amountOfTimeRef.current < 0.05) { 
-          console.warn("Session too short, skipping WPM calculation");
-          return;
-        }
+        // if (amountOfTimeRef.current != null && amountOfTimeRef.current < 0.05) { 
+        //   console.warn("Session too short, skipping WPM calculation");
+        //   return;
+        // }
 
-
-
-         if (
-          !totalCorrectedCharsRef.current ||
-          !amountOfTimeRef.current ||
-          amountOfTimeRef.current < 0.05 // guard against tiny times
-        )
-        return;
-        const finalWpm = (totalCorrectedCharsRef.current / 5)  / (amountOfTimeRef.current)
+        const finalWpm = (totalCorrectedCharsRef.current! / 5)  / (amountOfTimeRef.current!)
         setWpmFinal(Math.floor(finalWpm));
         // alert( )
 
@@ -322,9 +323,9 @@ const TypingApp: React.FC = () => {
   });
   return (
     <div
-      className={`min-h-screen transition-colors duration-300  ${
+      className={`min-h-screen transition-colors duration-300  bg-[${
         currentTheme.page_bg
-      }`}
+      }]`}
     >
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pb-20">
@@ -411,7 +412,7 @@ const TypingApp: React.FC = () => {
             <>
               <Reseter
                 isBlured={currentLetter.index === 0 ? true : false}
-          
+                currentTheme={currentTheme} 
                 handleReset={handleReset}
               />
               <NextText  nextText={nextText} />
@@ -420,7 +421,7 @@ const TypingApp: React.FC = () => {
         </div>
 
         {/* Stats Placeholder */}
-        <States />
+        <States  wpmFinal={wpmFinal} currentTheme={currentTheme} />
       </main>
 
       {/* Footer */}

@@ -1,4 +1,4 @@
-import React ,  { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React ,  { createContext, useCallback, useContext, useState } from "react";
 import type { ThemeColors } from "../types/experementTyping";
 import { colorThemes } from "../data/themColors";
 import useThemeHook from "../customHooks/useThemeHook";
@@ -152,21 +152,19 @@ const  BaseModal : React.FC<ChildModalProps> = React.memo(({
 
 }) => {
 
-  const { selectedTheme  } = useThemeHook();
+  const { currentTheme  } = useThemeHook();
 
   const {isLoadingTheme} = useBaseModelContext() ;
-  
+   
+ 
 
-  useEffect(() => {
-     console.log("is loading " , isLoadingTheme)
-  }, [isLoadingTheme]);
-  
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center `}>
       
      
       <div
-        className={`${selectedTheme.page_bg} border ${selectedTheme.border} rounded-xl w-96 max-w-full p-4 shadow-lg `}
+        className={` border border-[${currentTheme.border}]  rounded-xl w-96  max-w-full p-4 shadow-lg `}
+       style={{backgroundColor : currentTheme.page_bg}}
       >
         {/* Search Bar */}
         <input
@@ -174,7 +172,8 @@ const  BaseModal : React.FC<ChildModalProps> = React.memo(({
           placeholder="Search themes..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white mb-4"
+          style={{color : currentTheme.white}}
+          className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400  mb-4"
         />
 
         {/* Themes List */}
@@ -194,10 +193,7 @@ const  BaseModal : React.FC<ChildModalProps> = React.memo(({
                     key={index}
                     className={`w-5 h-5 rounded-sm border border-gray-300 dark:border-gray-700 ${color}`}
                     style={{
-                      background: color.slice(
-                        color.indexOf("#"),
-                        color.indexOf("]")
-                      ),
+                      background: color
                     }}
                   />
                 ))}
@@ -217,13 +213,10 @@ const  BaseModal : React.FC<ChildModalProps> = React.memo(({
               onClick={() =>  onConfirm()}
               className="mt-4 w-full py-2 rounded-md  text-white  transition"
               style={{
-                backgroundColor: selectedTheme.gray.slice(
-                  selectedTheme.gray.indexOf("#"),
-                  selectedTheme.gray.indexOf("]")
-                ),
+                backgroundColor: currentTheme.gray
               }}
             >
-              {isLoadingTheme  ? <Loader style="scale" size={20}/> :  "confirm"}
+              {isLoadingTheme  ? <Loader style="scale" size={20} color={currentTheme.darkRed} /> :  "confirm"}
             </button>
             {/* Close Button */}
             <button
@@ -231,10 +224,7 @@ const  BaseModal : React.FC<ChildModalProps> = React.memo(({
               className={`mt-4 w-full py-2 rounded-md  text-white hover:bg-indigo-500 transition   `}
 
               style={{
-                backgroundColor: selectedTheme.red.slice(
-                  selectedTheme.red.indexOf("#"),
-                  selectedTheme.red.indexOf("]")
-                ),
+                backgroundColor: currentTheme.red
               }}
             >
               close

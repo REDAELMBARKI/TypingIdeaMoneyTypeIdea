@@ -1,11 +1,22 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import type { ThemeColors } from '../types/experementTyping';
 
-function States() {
+function States({ wpmFinal , currentTheme }:{ wpmFinal: number , currentTheme: ThemeColors}) {
+  const [highestWpm , setHighestWpm] = React.useState<number>(0) ;
+
+  // update the highest wpm reacheed
+  useEffect(() => {
+     if(highestWpm >= wpmFinal )return ;
+
+     setHighestWpm(wpmFinal) ;
+  }, [wpmFinal]);
+
+
   return (
     <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 w-full max-w-2xl">
           {[ 
             
-            { label: 'WPM', value: '0' },
+            { label: 'Highest WPM', value: highestWpm },
             { label: 'Accuracy', value: '100%' },
             { label: 'Time', value: '0s' },
             { label: 'Characters', value: '0' }
@@ -15,12 +26,12 @@ function States() {
               className={`
                 text-center p-4 rounded-xl shadow-sm
                 ${
-                   'bg-white/70 backdrop-blur-sm border border-gray-200/50'
+                   `${currentTheme.gray} backdrop-blur-sm border border-${currentTheme.border}` 
                 }
               `}
             >
               <div className={`text-2xl sm:text-3xl font-bold 
-                text-blue-600
+                text-[${currentTheme.red}]
               `}>
                 {stat.value}
               </div>
@@ -34,4 +45,4 @@ function States() {
   )
 }
 
-export default States
+export default React.memo(States)

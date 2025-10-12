@@ -12,6 +12,8 @@ interface themeType {
     previewTheme : ThemeColors | null ;
     isPreviewTheme : boolean ;
     setIsPreviewTheme : React.Dispatch<React.SetStateAction<boolean>>
+    setCurrentTheme: React.Dispatch<React.SetStateAction<ThemeColors>>
+    currentTheme : ThemeColors
 }
 
 
