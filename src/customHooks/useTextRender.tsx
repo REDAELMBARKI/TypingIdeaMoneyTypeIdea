@@ -39,17 +39,17 @@ useEffect(() => {
 
   return currentText.split("").map((char, index) => {
       
-    let className = "transition-all duration-150 ";
+    let charStyle = "";
 
     if (index > currentLetter.index - 1) {
       // Untyped letters
-      className +=  `text-[${currentTheme.gray}]` ;
+      charStyle +=  currentTheme.gray ;
     } else if (wrongChars.includes(index)) {
       // Wrong chars
-      className += `text-[${currentTheme.red}]`;
+      charStyle += currentTheme.red;
     } else {
       // Correct typed chars
-      className += `text-[${currentTheme.white}]`;
+      charStyle += currentTheme.white ;
     }
 
     // Custom indicator logic
@@ -112,8 +112,13 @@ useEffect(() => {
                     // the compacted words the ones who are underlined also the untyped ones
                     <span
                       key={charIndex}
-                      className={`char-spa inline-block text-[${compactedwordColor}]  text-[${wrongChars.includes(globalCharIndex) && currentTheme.red}] `}
-                      style={{whiteSpace : "nowrap" ,  }}
+                      className={`char-spa inline-block transition-all duration-150  ${isTypingActive ? 'stop-animation' : ''}`}
+                      style={{
+                        whiteSpace: "nowrap",
+                        color: wrongChars.includes(globalCharIndex) 
+                          ? currentTheme.red 
+                          : compactedwordColor
+                      }}
                       
                     
                     >
@@ -142,9 +147,9 @@ useEffect(() => {
         {char === " " &&
           index === currentLetter.index &&
           trachWord.length > 0 && (
-            <span className={`trach-word inline-block  text-[${currentTheme.darkRed}] `} 
+            <span className={`trach-word inline-block ` }  
             
-            style={{ whiteSpace : "nowrap"  }} 
+            style={{ whiteSpace : "nowrap" ,color : currentTheme.darkRed }} 
             >
               {trachWord.join("")}
             </span>
@@ -155,7 +160,7 @@ useEffect(() => {
          
 
 
-        <span key={index} style={{ whiteSpace : "nowrap"   }} className={`px-[1px inline-block   ${className}  ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
+        <span key={index} style={{ whiteSpace : "nowrap" , color : charStyle  }} className={`inline-block  transition-all duration-150   ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
         
         >
           {char === " " ? "\u00A0" : char}

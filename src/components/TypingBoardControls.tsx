@@ -9,7 +9,7 @@ import {
   AlignLeft,
   Clock,
 } from "lucide-react";
-import type { Mode } from "../types/experementTyping";
+import type { Mode, ThemeColors } from "../types/experementTyping";
 
 
 interface TypingBoardControlsProps {
@@ -21,6 +21,7 @@ interface TypingBoardControlsProps {
  typedWordsAmount : number ;
  typingModeSelected :  Mode ;
  setTypingModeSelected: React.Dispatch<React.SetStateAction<Mode>>
+  currentTheme : ThemeColors ;
 }
 
 interface expandedoptionsListProps {
@@ -30,9 +31,10 @@ interface expandedoptionsListProps {
   optionsList : number[];
   typingModeSelected : Mode ;
   showWordsFadeAnimat:boolean ;
+ 
 }
 
-export default function TypingBoardControls({setTypingModeSelected,typingModeSelected , currentText , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
+export default function TypingBoardControls({currentTheme ,setTypingModeSelected,typingModeSelected , currentText , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
   
   const [showTimes, setShowTimes] = useState(false);
   const [showWordsFadeAnimat,setShowWordsFadeAnimat] =  useState(false);
@@ -45,17 +47,21 @@ export default function TypingBoardControls({setTypingModeSelected,typingModeSel
     <div className="w-full relative flex items-center gap-6 px-4 py-2 ">
       {/* Elapsed Time */}
       {typingModeSelected === 'time' ?
-                        <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none text-center w-[4em]
-                                ${isTypingStarted ? 'bg-green-600' : 'bg-indigo-500'}
-                                ${elapsedTime < 10 ? 'bg-red-500' : elapsedTime < 15 ? 'bg-orange-500' : ''}
-                                  `}>
-                          
+                        <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none text-center w-[4em] `}
+                        style={{
+                           background : isTypingStarted ? ( elapsedTime < 10 ? '#ef4444' : elapsedTime < 15 ? '#f97316' : '#16a34a' ) : currentTheme.buttonPrimary
+                        }}          
+                        
+                        >
+                           
                           {typingModeSelected === 'time' && elapsedTime}
                         
                         </div>
 
                         :
-                      <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none bg-indigo-500  text-center w-[4em]`}>
+                      <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none  text-center w-[4em]`}
+                        style={{background : currentTheme.buttonSecondary , color:currentTheme.buttonHover}}
+                       >
                         
                         {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
                         {typingModeSelected === 'words' && typedWordsAmount + "/" + (currentText.split(' ').length - 1)}  
@@ -72,8 +78,8 @@ export default function TypingBoardControls({setTypingModeSelected,typingModeSel
           }}
           className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700"
         >
-          <Timer size={22} className="text-slate-700" />
-          <span className="text-xs text-gray-700  leading-none">{selectedTime}</span>
+          <Timer size={22} style={{color:currentTheme.buttonHover}}   />
+          <span className="text-xs  leading-none" style={{color:currentTheme.buttonHover}} >{selectedTime}</span>
         </button>
    
       </div>
@@ -84,35 +90,35 @@ export default function TypingBoardControls({setTypingModeSelected,typingModeSel
                       setShowWordsFadeAnimat(!showWordsFadeAnimat)
                     }}
       >
-        <AlignLeft size={22} className="text-slate-700" />
-        <span className="text-xs text-gray-700">Words</span>
+        <AlignLeft size={22} style={{color:currentTheme.buttonHover}}  />
+        <span className="text-xs " style={{color:currentTheme.buttonHover}} >Words</span>
       </button>
 
       {/* Other Functional Buttons */}
       <div className="flex items-center gap-5 ml-2">
-          <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700">
-            <Hash size={22} className="text-slate-700" />
-            <span className="text-xs text-gray-700">Numbers</span>
+          <button className="flex items-center gap-2 text-sm hover:scale-110 transition " >
+            <Hash size={22} className="" style={{color:currentTheme.buttonHover}} />
+            <span className="text-xs " style={{color:currentTheme.buttonHover}} >Numbers</span>
           </button>
 
-          <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700">
-            <SquareAsterisk size={22} className="text-slate-700" />
-            <span className="text-xs text-gray-700">Symbols</span>
+          <button className="flex items-center gap-2 text-sm hover:scale-110 transition " style={{color:currentTheme.buttonHover}}>
+            <SquareAsterisk size={22} className="" style={{color:currentTheme.buttonHover}} />
+            <span className="text-xs "style={{color:currentTheme.buttonHover}}  >Symbols</span>
           </button>
 
-          <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700">
-            <Shuffle size={22} className="text-slate-700" />
-            <span className="text-xs text-gray-700">Shuffle</span>
+          <button className="flex items-center gap-2 text-sm hover:scale-110 transition " style={{color:currentTheme.buttonHover}}>
+            <Shuffle size={22} className="" style={{color:currentTheme.buttonHover}} />
+            <span className="text-xs "style={{color:currentTheme.buttonHover}}  >Shuffle</span>
           </button>
 
-          <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700">
-            <RefreshCw size={22} className="text-slate-700" />
-            <span className="text-xs text-gray-700">Reset</span>
+          <button className="flex items-center gap-2 text-sm hover:scale-110 transition " style={{color:currentTheme.buttonHover}}>
+            <RefreshCw size={22} className="" style={{color:currentTheme.buttonHover}} />
+            <span className="text-xs "style={{color:currentTheme.buttonHover}}  >Reset</span>
           </button>
 
-          <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700">
-            <SkipForward size={22} className="text-slate-700" />
-            <span className="text-xs text-gray-700">Next</span>
+          <button className="flex items-center gap-2 text-sm hover:scale-110 transition " style={{color:currentTheme.buttonHover}}>
+            <SkipForward size={22} className="" style={{color:currentTheme.buttonHover}} />
+            <span className="text-xs " style={{color:currentTheme.buttonHover}} >Next</span>
           </button>
       </div>
       {/* separator */}
@@ -144,7 +150,7 @@ const ExpandedoptionsList = ({showTimes , setSelectedTime , setShowTimes , optio
                 setSelectedTime(option);
                 setShowTimes(false);
               }}
-              className="flex items-center gap-2 text-xs text-gray-700 hover:text-slate-700 transition"
+              className="flex items-center gap-2 text-xs   hover:text-slate-700 transition"
             >
               {typingModeSelected == 'time' &&  <Clock size={18} className="text-slate-700" />}
               <span>{option}{typingModeSelected == 'time' ? 's' : 'w'}</span>

@@ -25,7 +25,8 @@ import useSessionTimerCountDown from "./customHooks/useSessionTimerCountDown";
 import useCapsLockListener from "./customHooks/useCapsLockListener";
 import useTypingControlleFunctions from "./functions/useTypingControlleFunctions";
 import useWpmServiceReset from "./customHooks/useWpmServiceReset";
-import correctTypedCharsCounterHandler from "./functions/correctTypedCharsCounterHandler";
+import useWpmCalculationHandler from "./customHooks/useWpmCalculationHandler";
+import useThemePreviewerAndSetter from "./customHooks/useThemePreviewerAndSetter";
 
 
 const sampleTexts = [
@@ -100,83 +101,29 @@ const TypingApp: React.FC = () => {
 
   const startTypingTimeRef = useRef<number>(0);
   //hooks
-  const { selectedTheme , isThemeConfirmed , previewTheme  } = useThemeHook();
+ 
   // theme state
 
   // console.log(previewTheme , 'preview theme in main');
-  const {currentTheme , setCurrentTheme } =  useThemeHook() ;
+  const {  currentTheme } =  useThemeHook() ;
  
 
   // console logs ////////////////
    useEffect(() => {
-      console.log('wpmFinal' , wpmFinal)
+      console.log( wpmFinal)
    }, [wpmFinal]);
   ///////////////////////////////////
 
 
 //////////////////////////////////////////////////////
-   // theme previewer
-  useEffect(() => {
-    setCurrentTheme(previewTheme ?? selectedTheme) ;
-  }, [previewTheme]);
- /// theme setter   
-  useEffect(() => {
-    if(!selectedTheme) return ;
-    if(! isThemeConfirmed) return ;
-    if(previewTheme) return ;
-    setCurrentTheme(selectedTheme);
-    localStorage.setItem("selectedTheme", JSON.stringify(selectedTheme))
-  }, [selectedTheme , isThemeConfirmed]);
-  // end theme setter 
+
 
 //////////////////////////////////////////////////////////
 
 
-
-  // wpm calculations handlers
-  const timeAmountCountHandler = () => {
-    if(! startTypingTimeRef.current) {
-       console.warn("starting date is not set ")  ;
-    }
-    const sessionTime =  Date.now() - startTypingTimeRef.current;
-    amountOfTimeRef.current = sessionTime / 1000  / 60  ;
-  }
-  // wpm Calculations 
-  useEffect(()=>{
-    if(!isTypingEnds ) return ;
-
-    setTimeout(() => {
-        // totall characters typed correctly 
-        correctTypedCharsCounterHandler({  
-        wordHistory,
-        wrongChars,
-        currentText,
-        totalCorrectedCharsRef})
-
-        // time amount 
-        timeAmountCountHandler();
-        // console.log('start time ' , startTypingTimeRef)
-        // console.log("end typinf time " , Date.now())
-        // console.log('current chars ' , totalCorrectedCharsRef.current)
-        // console.log('time' , amountOfTimeRef.current)
-
-        // if (amountOfTimeRef.current != null && amountOfTimeRef.current < 0.05) { 
-        //   console.warn("Session too short, skipping WPM calculation");
-        //   return;
-        // }
-
-        const finalWpm = (totalCorrectedCharsRef.current! / 5)  / (amountOfTimeRef.current!)
-        setWpmFinal(Math.floor(finalWpm));
-        // alert( )
-
-         setIsShowTypingOverModal(true);
-     }, 100);
-  },[isTypingEnds])
-
-  // the amount if words typed handler
+  // the amount of words typed handler
   useEffect(() => {
     if (inputValue !== " ") return;
-
     setTypedWordsAmount((prev) => prev + 1);
   }, [inputValue]);
 
@@ -216,12 +163,16 @@ const TypingApp: React.FC = () => {
   // window resize
   // useWindowResize({containerRef  ,setContainerWidth})
   
-  // wpm services and calculations reset
+  // ########################  wpm services and calculations reset ###########################
+     // wpm calculations handlers
+     useWpmCalculationHandler({setIsShowTypingOverModal , setWpmFinal , isTypingEnds,startTypingTimeRef,amountOfTimeRef ,wordHistory , wrongChars ,  currentText , totalCorrectedCharsRef }) ;
+     // wpm reset service
+     useWpmServiceReset({wpmFinal ,totalCorrectedCharsRef , amountOfTimeRef , startTypingTimeRef , setWpmFinal , setTypedWordsAmount , isTypingEnds})
+  // ########################  ###############  // ###########################
 
-  useWpmServiceReset({wpmFinal ,totalCorrectedCharsRef , amountOfTimeRef , startTypingTimeRef , setWpmFinal , setTypedWordsAmount , isTypingEnds})
-
-
-
+     // theme previewer
+    useThemePreviewerAndSetter() ;
+  // end theme setter 
   
   // starting timer listener (typing session start listener)
   useSessionTimerCountDown({
@@ -323,9 +274,8 @@ const TypingApp: React.FC = () => {
   });
   return (
     <div
-      className={`min-h-screen transition-colors duration-300  bg-[${
-        currentTheme.page_bg
-      }]`}
+      className={`min-h-screen transition-colors duration-300  `}
+      style={{background :  currentTheme.page_bg}}
     >
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pb-20">
@@ -337,6 +287,7 @@ const TypingApp: React.FC = () => {
         <div className="w-[80%] max-w-screen mx-auto mt-[100px]">
           <section>
             <TypingBoardControls
+              currentTheme={currentTheme}
               setTypingModeSelected={setTypingModeSelected}
               currentText={currentText}
               typingModeSelected={typingModeSelected}

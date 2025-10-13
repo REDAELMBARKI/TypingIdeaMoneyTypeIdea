@@ -7,27 +7,22 @@ interface  sessionTimerCountDownProps {
     setIsTypingStarted: React.Dispatch<React.SetStateAction<boolean>>
     allowedKeys: Set<string>;
     currentLetter : currentLetterType ;
+    
 }
 
 const  useSessionTimerCountDown = ({startTypingTimeRef,setIsTypingStarted,allowedKeys,currentLetter}:sessionTimerCountDownProps) => {
       useEffect(() => {
         
          const isStartedTyping = (e: KeyboardEvent) => {
-           if (e.repeat) return;
-           if (!["Enter", "Backspace", "Tab", "CapsLock"].includes(e.key)) {
-             if (allowedKeys.has(e.key)) {
+             if (e.repeat) return;
+             
+             if (!['Shift', 'CapsLock'].includes(e.key) && currentLetter.index === 0) {
                startTypingTimeRef.current = Date.now();
                setIsTypingStarted(true);
+
              }
-           }
-
-
-           if (!startTypingTimeRef.current && currentLetter.index === 0) {
-             if (!startTypingTimeRef.current) startTypingTimeRef.current = Date.now();
-              setIsTypingStarted(true);
-            }
-
-         };
+          }
+        
          
 
          window.addEventListener("keydown", isStartedTyping);

@@ -26,9 +26,11 @@ function States({ wpmFinal , currentTheme }:{ wpmFinal: number , currentTheme: T
               className={`
                 text-center p-4 rounded-xl shadow-sm
                 ${
-                   `${currentTheme.gray} backdrop-blur-sm border border-${currentTheme.border}` 
+                   ` backdrop-blur-sm border border-${currentTheme.border}` 
                 }
               `}
+
+              style={{ background : currentTheme.buttonSecondary, color : currentTheme.buttonHover}}
             >
               <div className={`text-2xl sm:text-3xl font-bold 
                 text-[${currentTheme.red}]

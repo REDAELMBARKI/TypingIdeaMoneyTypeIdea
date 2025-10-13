@@ -9,7 +9,14 @@ interface ThemeModalProps {
   setPreviewTheme: React.Dispatch<React.SetStateAction<ThemeColors | null>> 
   isThemeConfirmed : boolean ;
 }
-
+interface ChildModalProps {
+  search: string;
+  setSearch: (value: string) => void;
+  themes: ThemeColors[];
+  onClose: () => void;
+  onSelect: (theme: ThemeColors) => void;
+  onConfirm: () => void;
+}
 type BaseModalContextType =  {
   setIsLoadingTheme: React.Dispatch<React.SetStateAction<boolean>>
   isLoadingTheme : boolean 
@@ -92,14 +99,7 @@ export default function ThemeModal({ setIsThemeModalOpen , setPreviewTheme ,isTh
 }
 
 // Extend the props to include search & setSearch
-interface ChildModalProps {
-  search: string;
-  setSearch: (value: string) => void;
-  themes: ThemeColors[];
-  onClose: () => void;
-  onSelect: (theme: ThemeColors) => void;
-  onConfirm: () => void;
-}
+
 
 const AllModals : React.FC<ChildModalProps>  =  React.memo(({
   themes,
@@ -184,8 +184,8 @@ const  BaseModal : React.FC<ChildModalProps> = React.memo(({
               onClick={() => onSelect(theme)}
               className="flex justify-between items-center p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition"
             >
-              <span className="text-gray-800 dark:text-gray-100">
-                {theme.name}
+              <span style={{color : currentTheme.white}} className="font-medium">
+                {theme.name} {theme.id === (JSON.parse(localStorage.getItem('selectedTheme') || '{}').id ?? currentTheme.id) && "(Current)"} 
               </span>
               <div className="flex gap-1">
                 {theme.colors.map((color, index) => (

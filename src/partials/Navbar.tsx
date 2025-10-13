@@ -20,9 +20,11 @@ export const Navbar = () => {
       href={href}
       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
         highlight
-          ? `text-[${currentTheme.red}] hover:bg-indigo-50 dark:hover:bg-indigo-950`
+          ? `hover:bg-indigo-50 dark:hover:bg-indigo-950`
           : "text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
       }`}
+
+      style={ highlight ? {color : currentTheme.buttonHover} : {} }
     >
       {children}
     </a>
@@ -60,12 +62,26 @@ export const Navbar = () => {
 
             {/* Logo */}
             <div className="flex items-center space-x-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg">
+              <div  
+                style={{
+                background: `linear-gradient(90deg, ${currentTheme.buttonPrimary}, ${currentTheme.buttonHover})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+               }}  
+                className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg">
                 <Keyboard className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+              {/* <span className="text-2xl font-bold  "
+                style={{
+                background: `linear-gradient(90deg, ${currentTheme.accent}, ${currentTheme.white})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+              >
                 KeyFlow
-              </span>
+              </span> */}
             </div>
 
             {/* Desktop Navigation */}

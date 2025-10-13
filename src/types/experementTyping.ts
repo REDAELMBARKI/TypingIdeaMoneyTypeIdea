@@ -26,5 +26,15 @@ export interface ThemeColors {
   white  : string
   gray : string
   darkRed : string
-  colors : string[]
+  colors : string[] 
+    // Button colors
+  buttonPrimary: string;
+  buttonSecondary: string;
+  buttonHover: string;
+  buttonDisabled: string;
+  // Special colors
+  accent: string;
+  success: string;
+  warning: string;
+  info: string;
 }

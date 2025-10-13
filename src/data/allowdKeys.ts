@@ -8,7 +8,7 @@ export const  allowedKeys: Set<string>  = new Set([
   "0","1","2","3","4","5","6","7","8","9",
 
   // Whitespace + control
-  " ", "Enter", "Backspace", "Tab" , "CapsLock",
+  " ","Shift" ,"Enter", "Backspace", "Tab" , "CapsLock",
 
   // Basic punctuation
   ".", ",", ";", ":", "!", "?", "'", "\"",
