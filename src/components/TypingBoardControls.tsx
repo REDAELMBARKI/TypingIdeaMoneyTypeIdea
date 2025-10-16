@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import {
   Timer,
-  Hash,
-  SquareAsterisk,
-  RefreshCw,
-  SkipForward,
-  Shuffle,
+  
   AlignLeft,
   Clock,
+  Hash,
+  SquareAsteriskIcon,
+  ShuffleIcon,
+  AtSign,
 } from "lucide-react";
 import type { Mode, ThemeColors } from "../types/experementTyping";
+import ButtonExtraOption from "./ButtonExtraOption";
+
 
 interface TypingBoardControlsProps {
  selectedTime:number ;
@@ -38,14 +40,26 @@ export default function TypingBoardControls({currentTheme ,setTypingModeSelected
   
   const [showTimes, setShowTimes] = useState(false);
   const [showWordsFadeAnimat,setShowWordsFadeAnimat] =  useState(false);
+  const [selectedParametres , setSelectedParametres] = useState<string[]>([]) ;
   const timesOpt = [30, 60, 120];
   const wordsOpt= [10,20,30,50];
   
   const optionsList = typingModeSelected == "time" ? timesOpt : wordsOpt ;
+  const  handleParamOption = (paramType:string) => {
+          
+           if(selectedParametres.includes(paramType)){
+              setSelectedParametres(selectedParametres.filter(param => param !== paramType))
+              return ;
+           }
+            setSelectedParametres([...selectedParametres , paramType]) 
+      }
+  
 
   return (
-    <div className="w-full relative flex items-center gap-6 px-4 py-2 ">
-      {/* Elapsed Time */}
+    <div className="w-full relative flex items-center justify-center gap-6 px-4 py-2 ">
+
+{/* Elapsed Time */}
+     
       {typingModeSelected === 'time' ?
                         <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none text-center w-[4em] `}
                         style={{
@@ -68,8 +82,8 @@ export default function TypingBoardControls({currentTheme ,setTypingModeSelected
                       
                       </div>
       }
-         
-      {/* Time Selector + Expanding Times */}
+          
+      {/* Time Selector + Expanding Times // timer counter separate level */} 
       <div className="flex items-center gap-2">
         <button
           onClick={() => {
@@ -84,7 +98,7 @@ export default function TypingBoardControls({currentTheme ,setTypingModeSelected
    
       </div>
       
-      {/* Words Mode (new button) */}
+      {/* Words Mode (new button) first level has top label of typing mods */}
       <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700"
       onClick={()=> { setTypingModeSelected('words') 
                       setShowWordsFadeAnimat(!showWordsFadeAnimat)
@@ -94,38 +108,33 @@ export default function TypingBoardControls({currentTheme ,setTypingModeSelected
         <span className="text-xs " style={{color: typingModeSelected == "words" ? currentTheme.buttonHover : currentTheme.white }} >Words</span>
       </button>
 
-      {/* Other Functional Buttons */}
-      <div className="flex items-center gap-5 ml-2">
-          <button className="flex items-center gap-2 text-sm hover:scale-110 transition " >
-            <Hash size={22} className="" style={{color: typingModeSelected == "numbers" ? currentTheme.buttonHover : currentTheme.white }} />
-            <span className="text-xs " style={{color: typingModeSelected == "numbers" ? currentTheme.buttonHover : currentTheme.white }} >Numbers</span>
-          </button>
 
-          <button className="flex items-center gap-2 text-sm hover:scale-110 transition " style={{color:currentTheme.buttonHover}}>
-            <SquareAsterisk size={22} className="" style={{color: typingModeSelected == "symbols" ? currentTheme.buttonHover : currentTheme.white}} />
-            <span className="text-xs "style={{color: typingModeSelected == "symbols" ? currentTheme.buttonHover : currentTheme.white}}  >Symbols</span>
-          </button>
-
-          <button className="flex items-center gap-2 text-sm hover:scale-110 transition " style={{color:currentTheme.buttonHover}}>
-            <Shuffle size={22} className="" style={{color:currentTheme.buttonHover}} />
-            <span className="text-xs "style={{color:currentTheme.buttonHover}}  >Shuffle</span>
-          </button>
-
-          <button className="flex items-center gap-2 text-sm hover:scale-110 transition " style={{color:currentTheme.buttonHover}}>
-            <RefreshCw size={22} className="" style={{color:currentTheme.buttonHover}} />
-            <span className="text-xs "style={{color:currentTheme.buttonHover}}  >Reset</span>
-          </button>
-
-          <button className="flex items-center gap-2 text-sm hover:scale-110 transition " style={{color:currentTheme.buttonHover}}>
-            <SkipForward size={22} className="" style={{color:currentTheme.buttonHover}} />
-            <span className="text-xs " style={{color:currentTheme.buttonHover}} >Next</span>
-          </button>
-      </div>
       {/* separator */}
       <div className="bg-gray-500 w-[6px] h-[20px] rounded-lg"></div >
       {/* exapan options */}
 
+
+      
+      {/* Other Functional Buttons // these are on the seconds level option or extra options  */}
+      <div className="flex items-center gap-5 ml-2">
+          <ButtonExtraOption handleParamOption={handleParamOption} label="Numbers" Icon={Hash} currentTheme={currentTheme} />
+          <ButtonExtraOption handleParamOption={handleParamOption}  label="Symbols" Icon={SquareAsteriskIcon} currentTheme={currentTheme} />
+          <ButtonExtraOption handleParamOption={handleParamOption}  label="Punctuation" Icon={AtSign} currentTheme={currentTheme} />
+        
+
+      </div>
+      {/* separator */}
+      <div className="bg-gray-500 w-[6px] h-[20px] rounded-lg"></div >
+      {/* exapan options */}
+     
+     {/* thith level has actions and labeled as actions  like to shuufle the texts */}
       <div>
+       <ButtonExtraOption handleParamOption={handleParamOption}  label="Shuffle" Icon={ShuffleIcon} currentTheme={currentTheme} />
+      </div>
+
+       
+      <div>
+        {/* this one is options that belongs to typing mode selected i neeed to forth level */}
         <ExpandedoptionsList typingModeSelected={typingModeSelected} optionsList={optionsList} showTimes={showTimes} setSelectedTime={setSelectedTime}  setShowTimes={setShowTimes} showWordsFadeAnimat={showWordsFadeAnimat} />
       </div>
     </div>
