@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import type { Mode, ThemeColors } from "../types/experementTyping";
 
-
 interface TypingBoardControlsProps {
  selectedTime:number ;
  setSelectedTime:React.Dispatch<React.SetStateAction<number>>;
@@ -33,6 +32,7 @@ interface expandedoptionsListProps {
   showWordsFadeAnimat:boolean ;
  
 }
+
 
 export default function TypingBoardControls({currentTheme ,setTypingModeSelected,typingModeSelected , currentText , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
   
@@ -78,8 +78,8 @@ export default function TypingBoardControls({currentTheme ,setTypingModeSelected
           }}
           className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700"
         >
-          <Timer size={22} style={{color:currentTheme.buttonHover}}   />
-          <span className="text-xs  leading-none" style={{color:currentTheme.buttonHover}} >{selectedTime}</span>
+          <Timer size={22} style={{color:typingModeSelected == "time" ? currentTheme.buttonHover : currentTheme.white}}   />
+          <span className="text-xs  leading-none" style={{color:typingModeSelected == "time" ? currentTheme.buttonHover : currentTheme.white}} >{selectedTime}</span>
         </button>
    
       </div>
@@ -90,20 +90,20 @@ export default function TypingBoardControls({currentTheme ,setTypingModeSelected
                       setShowWordsFadeAnimat(!showWordsFadeAnimat)
                     }}
       >
-        <AlignLeft size={22} style={{color:currentTheme.buttonHover}}  />
-        <span className="text-xs " style={{color:currentTheme.buttonHover}} >Words</span>
+        <AlignLeft size={22} style={{color: typingModeSelected == "words" ? currentTheme.buttonHover : currentTheme.white }}  />
+        <span className="text-xs " style={{color: typingModeSelected == "words" ? currentTheme.buttonHover : currentTheme.white }} >Words</span>
       </button>
 
       {/* Other Functional Buttons */}
       <div className="flex items-center gap-5 ml-2">
           <button className="flex items-center gap-2 text-sm hover:scale-110 transition " >
-            <Hash size={22} className="" style={{color:currentTheme.buttonHover}} />
-            <span className="text-xs " style={{color:currentTheme.buttonHover}} >Numbers</span>
+            <Hash size={22} className="" style={{color: typingModeSelected == "numbers" ? currentTheme.buttonHover : currentTheme.white }} />
+            <span className="text-xs " style={{color: typingModeSelected == "numbers" ? currentTheme.buttonHover : currentTheme.white }} >Numbers</span>
           </button>
 
           <button className="flex items-center gap-2 text-sm hover:scale-110 transition " style={{color:currentTheme.buttonHover}}>
-            <SquareAsterisk size={22} className="" style={{color:currentTheme.buttonHover}} />
-            <span className="text-xs "style={{color:currentTheme.buttonHover}}  >Symbols</span>
+            <SquareAsterisk size={22} className="" style={{color: typingModeSelected == "symbols" ? currentTheme.buttonHover : currentTheme.white}} />
+            <span className="text-xs "style={{color: typingModeSelected == "symbols" ? currentTheme.buttonHover : currentTheme.white}}  >Symbols</span>
           </button>
 
           <button className="flex items-center gap-2 text-sm hover:scale-110 transition " style={{color:currentTheme.buttonHover}}>

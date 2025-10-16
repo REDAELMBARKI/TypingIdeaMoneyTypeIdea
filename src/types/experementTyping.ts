@@ -13,7 +13,7 @@ export type WordHistoryItem = {
 
 
 
-export type Mode = "time" | "words";
+export type Mode = "time" | "words" | "numbers" | "symbols" ;
 
 
 export interface ThemeColors {

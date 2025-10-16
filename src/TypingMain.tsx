@@ -27,16 +27,11 @@ import useTypingControlleFunctions from "./functions/useTypingControlleFunctions
 import useWpmServiceReset from "./customHooks/useWpmServiceReset";
 import useWpmCalculationHandler from "./customHooks/useWpmCalculationHandler";
 import useThemePreviewerAndSetter from "./customHooks/useThemePreviewerAndSetter";
+import { sampleTexts } from "./data/texts";
+// import TypingResults from "./modals/TypingResults";
 
 
-const sampleTexts = [
-  // "The quick brown fox jumps over the lazy dog near the riverbank.Technology has revolutionized the way we communicate and share information across the globe.Programming languages evolve continuously to meet the demands of modern software developmen Nature provides endless inspiration for artists writers and creative minds throughout history" ,
-  "The quick brown fox jumps over the lazy dog near the riverbank. ",
-  "Technology has revolutionized the way we communicate and share information across the globe. ",
-  "Mountains rise majestically against the azure sky while gentle waves lap at the sandy shore below. ",
-  "Programming languages evolve continuously to meet the demands of modern software development. ",
-  "Nature provides endless inspiration for artists, writers, and creative minds throughout history. ",
-];
+
 
 const TypingApp: React.FC = () => {
 
@@ -272,6 +267,38 @@ const TypingApp: React.FC = () => {
     trachWord,
     setTrachWord,
   });
+
+
+  //   const sampleSessionStats = {
+  //   wpm: 85,
+  //   rawWpm: 92,
+  //   accuracy: 96.5,
+  //   totalTime: 60,
+  //   correctChars: 425,
+  //   wrongChars: 12,
+  //   missedChars: 8,
+  //   totalChars: 445,
+  //   peakWpm: 98,
+  //   consistency: 89
+  // };
+
+  // const sampleChartData = [
+  //   { time: 0, wpm: 0 },
+  //   { time: 5, wpm: 45 },
+  //   { time: 10, wpm: 62 },
+  //   { time: 15, wpm: 73 },
+  //   { time: 20, wpm: 78 },
+  //   { time: 25, wpm: 85 },
+  //   { time: 30, wpm: 88 },
+  //   { time: 35, wpm: 92 },
+  //   { time: 40, wpm: 87 },
+  //   { time: 45, wpm: 90 },
+  //   { time: 50, wpm: 95 },
+  //   { time: 55, wpm: 98 },
+  //   { time: 60, wpm: 85 }
+  // ];
+
+
   return (
     <div
       className={`min-h-screen transition-colors duration-300  `}
@@ -317,6 +344,15 @@ const TypingApp: React.FC = () => {
               {/* // typing over div model  */}
               {isShowTypingOverModal  && <TypingOverModal
                     wpmFinal={wpmFinal}  nextText={nextText} handleReset={handleReset} />}
+            </div>
+
+            <div>
+              {/* { isShowTypingOverModal &&
+                 <TypingResults
+                  sessionStats={sampleSessionStats}
+                  chartData={sampleChartData}
+                />
+              } */}
             </div>
           </div>
         </div>
