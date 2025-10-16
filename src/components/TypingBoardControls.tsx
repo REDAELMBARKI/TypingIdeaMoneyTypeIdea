@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import {
   Timer,
   
-  AlignLeft,
   Clock,
   Hash,
   SquareAsteriskIcon,
-  ShuffleIcon,
-  AtSign,
+  CaseSensitive,
+  TextInitial,
 } from "lucide-react";
 import type { Mode, ThemeColors } from "../types/experementTyping";
 import ButtonExtraOption from "./ButtonExtraOption";
@@ -104,7 +103,7 @@ export default function TypingBoardControls({currentTheme ,setTypingModeSelected
                       setShowWordsFadeAnimat(!showWordsFadeAnimat)
                     }}
       >
-        <AlignLeft size={22} style={{color: typingModeSelected == "words" ? currentTheme.buttonHover : currentTheme.white }}  />
+        <TextInitial size={22} style={{color: typingModeSelected == "words" ? currentTheme.buttonHover : currentTheme.white }}  />
         <span className="text-xs " style={{color: typingModeSelected == "words" ? currentTheme.buttonHover : currentTheme.white }} >Words</span>
       </button>
 
@@ -119,22 +118,20 @@ export default function TypingBoardControls({currentTheme ,setTypingModeSelected
       <div className="flex items-center gap-5 ml-2">
           <ButtonExtraOption handleParamOption={handleParamOption} label="Numbers" Icon={Hash} currentTheme={currentTheme} />
           <ButtonExtraOption handleParamOption={handleParamOption}  label="Symbols" Icon={SquareAsteriskIcon} currentTheme={currentTheme} />
-          <ButtonExtraOption handleParamOption={handleParamOption}  label="Punctuation" Icon={AtSign} currentTheme={currentTheme} />
+          <ButtonExtraOption handleParamOption={handleParamOption}  label="Punctuation" Icon={CaseSensitive} currentTheme={currentTheme} />
         
 
       </div>
-      {/* separator */}
-      <div className="bg-gray-500 w-[6px] h-[20px] rounded-lg"></div >
-      {/* exapan options */}
      
      {/* thith level has actions and labeled as actions  like to shuufle the texts */}
-      <div>
+      {/* <div>
        <ButtonExtraOption handleParamOption={handleParamOption}  label="Shuffle" Icon={ShuffleIcon} currentTheme={currentTheme} />
-      </div>
+      </div> */}
 
        
-      <div>
         {/* this one is options that belongs to typing mode selected i neeed to forth level */}
+      <div>
+        
         <ExpandedoptionsList typingModeSelected={typingModeSelected} optionsList={optionsList} showTimes={showTimes} setSelectedTime={setSelectedTime}  setShowTimes={setShowTimes} showWordsFadeAnimat={showWordsFadeAnimat} />
       </div>
     </div>
@@ -152,6 +149,10 @@ const ExpandedoptionsList = ({showTimes , setSelectedTime , setShowTimes , optio
             ${isShowTime  ? "w-72 opacity-100" : "w-0 opacity-0" }`}
             
         >
+           {/* separator */}
+      <div className="bg-gray-500 w-[6px] h-[20px] rounded-lg"></div >
+      {/* exapan options */}
+     
           {optionsList.map((option,ind) => (
             <button
               key={ind}
