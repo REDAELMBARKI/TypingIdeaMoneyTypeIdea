@@ -12,6 +12,7 @@ interface TextRenderProps {
   wrongWords:{start : number , end:number}[];
   wordHistory: WordHistoryItem[] ;
   currentTheme: ThemeColors ;
+  
 }
 
 export const useTextRender = ({

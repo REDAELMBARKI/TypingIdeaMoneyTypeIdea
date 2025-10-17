@@ -11,7 +11,7 @@ interface buttonExtraOptionProps {
 }
 
 const  ButtonExtraOption = ({currentTheme , label  , Icon , handleParamOption}:buttonExtraOptionProps) => {
-    console.log("buttonExtraOption rendered" , label)
+    
     return (
       <React.Fragment >
    

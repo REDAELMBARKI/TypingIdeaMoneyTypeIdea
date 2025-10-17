@@ -10,7 +10,7 @@ const  useWindowResize = ({containerRef  ,setContainerWidth }:windowResizeProps)
          if(! containerRef) return ;
          // initialy set the container width 
          setContainerWidth(containerRef.current!.offsetWidth) ;
-       
+        
          const resize = () => {
              setContainerWidth(containerRef.current!.offsetWidth)
          }
@@ -21,6 +21,7 @@ const  useWindowResize = ({containerRef  ,setContainerWidth }:windowResizeProps)
     } ,[containerRef])
  
 
+  
 }
 
 

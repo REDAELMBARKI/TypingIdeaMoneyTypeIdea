@@ -94,7 +94,7 @@ const useControlleBoundery = ({
     
     window.addEventListener("keydown", handleBlurChange);
     return () => window.removeEventListener("keydown", handleBlurChange);
-  }, [wrongChars , setIsWrongWord, currentLetter]);
+  }, [wrongChars , setIsWrongWord, currentLetter.index]);
 };
 
 export default useControlleBoundery;

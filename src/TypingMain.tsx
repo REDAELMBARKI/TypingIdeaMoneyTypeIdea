@@ -17,7 +17,7 @@ import CapsOnModel from "./modals/CapsOnModel";
 import useTypingWatcher from "./customHooks/useTypingWatcher";
 import useErrorTypingSound from "./customHooks/useErrorTypingSound";
 import useSpaceJump from "./customHooks/useSpaceJump";
-// import useWindowResize from "./customHooks/useWindowResize";
+import useWindowResize from "./customHooks/useWindowResize";
 import NextText from "./partials/NextText";
 import TypingBoardControls from "./components/TypingBoardControls";
 import { ElapsedTimeHandler } from "./functions/elapsedTimeHandler";
@@ -28,15 +28,18 @@ import useWpmServiceReset from "./customHooks/useWpmServiceReset";
 import useWpmCalculationHandler from "./customHooks/useWpmCalculationHandler";
 import useThemePreviewerAndSetter from "./customHooks/useThemePreviewerAndSetter";
 import { sampleTexts } from "./data/texts";
+import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
+import { sliceWordsHandler } from "./functions/sliceWordsHandler";
 // import TypingResults from "./modals/TypingResults";
 
 
 
 
 const TypingApp: React.FC = () => {
-
-  // current text state
-  const [currentText, setCurrentText] = useState<string>(sampleTexts[0]);
+  
+  // current text state 15 words to be genrated at the first time 
+  const [sessionWordsCount , setSessionWordsCount] = useState<number>(15) ;
+  const [currentText, setCurrentText] = useState<string>(sliceWordsHandler(sessionWordsCount));
   const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
     index: 0,
     letter: "",
@@ -84,14 +87,15 @@ const TypingApp: React.FC = () => {
  
   const totalCorrectedCharsRef =  useRef<number | null>(null);
   //text conatiner width
-  // const [containerWidth  ,setContainerWidth] =  useState<number>(0);
+  const [containerWidth  ,setContainerWidth] =  useState<number>(0);
   
   // refs
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   const amountOfTimeRef = useRef<number | null>(null);
   // text container
   const containerRef = useRef<HTMLDivElement | null>(null);
-  // timer accum
+  // text font size ref
+  const fontSizeRef = useRef<number>(36);
   // underline ref
 
   const startTypingTimeRef = useRef<number>(0);
@@ -104,16 +108,21 @@ const TypingApp: React.FC = () => {
  
 
   // console logs ////////////////
-   useEffect(() => {
-      console.log( wpmFinal)
-   }, [wpmFinal]);
+     
   ///////////////////////////////////
+
 
 
 //////////////////////////////////////////////////////
 
+useEffect(() => {
+  if(! fontSizeRef.current || ! containerRef.current )  return ;
+  // i need too get every chars wiidth 
+}, [containerWidth]);
 
 //////////////////////////////////////////////////////////
+  
+  
 
 
   // the amount of words typed handler
@@ -129,6 +138,9 @@ const TypingApp: React.FC = () => {
   }, [isTypingStarted]);
 
 
+
+   //  text raws to be rendred slicer
+   useTextRawsSlicer({currentLetter})
   
   // caps listener
   useCapsLockListener({ setIsCapsOn });
@@ -156,7 +168,7 @@ const TypingApp: React.FC = () => {
 
   // hooks call
   // window resize
-  // useWindowResize({containerRef  ,setContainerWidth})
+  useWindowResize({containerRef  ,setContainerWidth})
   
   // ########################  wpm services and calculations reset ###########################
      // wpm calculations handlers
@@ -215,6 +227,7 @@ const TypingApp: React.FC = () => {
 
   // text chars render function
   const renderText = useTextRender({
+
     currentTheme ,
     currentText,
     currentLetter,
@@ -314,6 +327,7 @@ const TypingApp: React.FC = () => {
         <div className="w-[80%] max-w-screen mx-auto mt-[100px]">
           <section>
             <TypingBoardControls
+              setSessionWordsCount={setSessionWordsCount}
               currentTheme={currentTheme}
               setTypingModeSelected={setTypingModeSelected}
               currentText={currentText}
@@ -333,9 +347,9 @@ const TypingApp: React.FC = () => {
           `}
           >
             <div
-              className="mx-w-full hitespace-normal break-words break-keep text-3xl"
+              className="mx-w-full hitespace-normal break-words break-keep "
               ref={containerRef}
-              style={{ textAlign: "center" }}
+              style={{ textAlign: "center" , fontSize : `${fontSizeRef.current}px` }}
             >
               {/* // text render */}
               {renderText}

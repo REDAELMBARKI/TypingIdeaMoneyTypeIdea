@@ -64,7 +64,7 @@ const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentL
                     letter: currentText[nextWordFirstIndexStarts] ?? "",
                 });
                  
-      },[currentLetter ,inputValue , currentLetter.index])
+      },[inputValue , currentLetter.index])
 
 }
 

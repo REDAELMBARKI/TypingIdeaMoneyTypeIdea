@@ -22,6 +22,7 @@ interface TypingBoardControlsProps {
  typingModeSelected :  Mode ;
  setTypingModeSelected: React.Dispatch<React.SetStateAction<Mode>>
   currentTheme : ThemeColors ;
+  setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
 }
 
 interface expandedoptionsListProps {
@@ -31,11 +32,11 @@ interface expandedoptionsListProps {
   optionsList : number[];
   typingModeSelected : Mode ;
   showWordsFadeAnimat:boolean ;
- 
+  setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
 }
 
 
-export default function TypingBoardControls({currentTheme ,setTypingModeSelected,typingModeSelected , currentText , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
+export default function TypingBoardControls({setSessionWordsCount , currentTheme ,setTypingModeSelected,typingModeSelected , currentText , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
   
   const [showTimes, setShowTimes] = useState(false);
   const [showWordsFadeAnimat,setShowWordsFadeAnimat] =  useState(false);
@@ -119,8 +120,6 @@ export default function TypingBoardControls({currentTheme ,setTypingModeSelected
           <ButtonExtraOption handleParamOption={handleParamOption} label="Numbers" Icon={Hash} currentTheme={currentTheme} />
           <ButtonExtraOption handleParamOption={handleParamOption}  label="Symbols" Icon={SquareAsteriskIcon} currentTheme={currentTheme} />
           <ButtonExtraOption handleParamOption={handleParamOption}  label="Punctuation" Icon={CaseSensitive} currentTheme={currentTheme} />
-        
-
       </div>
      
      {/* thith level has actions and labeled as actions  like to shuufle the texts */}
@@ -132,7 +131,7 @@ export default function TypingBoardControls({currentTheme ,setTypingModeSelected
         {/* this one is options that belongs to typing mode selected i neeed to forth level */}
       <div>
         
-        <ExpandedoptionsList typingModeSelected={typingModeSelected} optionsList={optionsList} showTimes={showTimes} setSelectedTime={setSelectedTime}  setShowTimes={setShowTimes} showWordsFadeAnimat={showWordsFadeAnimat} />
+        <ExpandedoptionsList setSessionWordsCount={setSessionWordsCount} typingModeSelected={typingModeSelected} optionsList={optionsList} showTimes={showTimes} setSelectedTime={setSelectedTime}  setShowTimes={setShowTimes} showWordsFadeAnimat={showWordsFadeAnimat} />
       </div>
     </div>
   );
@@ -140,7 +139,7 @@ export default function TypingBoardControls({currentTheme ,setTypingModeSelected
 
 
 
-const ExpandedoptionsList = ({showTimes , setSelectedTime , setShowTimes , optionsList , typingModeSelected , showWordsFadeAnimat}:expandedoptionsListProps) => {
+const ExpandedoptionsList = ({setSessionWordsCount ,showTimes , setSelectedTime , setShowTimes , optionsList , typingModeSelected , showWordsFadeAnimat}:expandedoptionsListProps) => {
 
   const isShowTime = showWordsFadeAnimat || showTimes ;
   return (
@@ -159,6 +158,7 @@ const ExpandedoptionsList = ({showTimes , setSelectedTime , setShowTimes , optio
               onClick={() => {
                 setSelectedTime(option);
                 setShowTimes(false);
+                
               }}
               className="flex items-center gap-2 text-xs   hover:text-slate-700 transition"
             >
