@@ -7,6 +7,7 @@ import {
   SquareAsteriskIcon,
   CaseSensitive,
   TextInitial,
+  ChartBar,
 } from "lucide-react";
 import type { Mode, ThemeColors } from "../types/experementTyping";
 import ButtonExtraOption from "./ButtonExtraOption";
@@ -23,20 +24,27 @@ interface TypingBoardControlsProps {
  setTypingModeSelected: React.Dispatch<React.SetStateAction<Mode>>
   currentTheme : ThemeColors ;
   setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
+  sessionWordsCount : number
 }
 
-interface expandedoptionsListProps {
+interface expandedTimesOptionsProps {
   showTimes : boolean ;
   setSelectedTime:React.Dispatch<React.SetStateAction<number>>;
   setShowTimes: React.Dispatch<React.SetStateAction<boolean>> ;
   optionsList : number[];
-  typingModeSelected : Mode ;
-  showWordsFadeAnimat:boolean ;
-  setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
+
+
+}
+
+interface expandedWordsCountOptionsProps {
+   showWordsFadeAnimat:boolean ;
+   setShowWordsFadeAnimat: React.Dispatch<React.SetStateAction<boolean>>
+    optionsList : number[];
+    setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
 }
 
 
-export default function TypingBoardControls({setSessionWordsCount , currentTheme ,setTypingModeSelected,typingModeSelected , currentText , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
+export default function TypingBoardControls({setSessionWordsCount , sessionWordsCount , currentTheme ,setTypingModeSelected,typingModeSelected , currentText , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
   
   const [showTimes, setShowTimes] = useState(false);
   const [showWordsFadeAnimat,setShowWordsFadeAnimat] =  useState(false);
@@ -78,7 +86,7 @@ export default function TypingBoardControls({setSessionWordsCount , currentTheme
                        >
                         
                         {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
-                        {typingModeSelected === 'words' && typedWordsAmount + "/" + (currentText.split(' ').length - 1)}  
+                        {typingModeSelected === 'words' && typedWordsAmount + "/" + sessionWordsCount}  
                       
                       </div>
       }
@@ -130,8 +138,13 @@ export default function TypingBoardControls({setSessionWordsCount , currentTheme
        
         {/* this one is options that belongs to typing mode selected i neeed to forth level */}
       <div>
+
+        {
+          typingModeSelected == 'time' ? 
+           <ExpandedTimesOptionsList  optionsList={optionsList} showTimes={showTimes} setSelectedTime={setSelectedTime}  setShowTimes={setShowTimes}  /> 
+        : <ExpandedWordsCountOptionsList  optionsList={optionsList}  showWordsFadeAnimat={showWordsFadeAnimat} setShowWordsFadeAnimat={setShowWordsFadeAnimat} setSessionWordsCount={setSessionWordsCount}  />
+        }
         
-        <ExpandedoptionsList setSessionWordsCount={setSessionWordsCount} typingModeSelected={typingModeSelected} optionsList={optionsList} showTimes={showTimes} setSelectedTime={setSelectedTime}  setShowTimes={setShowTimes} showWordsFadeAnimat={showWordsFadeAnimat} />
       </div>
     </div>
   );
@@ -139,13 +152,12 @@ export default function TypingBoardControls({setSessionWordsCount , currentTheme
 
 
 
-const ExpandedoptionsList = ({setSessionWordsCount ,showTimes , setSelectedTime , setShowTimes , optionsList , typingModeSelected , showWordsFadeAnimat}:expandedoptionsListProps) => {
+const ExpandedTimesOptionsList = ({showTimes , setSelectedTime , setShowTimes , optionsList}:expandedTimesOptionsProps) => {
 
-  const isShowTime = showWordsFadeAnimat || showTimes ;
   return (
      <div
           className={`flex items-center gap-3 overflow-hidden transition-all duration-500 
-            ${isShowTime  ? "w-72 opacity-100" : "w-0 opacity-0" }`}
+            ${showTimes  ? "w-72 opacity-100" : "w-0 opacity-0" }`}
             
         >
            {/* separator */}
@@ -162,8 +174,41 @@ const ExpandedoptionsList = ({setSessionWordsCount ,showTimes , setSelectedTime 
               }}
               className="flex items-center gap-2 text-xs   hover:text-slate-700 transition"
             >
-              {typingModeSelected == 'time' &&  <Clock size={18} className="text-slate-700" />}
-              <span>{option}{typingModeSelected == 'time' ? 's' : 'w'}</span>
+              <Clock size={18} className="text-slate-700" />
+              <span>{option}s</span>
+            </button>
+          ))}
+        </div>
+  )
+}
+
+
+
+
+const ExpandedWordsCountOptionsList = ({optionsList , showWordsFadeAnimat , setShowWordsFadeAnimat , setSessionWordsCount}:expandedWordsCountOptionsProps) => {
+
+  return (
+     <div
+          className={`flex items-center gap-3 overflow-hidden transition-all duration-500 
+            ${showWordsFadeAnimat  ? "w-72 opacity-100" : "w-0 opacity-0" }`}
+            
+        >
+           {/* separator */}
+      <div className="bg-gray-500 w-[6px] h-[20px] rounded-lg"></div >
+      {/* exapan options */}
+     
+          {optionsList.map((option,ind) => (
+            <button
+              key={ind}
+              onClick={() => {
+                setSessionWordsCount(option);
+                setShowWordsFadeAnimat(false);
+                
+              }}
+              className="flex items-center gap-2 text-xs   hover:text-slate-700 transition"
+            >
+              <ChartBar size={18} className="text-slate-700" />
+              <span>{option}s</span>
             </button>
           ))}
         </div>

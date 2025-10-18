@@ -12,7 +12,7 @@ interface TextRenderProps {
   wrongWords:{start : number , end:number}[];
   wordHistory: WordHistoryItem[] ;
   currentTheme: ThemeColors ;
-  lineBreakIndices : number[]
+  
 }
 
 export const useTextRender = ({
@@ -25,9 +25,9 @@ export const useTextRender = ({
   isTypingActive ,
   wordHistory ,
  currentTheme , 
- lineBreakIndices
 }: TextRenderProps) => {
   
+
 
   
 useEffect(() => {
@@ -39,19 +39,11 @@ useEffect(() => {
 }, [currentTheme.isDarkModed]);
 
 
-let globalIndex = 0; 
-return  currentText.split(" ").map((word) => {
 
-    return word.concat(" ").split("").map((char) => {
-    const index = globalIndex++;
-
-    // let shouldBeRendered = true ; 
-    // if(lineBreakIndices.includes(index) && char == " "){
-    //   shouldBeRendered = false ;
-    // }
-
+  return currentText.split("").map((char, index) => {
+      
     let charStyle = "";
-  
+
     if (index > currentLetter.index - 1) {
       // Untyped letters
       charStyle +=  currentTheme.gray ;
@@ -86,8 +78,28 @@ return  currentText.split(" ").map((word) => {
             >
               <span className={`char-wrapper `}   style={{whiteSpace : "nowrap" ,  }}
                       >
-                {word.split("").map((wordCompacted, charIndex) => {
-                    let compactedwordColor = '' ;          
+                {word.split("").map((char, charIndex) => {
+                    let compactedwordColor = '' ;     
+                    
+
+                                                           // figure out something to get the chars that shoulud be colored while the index here is chaging from 0 inn every word
+                                                          //  q[jump][uick -> should be gray]
+                                                          // we need to color last for elements 
+                                                        
+                                                          // {lastindex:4 , end:8} 2 chars
+                                                          // end- lastindex == 4 the last for elements dhould be colored
+                                                          //1,2,3,4,5
+                                                          /* we seek to the get the start from where we should start coloring  0  with wold be the frst index where the charindex its 
+                                                            self + the number of thelast chars to gray = the full word's lenght  
+                                                          */    
+                                                         // quick for example "quick" the lenght == 5
+                                                         // number of elements should be colored -> ( wordHistoryIndexing.end -  wordHistoryIndexing.lastTypedIndex) ;
+                                                          // q 0 + [numberof elements shold be colored = 4] = 4 # length // should not be colored stays eather white or red 
+
+                                                          // u 1 + [numberof elements shold be colored = 4] = 5 === length  -> start coloring from thisi index so on //gray     
+                                                          // i 2 + [numberof elements shold be colored = 4]   // gray        
+                                                          // c 3 + [numberof elements shold be colored = 4]    // gray        
+                                                          // k 4 + [numberof elements shold be colored = 4]    // gray        
                             
                     if (wordHistoryIndexing) {
                       const remaining = wordHistoryIndexing.end - wordHistoryIndexing.lastTypedIndex;
@@ -113,7 +125,7 @@ return  currentText.split(" ").map((word) => {
                       
                     
                     >
-                      {wordCompacted}
+                      {char}
                     </span>
                   );
                 })}
@@ -151,20 +163,14 @@ return  currentText.split(" ").map((word) => {
          
 
 
-        <span key={index} style={{ whiteSpace : "nowrap" , color : charStyle  ,  textWrap : char === " " ?  'nowrap' : 'balance' }} className={`inline-block  transition-all duration-150   ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
+        <span key={index} style={{ whiteSpace : "nowrap" , color : charStyle  }} className={`inline-block  transition-all duration-150   ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
         
         >
-          { char === " " ?  "\u00A0" : char }
-          
+          {char === " " ? "\u00A0" : char}
         </span>
           
          }
         </React.Fragment>
     );
-  }); // inner looop ending
-
- }); // outer loop ending 
-  
+  });
 };
-
-

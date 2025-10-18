@@ -30,6 +30,7 @@ import useThemePreviewerAndSetter from "./customHooks/useThemePreviewerAndSetter
 import { sampleTexts } from "./data/texts";
 import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
 import { sliceWordsHandler } from "./functions/sliceWordsHandler";
+
 // import TypingResults from "./modals/TypingResults";
 
 
@@ -38,7 +39,7 @@ import { sliceWordsHandler } from "./functions/sliceWordsHandler";
 const TypingApp: React.FC = () => {
   
   // current text state 15 words to be genrated at the first time 
-  const [sessionWordsCount , setSessionWordsCount] = useState<number>(15) ;
+  const [sessionWordsCount , setSessionWordsCount] = useState<number>(100) ;
   const [currentText, setCurrentText] = useState<string>(sliceWordsHandler(sessionWordsCount));
   const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
     index: 0,
@@ -84,6 +85,8 @@ const TypingApp: React.FC = () => {
     // wpm ref
   const [wpmFinal, setWpmFinal] = useState<number>(0);
 
+ // lne bbreaks
+ const [lineBreakIndices, setLineBreakIndices] = useState<number[]>([]);
  
   const totalCorrectedCharsRef =  useRef<number | null>(null);
   //text conatiner width
@@ -101,6 +104,7 @@ const TypingApp: React.FC = () => {
   const startTypingTimeRef = useRef<number>(0);
   //hooks
  
+
   // theme state
 
   // console.log(previewTheme , 'preview theme in main');
@@ -108,7 +112,9 @@ const TypingApp: React.FC = () => {
  
 
   // console logs ////////////////
-     
+     useEffect(() => {
+      //  console.log(lineBreakIndices)
+     }, [lineBreakIndices]);
   ///////////////////////////////////
 
 
@@ -116,8 +122,15 @@ const TypingApp: React.FC = () => {
 //////////////////////////////////////////////////////
 
 useEffect(() => {
-  if(! fontSizeRef.current || ! containerRef.current )  return ;
-  // i need too get every chars wiidth 
+ let prevY = containerRef.current?.querySelector('span')?.getBoundingClientRect().top ;
+ const myTextSpans = containerRef.current?.querySelectorAll('span') ?? [] ;
+ myTextSpans.forEach((span , spanIndex) => {
+    if(span.getBoundingClientRect().top !== prevY ) {
+      setLineBreakIndices(prev => [...prev , spanIndex]) // set to new raw Y 
+      prevY = span.getBoundingClientRect().top;
+    }
+ })
+
 }, [containerWidth]);
 
 //////////////////////////////////////////////////////////
@@ -137,10 +150,11 @@ useEffect(() => {
     ElapsedTimeHandler({ selectedTime, setElapsedTime });
   }, [isTypingStarted]);
 
+ 
 
 
    //  text raws to be rendred slicer
-   useTextRawsSlicer({currentLetter})
+   useTextRawsSlicer({currentLetter , containerWidth , containerRef  , setCurrentText})
   
   // caps listener
   useCapsLockListener({ setIsCapsOn });
@@ -227,7 +241,7 @@ useEffect(() => {
 
   // text chars render function
   const renderText = useTextRender({
-
+    lineBreakIndices ,
     currentTheme ,
     currentText,
     currentLetter,
@@ -327,6 +341,7 @@ useEffect(() => {
         <div className="w-[80%] max-w-screen mx-auto mt-[100px]">
           <section>
             <TypingBoardControls
+              sessionWordsCount={sessionWordsCount}
               setSessionWordsCount={setSessionWordsCount}
               currentTheme={currentTheme}
               setTypingModeSelected={setTypingModeSelected}
@@ -347,9 +362,9 @@ useEffect(() => {
           `}
           >
             <div
-              className="mx-w-full hitespace-normal break-words break-keep "
+              className="mx-w-full hitespace-normal break-words break-keep  "
               ref={containerRef}
-              style={{ textAlign: "center" , fontSize : `${fontSizeRef.current}px` }}
+              style={{ textAlign: "start" , fontSize : `${fontSizeRef.current}px` , border : "1px solid red" }}
             >
               {/* // text render */}
               {renderText}
