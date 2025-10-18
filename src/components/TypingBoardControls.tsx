@@ -18,7 +18,6 @@ interface TypingBoardControlsProps {
  setSelectedTime:React.Dispatch<React.SetStateAction<number>>;
  elapsedTime: number ;
  isTypingStarted:boolean ;
- currentText : string ; 
  typedWordsAmount : number ;
  typingModeSelected :  Mode ;
  setTypingModeSelected: React.Dispatch<React.SetStateAction<Mode>>
@@ -37,17 +36,18 @@ interface expandedTimesOptionsProps {
 }
 
 interface expandedWordsCountOptionsProps {
-   showWordsFadeAnimat:boolean ;
-   setShowWordsFadeAnimat: React.Dispatch<React.SetStateAction<boolean>>
-    optionsList : number[];
-    setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
+   showWords:boolean ;
+   setShowWords: React.Dispatch<React.SetStateAction<boolean>>
+   optionsList : number[];
+   setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
+ 
 }
 
 
-export default function TypingBoardControls({setSessionWordsCount , sessionWordsCount , currentTheme ,setTypingModeSelected,typingModeSelected , currentText , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
+export default function TypingBoardControls({setSessionWordsCount , sessionWordsCount , currentTheme ,setTypingModeSelected,typingModeSelected , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
   
   const [showTimes, setShowTimes] = useState(false);
-  const [showWordsFadeAnimat,setShowWordsFadeAnimat] =  useState(false);
+  const [showWords,setShowWords] =  useState(false);
   const [selectedParametres , setSelectedParametres] = useState<string[]>([]) ;
   const timesOpt = [30, 60, 120];
   const wordsOpt= [10,20,30,50];
@@ -95,6 +95,7 @@ export default function TypingBoardControls({setSessionWordsCount , sessionWords
       <div className="flex items-center gap-2">
         <button
           onClick={() => {
+            if(showWords) setShowWords(false) ;
             setShowTimes(!showTimes)
             setTypingModeSelected('time')
           }}
@@ -108,8 +109,10 @@ export default function TypingBoardControls({setSessionWordsCount , sessionWords
       
       {/* Words Mode (new button) first level has top label of typing mods */}
       <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700"
-      onClick={()=> { setTypingModeSelected('words') 
-                      setShowWordsFadeAnimat(!showWordsFadeAnimat)
+      onClick={()=> { 
+                      if(showTimes) setShowTimes(false) ;
+                      setTypingModeSelected('words') 
+                      setShowWords(!showWords)
                     }}
       >
         <TextInitial size={22} style={{color: typingModeSelected == "words" ? currentTheme.buttonHover : currentTheme.white }}  />
@@ -142,7 +145,7 @@ export default function TypingBoardControls({setSessionWordsCount , sessionWords
         {
           typingModeSelected == 'time' ? 
            <ExpandedTimesOptionsList  optionsList={optionsList} showTimes={showTimes} setSelectedTime={setSelectedTime}  setShowTimes={setShowTimes}  /> 
-        : <ExpandedWordsCountOptionsList  optionsList={optionsList}  showWordsFadeAnimat={showWordsFadeAnimat} setShowWordsFadeAnimat={setShowWordsFadeAnimat} setSessionWordsCount={setSessionWordsCount}  />
+           : <ExpandedWordsCountOptionsList  optionsList={optionsList}  showWords={showWords} setShowWords={setShowWords} setSessionWordsCount={setSessionWordsCount}  />
         }
         
       </div>
@@ -156,7 +159,8 @@ const ExpandedTimesOptionsList = ({showTimes , setSelectedTime , setShowTimes , 
 
   return (
      <div
-          className={`flex items-center gap-3 overflow-hidden transition-all duration-500 
+          className={`flex items-center gap-3 overflow-hidden transition-all duration-500  
+            optionFade
             ${showTimes  ? "w-72 opacity-100" : "w-0 opacity-0" }`}
             
         >
@@ -168,6 +172,7 @@ const ExpandedTimesOptionsList = ({showTimes , setSelectedTime , setShowTimes , 
             <button
               key={ind}
               onClick={() => {
+
                 setSelectedTime(option);
                 setShowTimes(false);
                 
@@ -185,12 +190,12 @@ const ExpandedTimesOptionsList = ({showTimes , setSelectedTime , setShowTimes , 
 
 
 
-const ExpandedWordsCountOptionsList = ({optionsList , showWordsFadeAnimat , setShowWordsFadeAnimat , setSessionWordsCount}:expandedWordsCountOptionsProps) => {
+const ExpandedWordsCountOptionsList = ({optionsList , showWords , setShowWords , setSessionWordsCount}:expandedWordsCountOptionsProps) => {
 
   return (
      <div
-          className={`flex items-center gap-3 overflow-hidden transition-all duration-500 
-            ${showWordsFadeAnimat  ? "w-72 opacity-100" : "w-0 opacity-0" }`}
+          className={`flex items-center gap-3 overflow-hidden transition-all duration-500 optionFade
+            ${showWords  ? "w-72 opacity-100" : "w-0 opacity-0" }`}
             
         >
            {/* separator */}
@@ -202,7 +207,7 @@ const ExpandedWordsCountOptionsList = ({optionsList , showWordsFadeAnimat , setS
               key={ind}
               onClick={() => {
                 setSessionWordsCount(option);
-                setShowWordsFadeAnimat(false);
+                setShowWords(false);
                 
               }}
               className="flex items-center gap-2 text-xs   hover:text-slate-700 transition"

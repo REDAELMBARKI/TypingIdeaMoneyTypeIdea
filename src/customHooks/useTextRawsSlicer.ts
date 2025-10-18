@@ -1,16 +1,14 @@
 import React, { useEffect } from "react";
-import type { currentLetterType } from "../types/experementTyping";
 import { sliceWordsHandler } from "../functions/sliceWordsHandler";
 
 interface textRawsSlicerProps {
-     currentLetter: currentLetterType
      containerWidth : number
      containerRef :React.RefObject<HTMLDivElement | null> 
      setCurrentText : React.Dispatch<React.SetStateAction<string>>
 }
 
 
-const useTextRawsSlicer = ({currentLetter , containerWidth , containerRef  , setCurrentText  } : textRawsSlicerProps) => {
+const useTextRawsSlicer = ({containerWidth , containerRef  , setCurrentText  } : textRawsSlicerProps) => {
 
 
 
@@ -35,7 +33,7 @@ const useTextRawsSlicer = ({currentLetter , containerWidth , containerRef  , set
           })
 
           setCurrentText(sliceWordsHandler(wordsCountAllowed))
-      }, [currentLetter.index, containerWidth]);
+      }, [containerWidth]);
 }
 
 export default useTextRawsSlicer ; 

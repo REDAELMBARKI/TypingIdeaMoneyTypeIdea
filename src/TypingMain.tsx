@@ -113,14 +113,18 @@ const TypingApp: React.FC = () => {
 
   // console logs ////////////////
      useEffect(() => {
-      //  console.log(lineBreakIndices)
-     }, [lineBreakIndices]);
+
+       console.log(currentText)
+    
+     }, [currentText , sessionWordsCount]);
   ///////////////////////////////////
 
 
 
 //////////////////////////////////////////////////////
 
+
+// count th eindexes where the text breaks to next like /n
 useEffect(() => {
  let prevY = containerRef.current?.querySelector('span')?.getBoundingClientRect().top ;
  const myTextSpans = containerRef.current?.querySelectorAll('span') ?? [] ;
@@ -153,8 +157,8 @@ useEffect(() => {
  
 
 
-   //  text raws to be rendred slicer
-   useTextRawsSlicer({currentLetter , containerWidth , containerRef  , setCurrentText})
+   //  text raws to be rendered slicer
+   useTextRawsSlicer({containerWidth , containerRef  , setCurrentText})
   
   // caps listener
   useCapsLockListener({ setIsCapsOn });
@@ -345,7 +349,6 @@ useEffect(() => {
               setSessionWordsCount={setSessionWordsCount}
               currentTheme={currentTheme}
               setTypingModeSelected={setTypingModeSelected}
-              currentText={currentText}
               typingModeSelected={typingModeSelected}
               typedWordsAmount={typedWordsAmount}
               isTypingStarted={isTypingStarted}
