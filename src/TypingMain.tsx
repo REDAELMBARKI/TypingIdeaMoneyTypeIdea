@@ -30,6 +30,7 @@ import useThemePreviewerAndSetter from "./customHooks/useThemePreviewerAndSetter
 import { sampleTexts } from "./data/texts";
 import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
 import { sliceWordsHandler } from "./functions/sliceWordsHandler";
+import { containerWordsRangeFitHanlder } from "./functions/containerWordsRangeFitHanlder";
 
 // import TypingResults from "./modals/TypingResults";
 
@@ -38,9 +39,14 @@ import { sliceWordsHandler } from "./functions/sliceWordsHandler";
 
 const TypingApp: React.FC = () => {
   
-  // current text state 15 words to be genrated at the first time 
+  // the text sliced index where the text will be sliced from (the text starts from this index )
+  const [textSliceStartIndex , setTextSliceStartIndex] = useState<number>(0) ;
+  // current text state 15 words to be genrated at the first time (the text ends in this index)
   const [sessionWordsCount , setSessionWordsCount] = useState<number>(100) ;
-  const [currentText, setCurrentText] = useState<string>(sliceWordsHandler(sessionWordsCount));
+
+  const [dynamicTextRange , setDynamicTextRange] = useState<number>(15) ; // the words count that can fit in the container raws
+
+  const [currentText, setCurrentText] = useState<string>(sliceWordsHandler(textSliceStartIndex , dynamicTextRange ));
   const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
     index: 0,
     letter: "",
@@ -114,7 +120,7 @@ const TypingApp: React.FC = () => {
   // console logs ////////////////
      useEffect(() => {
 
-       console.log(currentText)
+      //  console.log(currentText)
     
      }, [currentText , sessionWordsCount]);
   ///////////////////////////////////
@@ -124,7 +130,7 @@ const TypingApp: React.FC = () => {
 //////////////////////////////////////////////////////
 
 
-// count th eindexes where the text breaks to next like /n
+// count the eindexes where the text breaks to next like /n
 useEffect(() => {
  let prevY = containerRef.current?.querySelector('span')?.getBoundingClientRect().top ;
  const myTextSpans = containerRef.current?.querySelectorAll('span') ?? [] ;
@@ -139,8 +145,15 @@ useEffect(() => {
 
 //////////////////////////////////////////////////////////
   
-  
-
+  // denamice text raws updater (every we typd two raws the first line of the text should be removed  and new line appears )
+  useEffect(() => {
+    if(! containerRef.current ) return ;
+    const currentSpan = containerRef.current.querySelector('span')!.getBoundingClientRect().top;
+    if (!currentSpan) return;
+    // const i:number = 15 ;
+    // setTextSliceStartIndex(i) ; 
+    // setDynamicTextRange(prev => prev + i) ;
+  }, [currentLetter.index]);
 
   // the amount of words typed handler
   useEffect(() => {
@@ -158,7 +171,7 @@ useEffect(() => {
 
 
    //  text raws to be rendered slicer
-   useTextRawsSlicer({containerWidth , containerRef  , setCurrentText})
+   useTextRawsSlicer({containerWidth , containerRef  , setCurrentText ,textSliceStartIndex ,dynamicTextRange, setDynamicTextRange})
   
   // caps listener
   useCapsLockListener({ setIsCapsOn });
@@ -367,7 +380,7 @@ useEffect(() => {
             <div
               className="mx-w-full hitespace-normal break-words break-keep  "
               ref={containerRef}
-              style={{ textAlign: "start" , fontSize : `${fontSizeRef.current}px` , border : "1px solid red" }}
+              style={{ textAlign: "start" , fontSize : `${fontSizeRef.current}px` , border : "1px solid red" , overflowY:'hidden' }}
             >
               {/* // text render */}
               {renderText}
