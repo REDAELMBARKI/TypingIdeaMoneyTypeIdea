@@ -19,7 +19,8 @@ const useTextRawsSlicer = ({containerWidth , containerRef  , setCurrentText  , t
       useEffect(() => {
          
           if(! containerRef.current ) return ;
-          const wordsCountAllowed = containerWordsRangeFitHanlder(containerRef ,containerWidth ) ;
+          const wordsCountAllowed = containerWordsRangeFitHanlder(containerRef ) ;
+         
           setDynamicTextRange(wordsCountAllowed) ;
           setCurrentText(sliceWordsHandler(textSliceStartIndex , wordsCountAllowed))
       }, [containerWidth , textSliceStartIndex , dynamicTextRange ]);

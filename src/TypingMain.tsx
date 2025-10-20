@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import useThemeHook from "./customHooks/useThemeHook";
 import Footer from "./partials/Footer";
 import States from "./partials/States";
@@ -29,8 +29,6 @@ import useWpmCalculationHandler from "./customHooks/useWpmCalculationHandler";
 import useThemePreviewerAndSetter from "./customHooks/useThemePreviewerAndSetter";
 import { sampleTexts } from "./data/texts";
 import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
-import { sliceWordsHandler } from "./functions/sliceWordsHandler";
-import { containerWordsRangeFitHanlder } from "./functions/containerWordsRangeFitHanlder";
 
 // import TypingResults from "./modals/TypingResults";
 
@@ -40,13 +38,13 @@ import { containerWordsRangeFitHanlder } from "./functions/containerWordsRangeFi
 const TypingApp: React.FC = () => {
   
   // the text sliced index where the text will be sliced from (the text starts from this index )
-  const [textSliceStartIndex , setTextSliceStartIndex] = useState<number>(0) ;
+  const [textSliceStartIndex ] = useState<number>(0) ;
   // current text state 15 words to be genrated at the first time (the text ends in this index)
   const [sessionWordsCount , setSessionWordsCount] = useState<number>(100) ;
 
-  const [dynamicTextRange , setDynamicTextRange] = useState<number>(15) ; // the words count that can fit in the container raws
+  const [dynamicTextRange , setDynamicTextRange] = useState<number>(0) ; // the words count that can fit in the container raws
 
-  const [currentText, setCurrentText] = useState<string>(sliceWordsHandler(textSliceStartIndex , dynamicTextRange ));
+  const [currentText, setCurrentText] = useState<string>("");
   const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
     index: 0,
     letter: "",
@@ -91,8 +89,9 @@ const TypingApp: React.FC = () => {
     // wpm ref
   const [wpmFinal, setWpmFinal] = useState<number>(0);
 
- // lne bbreaks
- const [lineBreakIndices, setLineBreakIndices] = useState<number[]>([]);
+
+
+
  
   const totalCorrectedCharsRef =  useRef<number | null>(null);
   //text conatiner width
@@ -118,11 +117,7 @@ const TypingApp: React.FC = () => {
  
 
   // console logs ////////////////
-     useEffect(() => {
-
-      //  console.log(currentText)
-    
-     }, [currentText , sessionWordsCount]);
+     
   ///////////////////////////////////
 
 
@@ -130,21 +125,16 @@ const TypingApp: React.FC = () => {
 //////////////////////////////////////////////////////
 
 
-// count the eindexes where the text breaks to next like /n
-useEffect(() => {
- let prevY = containerRef.current?.querySelector('span')?.getBoundingClientRect().top ;
- const myTextSpans = containerRef.current?.querySelectorAll('span') ?? [] ;
- myTextSpans.forEach((span , spanIndex) => {
-    if(span.getBoundingClientRect().top !== prevY ) {
-      setLineBreakIndices(prev => [...prev , spanIndex]) // set to new raw Y 
-      prevY = span.getBoundingClientRect().top;
-    }
- })
 
-}, [containerWidth]);
+
 
 //////////////////////////////////////////////////////////
   
+
+
+  // sliced text initializer
+  
+
   // denamice text raws updater (every we typd two raws the first line of the text should be removed  and new line appears )
   useEffect(() => {
     if(! containerRef.current ) return ;
@@ -258,7 +248,6 @@ useEffect(() => {
 
   // text chars render function
   const renderText = useTextRender({
-    lineBreakIndices ,
     currentTheme ,
     currentText,
     currentLetter,
@@ -268,7 +257,7 @@ useEffect(() => {
     trachWord,
     wrongWords,
     isTypingActive,
-    wordHistory,
+    wordHistory
   });
 
 
@@ -355,7 +344,7 @@ useEffect(() => {
         {/* cntrolls  */}
 
         {/* Text Display */}
-        <div className="w-[80%] max-w-screen mx-auto mt-[100px]">
+        <div className="w-full max-w-screen mx-auto mt-[100px] ">
           <section>
             <TypingBoardControls
               sessionWordsCount={sessionWordsCount}
@@ -378,17 +367,17 @@ useEffect(() => {
           `}
           >
             <div
-              className="mx-w-full hitespace-normal break-words break-keep  "
+              className="mx-w-full hitespace-normal break-words break-keep h-[180px]"
               ref={containerRef}
-              style={{ textAlign: "start" , fontSize : `${fontSizeRef.current}px` , border : "1px solid red" , overflowY:'hidden' }}
+              style={{ textAlign: "start" , fontSize : `${fontSizeRef.current}px`, overflowY:'hidden' }}
             >
               {/* // text render */}
               {renderText}
             </div>
             <div className="">
               {/* // typing over div model  */}
-              {isShowTypingOverModal  && <TypingOverModal
-                    wpmFinal={wpmFinal}  nextText={nextText} handleReset={handleReset} />}
+              {/* {isShowTypingOverModal  && <TypingOverModal
+                    wpmFinal={wpmFinal}  nextText={nextText} handleReset={handleReset} />} */}
             </div>
 
             <div>

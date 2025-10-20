@@ -12,7 +12,7 @@ interface TextRenderProps {
   wrongWords:{start : number , end:number}[];
   wordHistory: WordHistoryItem[] ;
   currentTheme: ThemeColors ;
-  lineBreakIndices : number[]
+
 }
 
 export const useTextRender = ({
@@ -24,8 +24,7 @@ export const useTextRender = ({
   wrongWords ,
   isTypingActive ,
   wordHistory ,
- currentTheme , 
- lineBreakIndices
+ currentTheme 
 }: TextRenderProps) => {
   
 
@@ -40,15 +39,10 @@ useEffect(() => {
 
 
 let globalIndex = 0; 
-return  currentText.split(" ").map((word) => {
-
-    return word.concat(" ").split("").map((char) => {
+return  currentText.split(" ").map((word , wordIndex) => {
+     
+    return (<span  key={wordIndex} style={{ whiteSpace: 'nowrap', display: 'inline-block' }} >{word.concat(" ").split("").map((char) => {
     const index = globalIndex++;
-
-    // let shouldBeRendered = true ; 
-    // if(lineBreakIndices.includes(index) && char == " "){
-    //   shouldBeRendered = false ;
-    // }
 
     let charStyle = "";
   
@@ -150,18 +144,17 @@ return  currentText.split(" ").map((word) => {
          { 
          
 
-
-        <span key={index} style={{ whiteSpace : "nowrap" , color : charStyle  ,  textWrap : char === " " ?  'nowrap' : 'balance' }} className={`inline-block  transition-all duration-150   ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}
         
-        >
-          { char === " " ?  "\u00A0" : char }
-          
+        <span key={index} style={{ whiteSpace : "nowrap" , color : charStyle  ,  textWrap : char === " " ?  'nowrap' : 'balance' }} className={`inline-block  transition-all duration-150   ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}>
+          { char === " " ?  "\u00A0" :  char } 
         </span>
           
          }
         </React.Fragment>
     );
-  }); // inner looop ending
+  })}
+  </span>
+) // inner looop ending
 
  }); // outer loop ending 
   
