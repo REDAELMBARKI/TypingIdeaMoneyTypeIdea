@@ -16,14 +16,15 @@ const  ButtonExtraOption = ({isHighlighted , action , currentTheme , label  , Ic
     const paramCheck = useRef<HTMLInputElement | null>(null)
     useEffect(() => {
        if(! paramCheck.current) return ;
-       if(isHighlighted) paramCheck.current!.checked = true ;
+       if(isHighlighted) paramCheck.current.checked = true ;
     }, [isHighlighted]);
+    
     return (
       <React.Fragment >
    
                     <button 
                    
-                    className={`flex items-center gap-2 text-sm hover:scale-110 transition`}>
+                    className={`flex items-center gap-2 text-sm hover:scale-110 transition ${isHighlighted && 'border border-red-500'}`}>
                                     <label className="cursor-pointer relative flex items-center gap-2">
                                         <input
                                         ref={paramCheck}

@@ -48,20 +48,16 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
       }
 
 
-  useEffect(() => {
-      if(selectedParameters.length == 0 ) return  ;
-      const   oldStoredParams : string[] =  JSON.parse(localStorage.getItem('parameters') ?? `[]`) ; 
-    
+  useEffect(() => { 
       
-      if(! isEqual(oldStoredParams ,  selectedParameters) ) {
+      const   oldStoredParams : string[] =  JSON.parse(localStorage.getItem('parameters') ?? `[]`) ; 
+      
+      if(! isEqual(oldStoredParams ,  selectedParameters) &&  selectedParameters.length > 0) {
         localStorage.setItem('parameters' , JSON.stringify(selectedParameters)) ; 
       }
 
-      
   }, [selectedParameters]);
   
-
-
 
   useEffect(() => {
      setSelectedParameters(JSON.parse(localStorage.getItem('parameters') ?? `[]`))
