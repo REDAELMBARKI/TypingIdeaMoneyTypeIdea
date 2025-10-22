@@ -33,26 +33,39 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
   
   const [showTimes, setShowTimes] = useState(false);
   const [showWords,setShowWords] =  useState(false);
-  const [selectedParametres , setSelectedParametres] = useState<string[]>([]) ;
+  const [selectedParameters , setSelectedParameters] = useState<string[]>([]) ;
   const timesOpt = [30, 60, 120];
   const wordsOpt= [10,20,30,50];
   
   const optionsList = typingModeSelected == "time" ? timesOpt : wordsOpt ;
   const  handleParamOption = (paramType:string) => {
           
-           if(selectedParametres.includes(paramType)){
-              setSelectedParametres(selectedParametres.filter(param => param !== paramType))
+           if(selectedParameters.includes(paramType)){
+              setSelectedParameters(selectedParameters.filter(param => param !== paramType))
               return ;
            }
-            setSelectedParametres([...selectedParametres , paramType]) 
+            setSelectedParameters([...selectedParameters , paramType.toLowerCase()]) 
       }
 
 
   useEffect(() => {
-      const oldStoredParams = 
-      localStorage.setItem('parametres' , JSON.stringify(selectedParametres)) ;
-  }, [selectedParametres]);
+      if(selectedParameters.length == 0 ) return  ;
+      const   oldStoredParams : string[] =  JSON.parse(localStorage.getItem('parameters') ?? `[]`) ; 
+    
+      
+      if(! isEqual(oldStoredParams ,  selectedParameters) ) {
+        localStorage.setItem('parameters' , JSON.stringify(selectedParameters)) ; 
+      }
+
+      
+  }, [selectedParameters]);
   
+
+
+
+  useEffect(() => {
+     setSelectedParameters(JSON.parse(localStorage.getItem('parameters') ?? `[]`))
+  }, []);
 
   return (
     <div className="w-full relative flex items-center justify-center gap-6 px-4 py-2 ">
@@ -119,15 +132,15 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
       
       {/* Other Functional Buttons // these are on the seconds level option or extra options  */}
       <div className="flex items-center gap-5 ml-2">
-          <ButtonExtraOption handleParamOption={handleParamOption} label="Numbers" Icon={Hash} currentTheme={currentTheme} />
-          <ButtonExtraOption handleParamOption={handleParamOption}  label="Symbols" Icon={SquareAsteriskIcon} currentTheme={currentTheme} />
-          <ButtonExtraOption handleParamOption={handleParamOption}  label="Punctuation" Icon={CaseSensitive} currentTheme={currentTheme} />
+          <ButtonExtraOption isHighlighted={selectedParameters.includes('Numbers'.toLowerCase())}  handleParamOption={handleParamOption} label="Numbers" Icon={Hash} currentTheme={currentTheme} />
+          <ButtonExtraOption  isHighlighted={selectedParameters.includes('Symbols'.toLowerCase())}  handleParamOption={handleParamOption}  label="Symbols" Icon={SquareAsteriskIcon} currentTheme={currentTheme} />
+          <ButtonExtraOption isHighlighted={selectedParameters.includes('Punctuation'.toLowerCase())}  handleParamOption={handleParamOption}  label="Punctuation" Icon={CaseSensitive} currentTheme={currentTheme} />
 
           {/* // sound buttons activation */}
           {/* normal sound */}
-          <ButtonExtraOption action={()=> setIsNormalTypingSoundEnabled(prev => !prev)}  Icon={CaseSensitive} currentTheme={currentTheme} />
+          <ButtonExtraOption isHighlighted={selectedParameters.includes('sound'.toLowerCase())} handleParamOption={handleParamOption} action={()=> setIsNormalTypingSoundEnabled(prev => !prev)} label="sound" Icon={CaseSensitive} currentTheme={currentTheme} />
           {/* erro sound */}
-          <ButtonExtraOption action={()=> setIsErrorSoundEnabled(prev => !prev)}  Icon={CaseSensitive} currentTheme={currentTheme} />
+          <ButtonExtraOption isHighlighted={selectedParameters.includes('errorSound'.toLowerCase())} handleParamOption={handleParamOption} action={()=> setIsErrorSoundEnabled(prev => !prev)} label="errorSound" Icon={CaseSensitive} currentTheme={currentTheme} />
           
       </div>
      

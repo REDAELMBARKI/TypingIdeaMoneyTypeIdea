@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import type { ThemeColors } from "../types/experementTyping";
 
 interface buttonExtraOptionProps {
@@ -9,23 +9,29 @@ interface buttonExtraOptionProps {
       Icon : React.ComponentType<React.SVGProps<SVGSVGElement>> ;
       handleParamOption ? : (paramType: string) => void
       action? : () => void
+      isHighlighted : boolean ;
 }
 
-const  ButtonExtraOption = ({action , currentTheme , label  , Icon , handleParamOption}:buttonExtraOptionProps) => {
-    
+const  ButtonExtraOption = ({isHighlighted , action , currentTheme , label  , Icon , handleParamOption}:buttonExtraOptionProps) => {
+    const paramCheck = useRef<HTMLInputElement | null>(null)
+    useEffect(() => {
+       if(! paramCheck.current) return ;
+       if(isHighlighted) paramCheck.current!.checked = true ;
+    }, [isHighlighted]);
     return (
       <React.Fragment >
    
                     <button 
                    
-                    className="flex items-center gap-2 text-sm hover:scale-110 transition">
+                    className={`flex items-center gap-2 text-sm hover:scale-110 transition`}>
                                     <label className="cursor-pointer relative flex items-center gap-2">
                                         <input
-                                        
+                                        ref={paramCheck}
                                         type="checkbox"
                                         value={label?.toLowerCase() ?? ''}
                                         className="h-[1px] w-[1px] opacity-0 absolute"
                                         onChange={(e) => {
+                                            
                                             handleParamOption?.(e.target.value);
                                             action?.(); 
                                             const span = e.target.nextElementSibling as HTMLElement;
@@ -35,7 +41,7 @@ const  ButtonExtraOption = ({action , currentTheme , label  , Icon , handleParam
                                             span.style.boxShadow = `0 0 10px ${currentTheme.success}55`;
                                             span.style.color = currentTheme.success;
                                             const mark = span.querySelector('.checkmark') as HTMLElement;
-                                            if (mark) {
+                                            if (mark ) {
                                                 mark.style.opacity = '1';
                                                 mark.style.transform = 'scale(1)';
                                                 mark.style.backgroundColor = currentTheme.success;

@@ -134,31 +134,7 @@ const TypingApp: React.FC = () => {
 //////////////////////////////////////////////////////////
   
   // controlls options storing in the localstorage 
-  useEffect(() => {
-      let  oldState= localStorage.getItem('normalSoundState') ;
-      if(oldState == 'undefined' || oldState == null ) {
-        localStorage.setItem('normalSoundState' , JSON.stringify(isNormalTypingSoundEnabled))
-        oldState = JSON.stringify(isNormalTypingSoundEnabled) ; 
-      }
-   
-      const oldAction = JSON.parse(oldState) ;
 
-      if(oldAction != isNormalTypingSoundEnabled || oldAction == null )  localStorage.setItem('normalSoundState' , JSON.stringify(isNormalTypingSoundEnabled)) ;
-
-  }, [isNormalTypingSoundEnabled]);
-
-
-  useEffect(() => {
-      let oldState = localStorage.getItem('errorSoundState');
-      if(oldState == 'undefined' || oldState == null )  {
-        localStorage.setItem('errorSoundState' , JSON.stringify(isErrorSoundEnabled))
-        oldState = JSON.stringify(isErrorSoundEnabled) ; 
-      }
-
-      const oldAction = JSON.parse(oldState!) ;
-      if(oldAction != isErrorSoundEnabled || oldAction == null )  localStorage.setItem('errorSoundState' , JSON.stringify(isErrorSoundEnabled)) ;
-
-  }, [isErrorSoundEnabled]);
   // sliced text initializer
   
 
