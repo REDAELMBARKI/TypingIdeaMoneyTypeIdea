@@ -44,6 +44,7 @@ const useWpmCalculationHandler = ({setIsShowTypingOverModal , setWpmFinal , isTy
               setWpmFinal(Math.floor(finalWpm));
               // alert( )
       
+              
                setIsShowTypingOverModal(true);
            }, 100);
         },[isTypingEnds])

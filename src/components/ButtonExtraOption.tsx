@@ -5,28 +5,29 @@ import type { ThemeColors } from "../types/experementTyping";
 interface buttonExtraOptionProps {
      
      currentTheme : ThemeColors 
-     label : string 
+     label? : string 
       Icon : React.ComponentType<React.SVGProps<SVGSVGElement>> ;
-      handleParamOption: (paramType: string) => void
+      handleParamOption ? : (paramType: string) => void
+      action? : () => void
 }
 
-const  ButtonExtraOption = ({currentTheme , label  , Icon , handleParamOption}:buttonExtraOptionProps) => {
+const  ButtonExtraOption = ({action , currentTheme , label  , Icon , handleParamOption}:buttonExtraOptionProps) => {
     
     return (
       <React.Fragment >
    
                     <button 
-                    
                    
                     className="flex items-center gap-2 text-sm hover:scale-110 transition">
                                     <label className="cursor-pointer relative flex items-center gap-2">
                                         <input
                                         
                                         type="checkbox"
-                                        value={label.toLowerCase()}
+                                        value={label?.toLowerCase() ?? ''}
                                         className="h-[1px] w-[1px] opacity-0 absolute"
                                         onChange={(e) => {
-                                            handleParamOption(e.target.value);
+                                            handleParamOption?.(e.target.value);
+                                            action?.(); 
                                             const span = e.target.nextElementSibling as HTMLElement;
                                             if (e.target.checked) {
                                             

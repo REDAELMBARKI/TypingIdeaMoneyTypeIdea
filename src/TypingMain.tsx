@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import useThemeHook from "./customHooks/useThemeHook";
 import Footer from "./partials/Footer";
 import States from "./partials/States";
@@ -53,8 +53,8 @@ const TypingApp: React.FC = () => {
   const [wordHistory, setWordHistory] = useState<WordHistoryItem[]>([]);
   // ----------------------------------------------------------------------
   // sound param (mute / activate)
-  const [isNormalTypingSoundEnabled] = useState<boolean>(false);
-  const [isErrorSoundEnabled] = useState<boolean>(false);
+  const [isNormalTypingSoundEnabled,setIsNormalTypingSoundEnabled] = useState<boolean>(false);
+  const [isErrorSoundEnabled , setIsErrorSoundEnabled] = useState<boolean>(false);
   // game end controller state
   const [isTypingEnds, setIsTypingEnds] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -88,7 +88,8 @@ const TypingApp: React.FC = () => {
   const [isShowTypingOverModal , setIsShowTypingOverModal] = useState<boolean>(false)
     // wpm ref
   const [wpmFinal, setWpmFinal] = useState<number>(0);
-
+  
+  const [isFocuceOnText ,setIsFocuceOnText] = useState<boolean>(false) ;
 
 
 
@@ -117,7 +118,9 @@ const TypingApp: React.FC = () => {
  
 
   // console logs ////////////////
-     
+     useEffect(() => {
+        console.log(isTypingActive)
+     }, [isTypingActive]);
   ///////////////////////////////////
 
 
@@ -130,8 +133,32 @@ const TypingApp: React.FC = () => {
 
 //////////////////////////////////////////////////////////
   
+  // controlls options storing in the localstorage 
+  useEffect(() => {
+      let  oldState= localStorage.getItem('normalSoundState') ;
+      if(oldState == 'undefined' || oldState == null ) {
+        localStorage.setItem('normalSoundState' , JSON.stringify(isNormalTypingSoundEnabled))
+        oldState = JSON.stringify(isNormalTypingSoundEnabled) ; 
+      }
+   
+      const oldAction = JSON.parse(oldState) ;
+
+      if(oldAction != isNormalTypingSoundEnabled || oldAction == null )  localStorage.setItem('normalSoundState' , JSON.stringify(isNormalTypingSoundEnabled)) ;
+
+  }, [isNormalTypingSoundEnabled]);
 
 
+  useEffect(() => {
+      let oldState = localStorage.getItem('errorSoundState');
+      if(oldState == 'undefined' || oldState == null )  {
+        localStorage.setItem('errorSoundState' , JSON.stringify(isErrorSoundEnabled))
+        oldState = JSON.stringify(isErrorSoundEnabled) ; 
+      }
+
+      const oldAction = JSON.parse(oldState!) ;
+      if(oldAction != isErrorSoundEnabled || oldAction == null )  localStorage.setItem('errorSoundState' , JSON.stringify(isErrorSoundEnabled)) ;
+
+  }, [isErrorSoundEnabled]);
   // sliced text initializer
   
 
@@ -221,7 +248,7 @@ const TypingApp: React.FC = () => {
   });
 
   // typing watcher (typing active or not)
-  useTypingWatcher({ setIsTypingActive });
+  useTypingWatcher({ setIsTypingActive , isFocuceOnText , setIsFocuceOnText });
 
   // index incriment controller
   useIndexIncrementer({
@@ -345,8 +372,13 @@ const TypingApp: React.FC = () => {
 
         {/* Text Display */}
         <div className="w-full max-w-screen mx-auto mt-[100px] ">
-          <section>
+          
+          {/* chow controlls only if we dont type any more line 1000 no keydown */}
+
+          {! isFocuceOnText && <section className="opacity-0 animate-appear-smooth"> 
             <TypingBoardControls
+              setIsNormalTypingSoundEnabled={setIsNormalTypingSoundEnabled}
+              setIsErrorSoundEnabled={setIsErrorSoundEnabled}
               sessionWordsCount={sessionWordsCount}
               setSessionWordsCount={setSessionWordsCount}
               currentTheme={currentTheme}
@@ -358,7 +390,7 @@ const TypingApp: React.FC = () => {
               setSelectedTime={setSelectedTime}
               elapsedTime={elapsedTime}
             />
-          </section>
+          </section>}
           <div
             className={`
             text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
@@ -376,8 +408,8 @@ const TypingApp: React.FC = () => {
             </div>
             <div className="">
               {/* // typing over div model  */}
-              {/* {isShowTypingOverModal  && <TypingOverModal
-                    wpmFinal={wpmFinal}  nextText={nextText} handleReset={handleReset} />} */}
+              {isShowTypingOverModal  && <TypingOverModal
+                    wpmFinal={wpmFinal}  nextText={nextText} handleReset={handleReset} />}
             </div>
 
             <div>
@@ -429,20 +461,20 @@ const TypingApp: React.FC = () => {
 
         {/* Controls */}
         <div className="flex items-center justify-center mt-8 space-x-4">
-          {
-            <>
+          { ! isFocuceOnText &&  
+            <section className="opacity-0 animate-appear-smooth flex gap-3">
               <Reseter
                 isBlured={currentLetter.index === 0 ? true : false}
                 currentTheme={currentTheme} 
                 handleReset={handleReset}
               />
               <NextText  nextText={nextText} />
-            </>
+            </section>
           }
         </div>
 
         {/* Stats Placeholder */}
-        <States  wpmFinal={wpmFinal} currentTheme={currentTheme} />
+        {! isFocuceOnText &&  <States  wpmFinal={wpmFinal} currentTheme={currentTheme} />}
       </main>
 
       {/* Footer */}

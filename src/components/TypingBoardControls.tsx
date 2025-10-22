@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Timer,
   
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type { Mode, ThemeColors } from "../types/experementTyping";
 import ButtonExtraOption from "./ButtonExtraOption";
+import { isEqual } from "lodash";
 
 
 interface TypingBoardControlsProps {
@@ -24,27 +25,11 @@ interface TypingBoardControlsProps {
   currentTheme : ThemeColors ;
   setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
   sessionWordsCount : number
+  setIsErrorSoundEnabled : React.Dispatch<React.SetStateAction<boolean>>
+  setIsNormalTypingSoundEnabled : React.Dispatch<React.SetStateAction<boolean>>
 }
 
-interface expandedTimesOptionsProps {
-  showTimes : boolean ;
-  setSelectedTime:React.Dispatch<React.SetStateAction<number>>;
-  setShowTimes: React.Dispatch<React.SetStateAction<boolean>> ;
-  optionsList : number[];
-
-
-}
-
-interface expandedWordsCountOptionsProps {
-   showWords:boolean ;
-   setShowWords: React.Dispatch<React.SetStateAction<boolean>>
-   optionsList : number[];
-   setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
- 
-}
-
-
-export default function TypingBoardControls({setSessionWordsCount , sessionWordsCount , currentTheme ,setTypingModeSelected,typingModeSelected , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
+export default function TypingBoardControls({setSessionWordsCount , setIsNormalTypingSoundEnabled , setIsErrorSoundEnabled , sessionWordsCount , currentTheme ,setTypingModeSelected,typingModeSelected , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
   
   const [showTimes, setShowTimes] = useState(false);
   const [showWords,setShowWords] =  useState(false);
@@ -61,6 +46,12 @@ export default function TypingBoardControls({setSessionWordsCount , sessionWords
            }
             setSelectedParametres([...selectedParametres , paramType]) 
       }
+
+
+  useEffect(() => {
+      const oldStoredParams = 
+      localStorage.setItem('parametres' , JSON.stringify(selectedParametres)) ;
+  }, [selectedParametres]);
   
 
   return (
@@ -131,6 +122,13 @@ export default function TypingBoardControls({setSessionWordsCount , sessionWords
           <ButtonExtraOption handleParamOption={handleParamOption} label="Numbers" Icon={Hash} currentTheme={currentTheme} />
           <ButtonExtraOption handleParamOption={handleParamOption}  label="Symbols" Icon={SquareAsteriskIcon} currentTheme={currentTheme} />
           <ButtonExtraOption handleParamOption={handleParamOption}  label="Punctuation" Icon={CaseSensitive} currentTheme={currentTheme} />
+
+          {/* // sound buttons activation */}
+          {/* normal sound */}
+          <ButtonExtraOption action={()=> setIsNormalTypingSoundEnabled(prev => !prev)}  Icon={CaseSensitive} currentTheme={currentTheme} />
+          {/* erro sound */}
+          <ButtonExtraOption action={()=> setIsErrorSoundEnabled(prev => !prev)}  Icon={CaseSensitive} currentTheme={currentTheme} />
+          
       </div>
      
      {/* thith level has actions and labeled as actions  like to shuufle the texts */}
@@ -153,6 +151,16 @@ export default function TypingBoardControls({setSessionWordsCount , sessionWords
   );
 }
 
+
+
+interface expandedTimesOptionsProps {
+  showTimes : boolean ;
+  setSelectedTime:React.Dispatch<React.SetStateAction<number>>;
+  setShowTimes: React.Dispatch<React.SetStateAction<boolean>> ;
+  optionsList : number[];
+
+
+}
 
 
 const ExpandedTimesOptionsList = ({showTimes , setSelectedTime , setShowTimes , optionsList}:expandedTimesOptionsProps) => {
@@ -190,6 +198,13 @@ const ExpandedTimesOptionsList = ({showTimes , setSelectedTime , setShowTimes , 
 
 
 
+interface expandedWordsCountOptionsProps {
+   showWords:boolean ;
+   setShowWords: React.Dispatch<React.SetStateAction<boolean>>
+   optionsList : number[];
+   setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
+
+}
 const ExpandedWordsCountOptionsList = ({optionsList , showWords , setShowWords , setSessionWordsCount}:expandedWordsCountOptionsProps) => {
 
   return (
@@ -219,3 +234,4 @@ const ExpandedWordsCountOptionsList = ({optionsList , showWords , setShowWords ,
         </div>
   )
 }
+

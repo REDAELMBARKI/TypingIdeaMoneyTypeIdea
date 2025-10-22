@@ -13,7 +13,7 @@ function States({ wpmFinal , currentTheme }:{ wpmFinal: number , currentTheme: T
 
 
   return (
-    <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 w-full max-w-2xl">
+    <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 w-full max-w-2xl opacity-0 animate-appear-smooth flex gap-3">
           {[ 
             
             { label: 'Highest WPM', value: highestWpm },

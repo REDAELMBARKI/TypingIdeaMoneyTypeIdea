@@ -11,9 +11,9 @@ interface typingEndProps {
 const useTypingEnd = ({currentLetter , currentText , setIsTypingEnds}:typingEndProps) => {
     useEffect(()=>{
     // shows end typing model 
-    if(currentLetter.index < currentText.length) return ;
+
+    if(currentLetter.index < currentText.length || currentText == "" ) return ;
     
-    // set it to true 
     setIsTypingEnds(true) ;
     
   },[currentLetter.index])

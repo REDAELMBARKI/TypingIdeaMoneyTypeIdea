@@ -198,3 +198,16 @@
     opacity: 1;
   }
 }
+
+
+/* 
+isactive typing animation
+ */
+ @keyframes appearSmooth {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-appear-smooth {
+  animation: appearSmooth 1s ease-in-out forwards;
+}
