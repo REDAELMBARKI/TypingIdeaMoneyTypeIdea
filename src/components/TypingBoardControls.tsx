@@ -17,23 +17,22 @@ import { isEqual } from "lodash";
 interface TypingBoardControlsProps {
  selectedTime:number ;
  setSelectedTime:React.Dispatch<React.SetStateAction<number>>;
- elapsedTime: number ;
  isTypingStarted:boolean ;
- typedWordsAmount : number ;
  typingModeSelected :  Mode ;
  setTypingModeSelected: React.Dispatch<React.SetStateAction<Mode>>
   currentTheme : ThemeColors ;
   setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
-  sessionWordsCount : number
+
   setIsErrorSoundEnabled : React.Dispatch<React.SetStateAction<boolean>>
   setIsNormalTypingSoundEnabled : React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function TypingBoardControls({setSessionWordsCount , setIsNormalTypingSoundEnabled , setIsErrorSoundEnabled , sessionWordsCount , currentTheme ,setTypingModeSelected,typingModeSelected , typedWordsAmount ,selectedTime , setSelectedTime , elapsedTime , isTypingStarted}:TypingBoardControlsProps) {
+const lazyLoadeStoredParams  = () => JSON.parse(localStorage.getItem('parameters') ?? `[]`) ;
+export default function TypingBoardControls({setSessionWordsCount , setIsNormalTypingSoundEnabled , setIsErrorSoundEnabled  , currentTheme ,setTypingModeSelected,typingModeSelected  ,selectedTime , setSelectedTime}:TypingBoardControlsProps) {
   
   const [showTimes, setShowTimes] = useState(false);
   const [showWords,setShowWords] =  useState(false);
-  const [selectedParameters , setSelectedParameters] = useState<string[]>([]) ;
+  const [selectedParameters , setSelectedParameters] = useState<string[]>(lazyLoadeStoredParams) ;
   const timesOpt = [30, 60, 120];
   const wordsOpt= [10,20,30,50];
   
@@ -45,52 +44,35 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
               return ;
            }
             setSelectedParameters([...selectedParameters , paramType.toLowerCase()]) 
-      }
+      } 
 
 
-  useEffect(() => { 
-      
+
+      useEffect(() => { 
       const   oldStoredParams : string[] =  JSON.parse(localStorage.getItem('parameters') ?? `[]`) ; 
       
-      if(! isEqual(oldStoredParams ,  selectedParameters) &&  selectedParameters.length > 0) {
+      if(! isEqual(oldStoredParams ,  selectedParameters)) {
+    
         localStorage.setItem('parameters' , JSON.stringify(selectedParameters)) ; 
       }
-
-  }, [selectedParameters]);
+ 
+  }, [selectedParameters]); 
   
-
+ 
   useEffect(() => {
-     setSelectedParameters(JSON.parse(localStorage.getItem('parameters') ?? `[]`))
-  }, []);
+     console.log(selectedParameters)
+  }, [selectedParameters]);
+
+
+  const NSoundHandler = ()=> setIsNormalTypingSoundEnabled(prev => !prev)  ; 
+  const ErrSoundHandler = ()=> setIsErrorSoundEnabled(prev => !prev)  ; 
 
   return (
     <div className="w-full relative flex items-center justify-center gap-6 px-4 py-2 ">
 
 {/* Elapsed Time */}
      
-      {typingModeSelected === 'time' ?
-                        <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none text-center w-[4em] `}
-                        style={{
-                           background : isTypingStarted ? ( elapsedTime < 10 ? '#ef4444' : elapsedTime < 15 ? '#f97316' : '#16a34a' ) : currentTheme.buttonPrimary
-                        }}          
-                        
-                        >
-                           
-                          {typingModeSelected === 'time' && elapsedTime}
-                        
-                        </div>
-
-                        :
-                      <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none  text-center w-[4em]`}
-                        style={{background : currentTheme.buttonSecondary , color:currentTheme.buttonHover}}
-                       >
-                        
-                        {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
-                        {typingModeSelected === 'words' && typedWordsAmount + "/" + sessionWordsCount}  
-                      
-                      </div>
-      }
-          
+    
       {/* Time Selector + Expanding Times // timer counter separate level */} 
       <div className="flex items-center gap-2">
         <button
@@ -128,15 +110,15 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
       
       {/* Other Functional Buttons // these are on the seconds level option or extra options  */}
       <div className="flex items-center gap-5 ml-2">
-          <ButtonExtraOption isHighlighted={selectedParameters.includes('Numbers'.toLowerCase())}  handleParamOption={handleParamOption} label="Numbers" Icon={Hash} currentTheme={currentTheme} />
-          <ButtonExtraOption  isHighlighted={selectedParameters.includes('Symbols'.toLowerCase())}  handleParamOption={handleParamOption}  label="Symbols" Icon={SquareAsteriskIcon} currentTheme={currentTheme} />
-          <ButtonExtraOption isHighlighted={selectedParameters.includes('Punctuation'.toLowerCase())}  handleParamOption={handleParamOption}  label="Punctuation" Icon={CaseSensitive} currentTheme={currentTheme} />
+          <ButtonExtraOption  selectedParameters={selectedParameters}  handleParamOption={handleParamOption} label="Numbers" Icon={Hash} currentTheme={currentTheme} />
+          <ButtonExtraOption  selectedParameters={selectedParameters}  handleParamOption={handleParamOption}  label="Symbols" Icon={SquareAsteriskIcon} currentTheme={currentTheme} />
+          <ButtonExtraOption selectedParameters={selectedParameters}  handleParamOption={handleParamOption}  label="Punctuation" Icon={CaseSensitive} currentTheme={currentTheme} />
 
           {/* // sound buttons activation */}
           {/* normal sound */}
-          <ButtonExtraOption isHighlighted={selectedParameters.includes('sound'.toLowerCase())} handleParamOption={handleParamOption} action={()=> setIsNormalTypingSoundEnabled(prev => !prev)} label="sound" Icon={CaseSensitive} currentTheme={currentTheme} />
+          <ButtonExtraOption selectedParameters={selectedParameters} handleParamOption={handleParamOption} action={NSoundHandler} label="sound" Icon={CaseSensitive} currentTheme={currentTheme} />
           {/* erro sound */}
-          <ButtonExtraOption isHighlighted={selectedParameters.includes('errorSound'.toLowerCase())} handleParamOption={handleParamOption} action={()=> setIsErrorSoundEnabled(prev => !prev)} label="errorSound" Icon={CaseSensitive} currentTheme={currentTheme} />
+          <ButtonExtraOption selectedParameters={selectedParameters} handleParamOption={handleParamOption} action={ErrSoundHandler} label="errorSound" Icon={CaseSensitive} currentTheme={currentTheme} />
           
       </div>
      

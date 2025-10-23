@@ -134,7 +134,7 @@ const TypingApp: React.FC = () => {
 //////////////////////////////////////////////////////////
   
   // controlls options storing in the localstorage 
-
+ 
   // sliced text initializer
   
 
@@ -355,16 +355,15 @@ const TypingApp: React.FC = () => {
             <TypingBoardControls
               setIsNormalTypingSoundEnabled={setIsNormalTypingSoundEnabled}
               setIsErrorSoundEnabled={setIsErrorSoundEnabled}
-              sessionWordsCount={sessionWordsCount}
               setSessionWordsCount={setSessionWordsCount}
               currentTheme={currentTheme}
               setTypingModeSelected={setTypingModeSelected}
               typingModeSelected={typingModeSelected}
-              typedWordsAmount={typedWordsAmount}
+            
               isTypingStarted={isTypingStarted}
               selectedTime={selectedTime}
               setSelectedTime={setSelectedTime}
-              elapsedTime={elapsedTime}
+           
             />
           </section>}
           <div
@@ -374,11 +373,38 @@ const TypingApp: React.FC = () => {
             backdrop-blur-sm 
           `}
           >
+            {/* // words counter  */}
+             {typingModeSelected === 'time' ?
+                        <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none text-center w-[4em] `}
+                        style={{
+                           background : isTypingStarted ? ( elapsedTime < 10 ? '#ef4444' : elapsedTime < 15 ? '#f97316' : '#16a34a' ) : currentTheme.buttonPrimary
+                        }}          
+                        
+                        >
+                           
+                          {typingModeSelected === 'time' && elapsedTime}
+                        
+                        </div>
+
+                        :
+                      <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none  text-center w-[4em]`}
+                        style={{color : currentTheme.buttonSecondary}}
+                       >
+                        
+                        {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
+                        {typingModeSelected === 'words' && typedWordsAmount + "/" + sessionWordsCount}  
+                      
+                      </div>
+                }
+          
+
             <div
               className="mx-w-full hitespace-normal break-words break-keep h-[180px]"
               ref={containerRef}
               style={{ textAlign: "start" , fontSize : `${fontSizeRef.current}px`, overflowY:'hidden' }}
             >
+
+               
               {/* // text render */}
               {renderText}
             </div>
