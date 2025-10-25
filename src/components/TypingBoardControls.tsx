@@ -57,11 +57,6 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
       }
  
   }, [selectedParameters]); 
-  
- 
-  useEffect(() => {
-     console.log(selectedParameters)
-  }, [selectedParameters]);
 
 
   const NSoundHandler = ()=> setIsNormalTypingSoundEnabled(prev => !prev)  ; 
@@ -74,7 +69,6 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
      
     
       {/* Time Selector + Expanding Times // timer counter separate level */} 
-      <div className="flex items-center gap-2">
         <button
           onClick={() => {
             if(showWords) setShowWords(false) ;
@@ -87,7 +81,7 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
           <span className="text-xs  leading-none" style={{color:typingModeSelected == "time" ? currentTheme.buttonHover : currentTheme.white}} >{selectedTime}</span>
         </button>
    
-      </div>
+    
       
       {/* Words Mode (new button) first level has top label of typing mods */}
       <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700"

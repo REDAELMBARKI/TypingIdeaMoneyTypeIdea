@@ -38,3 +38,6 @@ export interface ThemeColors {
   warning: string;
   info: string;
 }
+
+
+export type soundOptions = 'sound' | 'errorSound' ; 

@@ -7,6 +7,7 @@ interface audioProps {
 }
 const useTypingSound = ({ allowedKeys, isNormalTypingSoundEnabled }: audioProps) => {
   useEffect(() => {
+
     if (!isNormalTypingSoundEnabled) return;
     const regularkey = new Audio("/sounds/keyboard-click.mp3");
     const del = new Audio("/sounds/del-key.mp3");
@@ -30,7 +31,7 @@ const useTypingSound = ({ allowedKeys, isNormalTypingSoundEnabled }: audioProps)
     window.addEventListener("keydown", playSound);
 
     return () => window.removeEventListener("keydown", playSound);
-  }, []);
+  }, [allowedKeys , isNormalTypingSoundEnabled]);
 
   return null;
 };

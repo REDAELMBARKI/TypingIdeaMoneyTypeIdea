@@ -30,7 +30,7 @@ function States({ wpmFinal , currentTheme }:{ wpmFinal: number , currentTheme: T
                 }
               `}
 
-              style={{ background : currentTheme.buttonSecondary, color : currentTheme.buttonHover}}
+              style={{ color : currentTheme.buttonHover}}
             >
               <div className={`text-2xl sm:text-3xl font-bold 
                 text-[${currentTheme.red}]

@@ -1,7 +1,11 @@
 
-export const containerWordsRangeFitHanlder = 
-(containerRef:React.RefObject<HTMLDivElement | null > 
-    ) => {
+
+
+interface containerWordsProps  {
+     containerRef:React.RefObject<HTMLDivElement | null > 
+      line3YRef : React.RefObject<number | null>
+    }
+export const containerWordsRangeFitHanlder = ({containerRef , line3YRef}:containerWordsProps ) => {
 
    let wordsCountAllowed = 0;
 let currentLine = 1;
@@ -19,6 +23,7 @@ for (let i = 0; i < spans.length; i++) {
   const span = spans[i];
   const currentY = span.getBoundingClientRect().top;
   
+
   if (currentY !== prevY) {
     currentLine++;
     prevY = currentY;
@@ -27,7 +32,10 @@ for (let i = 0; i < spans.length; i++) {
   if (currentLine > 3) break;
   
   if (currentLine === 3 && line3Y === null) {
+    
     line3Y = currentY;
+    line3YRef.current = line3Y ;
+    
   }
   
   if (span.textContent === "\u00A0" ) {

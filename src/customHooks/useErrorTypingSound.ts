@@ -30,5 +30,5 @@ export default function useErrorTypingSound({inputValue , currentText , currentL
             const incorrectSound =  audio.cloneNode() as HTMLAudioElement;
             incorrectSound.play().catch(() => {})
         }
-    },[inputValue])
+    },[inputValue , isErrorSoundEnabled])
 }

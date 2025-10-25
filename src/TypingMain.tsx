@@ -33,7 +33,8 @@ import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
 // import TypingResults from "./modals/TypingResults";
 
 
-
+const lasySoundStoredState = () => JSON.parse(localStorage.getItem('parameters') ?? `[]`).includes('sound'.toLowerCase()) ; 
+const lasyErrorSoundStoredState = () => JSON.parse(localStorage.getItem('parameters') ?? `[]`).includes('errorSound'.toLowerCase()) ; 
 
 const TypingApp: React.FC = () => {
   
@@ -53,8 +54,8 @@ const TypingApp: React.FC = () => {
   const [wordHistory, setWordHistory] = useState<WordHistoryItem[]>([]);
   // ----------------------------------------------------------------------
   // sound param (mute / activate)
-  const [isNormalTypingSoundEnabled,setIsNormalTypingSoundEnabled] = useState<boolean>(false);
-  const [isErrorSoundEnabled , setIsErrorSoundEnabled] = useState<boolean>(false);
+  const [isNormalTypingSoundEnabled,setIsNormalTypingSoundEnabled] = useState<boolean>(lasySoundStoredState);
+  const [isErrorSoundEnabled , setIsErrorSoundEnabled] = useState<boolean>(lasyErrorSoundStoredState);
   // game end controller state
   const [isTypingEnds, setIsTypingEnds] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -90,9 +91,9 @@ const TypingApp: React.FC = () => {
   const [wpmFinal, setWpmFinal] = useState<number>(0);
   
   const [isFocuceOnText ,setIsFocuceOnText] = useState<boolean>(false) ;
-
-
-
+ //  first line shift toggler 
+const [isShiftFirstLine , setIsShiftFirstLine] = useState<boolean>(false) ; 
+const line3YRef = useRef<number|null>(null) ;
  
   const totalCorrectedCharsRef =  useRef<number | null>(null);
   //text conatiner width
@@ -118,9 +119,7 @@ const TypingApp: React.FC = () => {
  
 
   // console logs ////////////////
-     useEffect(() => {
-        console.log(isTypingActive)
-     }, [isTypingActive]);
+
   ///////////////////////////////////
 
 
@@ -139,14 +138,28 @@ const TypingApp: React.FC = () => {
   
 
   // denamice text raws updater (every we typd two raws the first line of the text should be removed  and new line appears )
+ // ...existing code...
+  // denamice text raws updater (every we typd two raws the first line of the text should be removed  and new line appears )
   useEffect(() => {
-    if(! containerRef.current ) return ;
-    const currentSpan = containerRef.current.querySelector('span')!.getBoundingClientRect().top;
-    if (!currentSpan) return;
-    // const i:number = 15 ;
-    // setTextSliceStartIndex(i) ; 
-    // setDynamicTextRange(prev => prev + i) ;
+   if(! containerRef.current ) return ;
+    let currentLine  =  1 ;
+    const spans =  containerRef.current.querySelectorAll('span');
+
+    const prevIndex = currentLetter.index > 0 ? currentLetter.index - 1 : 0;
+    let prevSpanLine = spans[prevIndex].getBoundingClientRect().top;
+
+    const currentSpanLine = spans[currentLetter.index].getBoundingClientRect().top ;
+    
+    const buffer = Math.abs(prevSpanLine - currentSpanLine) ;
+    console.log('im in line', currentLine , 'diff' , buffer );
+    if(buffer > 7){ //  count as new line only if the diffirense in 1 pixel
+        prevSpanLine = currentSpanLine ;
+        currentLine++ ;
+    }
+
   }, [currentLetter.index]);
+  
+// ...existing code...
 
   // the amount of words typed handler
   useEffect(() => {
@@ -164,7 +177,7 @@ const TypingApp: React.FC = () => {
 
 
    //  text raws to be rendered slicer
-   useTextRawsSlicer({containerWidth , containerRef  , setCurrentText ,textSliceStartIndex ,dynamicTextRange, setDynamicTextRange})
+   useTextRawsSlicer({line3YRef ,  containerWidth , containerRef  , setCurrentText ,textSliceStartIndex ,dynamicTextRange, setDynamicTextRange})
   
   // caps listener
   useCapsLockListener({ setIsCapsOn });
@@ -174,7 +187,7 @@ const TypingApp: React.FC = () => {
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
-  }, []);
+  }, [isFocuceOnText]);
 
   const { nextText, handleReset } = useTypingControlleFunctions({
     sampleTexts,
@@ -228,6 +241,7 @@ const TypingApp: React.FC = () => {
 
   // index incriment controller
   useIndexIncrementer({
+    containerRef ,
     currentText,
     currentLetter,
     inputValue,
@@ -369,12 +383,12 @@ const TypingApp: React.FC = () => {
           <div
             className={`
             text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
-            font-mono text-center p-6 sm:p-8 lg:p-12 rounded-2xl shadow-sm 
-            backdrop-blur-sm 
+            font-mono text-center p-6 sm:p-8 lg:p-12 rounded-2xl
+            
           `}
           >
             {/* // words counter  */}
-             {typingModeSelected === 'time' ?
+             {isFocuceOnText && typingModeSelected === 'time' ?
                         <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none text-center w-[4em] `}
                         style={{
                            background : isTypingStarted ? ( elapsedTime < 10 ? '#ef4444' : elapsedTime < 15 ? '#f97316' : '#16a34a' ) : currentTheme.buttonPrimary
@@ -387,12 +401,12 @@ const TypingApp: React.FC = () => {
                         </div>
 
                         :
-                      <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none  text-center w-[4em]`}
+                      <div className={`px-4 py-2 rounded-lg text-white font-bold  cursor-default select-none  text-center w-[4em]`}
                         style={{color : currentTheme.buttonSecondary}}
                        >
                         
                         {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
-                        {typingModeSelected === 'words' && typedWordsAmount + "/" + sessionWordsCount}  
+                        {isFocuceOnText && typingModeSelected === 'words' && typedWordsAmount + "/" + sessionWordsCount}  
                       
                       </div>
                 }
@@ -453,7 +467,7 @@ const TypingApp: React.FC = () => {
             }
           }}
           type="text"
-          className="absolute -left-9999px opacity-0 pointer-events-none"
+          className="absolute -left-9999px opacity-0 pointer-events-none "
           aria-hidden="true"
           autoComplete="off"
           autoCapitalize="off"

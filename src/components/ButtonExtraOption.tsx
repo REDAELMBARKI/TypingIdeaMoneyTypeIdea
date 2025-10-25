@@ -23,14 +23,16 @@ const  ButtonExtraOption = ({  selectedParameters , action , currentTheme , labe
         setIsHighlighted(shouldHighlight) ;
     } , [selectedParameters , label])
 
+
+
+
     useEffect(() => {
-        console.log('checking ')
+ 
        if(! spanRef.current || ! ButtonRef.current ) return ;
 
        const isShouldBeHighlighted = isHighlighted || isCheckedParam ;
        const span  =  spanRef.current ;
        if (isShouldBeHighlighted) { 
-            console.log("checked " , isCheckedParam) ;              
             span.style.borderColor = currentTheme.buttonPrimary;
             span.style.boxShadow = `0 0 10px ${currentTheme.buttonPrimary}55`;
             span.style.color = currentTheme.buttonPrimary;
@@ -54,7 +56,7 @@ const  ButtonExtraOption = ({  selectedParameters , action , currentTheme , labe
     return (
       <React.Fragment >
    
-                    <button 
+                    <div 
                     
                     className={`flex items-center gap-2 text-sm hover:scale-110 transition `}>
                                     <label className="cursor-pointer relative flex items-center ">
@@ -95,7 +97,7 @@ const  ButtonExtraOption = ({  selectedParameters , action , currentTheme , labe
                                         <span>{label}</span>
                                         </span>
                                     </label>
-                                    </button>
+                                    </div>
 
       </React.Fragment>
     )

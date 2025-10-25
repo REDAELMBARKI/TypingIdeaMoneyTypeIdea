@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import type { currentLetterType } from "../types/experementTyping";
 
 interface useIncrimenterProps {
@@ -17,11 +17,12 @@ interface useIncrimenterProps {
        inputValue : string ;
         setWrongChars: React.Dispatch<React.SetStateAction<number[]>>;
         isWrongWord : boolean ; 
-
+        containerRef : React.RefObject<HTMLDivElement | null>
+     
 }
 
 
-function useIndexIncrementer({currentText , currentLetter , inputValue , setInputValue , wrongChars ,isWrongWord, setIsWrongWord , setWrongChars ,setCurrentLetter}:useIncrimenterProps) {
+function useIndexIncrementer({containerRef ,currentText , currentLetter , inputValue , setInputValue , wrongChars ,isWrongWord, setIsWrongWord , setWrongChars ,setCurrentLetter}:useIncrimenterProps) {
    useEffect(() => {
     
     // prevent space click to be treated as wrongchar (eather jump to next word or stick) as we are not in space position 
@@ -70,11 +71,23 @@ function useIndexIncrementer({currentText , currentLetter , inputValue , setInpu
       
       //  incriment only if the previous word is correct !iswrongword  
       if (typedChar === expectedChar && !isWrongWord) {
-        setCurrentLetter((prev) => ({
+        setCurrentLetter((prev) => {
+          
+          // update the 
+            if(containerRef.current){
+
+              const spanLine3 = containerRef.current?.querySelectorAll('span > span');
+            
+              console.log('ind' , prev.index + 1)
+              console.log(spanLine3[prev.index + 1].innerHTML)
+            }
+      
+          return{
           ...prev,
           index: prev.index + 1,
           letter: typedChar,
-        }));
+          }
+      });
       } else if (typedChar !== expectedChar && !isWrongWord) {
 
         // skip spaces dont add then to wrong chars 
