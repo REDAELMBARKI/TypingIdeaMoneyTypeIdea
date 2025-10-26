@@ -60,7 +60,7 @@ const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentL
                 
                 // set current index to next word begining
                 setCurrentLetter(()=> { 
-
+                   
                     return{
                     index: nextWordFirstIndexStarts,
                     letter: currentText[nextWordFirstIndexStarts] ?? "",
@@ -68,7 +68,7 @@ const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentL
             }
             );
                  
-      },[inputValue , currentLetter.index])
+      },[inputValue , currentLetter.index,currentText , setCurrentLetter , setWordHistory , setWrongWords])
 
 }
 

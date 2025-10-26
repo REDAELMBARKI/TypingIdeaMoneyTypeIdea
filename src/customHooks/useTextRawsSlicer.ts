@@ -9,7 +9,7 @@ interface textRawsSlicerProps {
      textSliceStartIndex : number
      setDynamicTextRange : React.Dispatch<React.SetStateAction<number>> // the words count that can fit in the container raws
       dynamicTextRange ?: number
-      line3YRef : React.RefObject<number | null>
+      line3YRef : React.RefObject<{top : number , wordIndex : number} | null>
 }
 
 

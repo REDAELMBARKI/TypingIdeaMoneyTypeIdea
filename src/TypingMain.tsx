@@ -93,7 +93,7 @@ const TypingApp: React.FC = () => {
   const [isFocuceOnText ,setIsFocuceOnText] = useState<boolean>(false) ;
  //  first line shift toggler 
 const [isShiftFirstLine , setIsShiftFirstLine] = useState<boolean>(false) ; 
-const line3YRef = useRef<number|null>(null) ;
+const line3YRef = useRef<{top : number , wordIndex : number} |null>(null) ;
  
   const totalCorrectedCharsRef =  useRef<number | null>(null);
   //text conatiner width
@@ -127,40 +127,13 @@ const line3YRef = useRef<number|null>(null) ;
 //////////////////////////////////////////////////////
 
 
-
+ useEffect(() => {
+   
+ }, [currentLetter.index]);
 
 
 //////////////////////////////////////////////////////////
-  
-  // controlls options storing in the localstorage 
  
-  // sliced text initializer
-  
-
-  // denamice text raws updater (every we typd two raws the first line of the text should be removed  and new line appears )
- // ...existing code...
-  // denamice text raws updater (every we typd two raws the first line of the text should be removed  and new line appears )
-  useEffect(() => {
-   if(! containerRef.current ) return ;
-    let currentLine  =  1 ;
-    const spans =  containerRef.current.querySelectorAll('span');
-
-    const prevIndex = currentLetter.index > 0 ? currentLetter.index - 1 : 0;
-    let prevSpanLine = spans[prevIndex].getBoundingClientRect().top;
-
-    const currentSpanLine = spans[currentLetter.index].getBoundingClientRect().top ;
-    
-    const buffer = Math.abs(prevSpanLine - currentSpanLine) ;
-    console.log('im in line', currentLine , 'diff' , buffer );
-    if(buffer > 7){ //  count as new line only if the diffirense in 1 pixel
-        prevSpanLine = currentSpanLine ;
-        currentLine++ ;
-    }
-
-  }, [currentLetter.index]);
-  
-// ...existing code...
-
   // the amount of words typed handler
   useEffect(() => {
     if (inputValue !== " ") return;
@@ -241,7 +214,6 @@ const line3YRef = useRef<number|null>(null) ;
 
   // index incriment controller
   useIndexIncrementer({
-    containerRef ,
     currentText,
     currentLetter,
     inputValue,
@@ -379,7 +351,8 @@ const line3YRef = useRef<number|null>(null) ;
               setSelectedTime={setSelectedTime}
            
             />
-          </section>}
+          </section>} 
+           
           <div
             className={`
             text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
@@ -411,7 +384,7 @@ const line3YRef = useRef<number|null>(null) ;
                       </div>
                 }
           
-
+            
             <div
               className="mx-w-full hitespace-normal break-words break-keep h-[180px]"
               ref={containerRef}
@@ -421,7 +394,10 @@ const line3YRef = useRef<number|null>(null) ;
                
               {/* // text render */}
               {renderText}
+
             </div>
+       
+
             <div className="">
               {/* // typing over div model  */}
               {isShowTypingOverModal  && <TypingOverModal
