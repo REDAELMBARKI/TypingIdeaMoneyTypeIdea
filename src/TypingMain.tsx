@@ -29,6 +29,7 @@ import useWpmCalculationHandler from "./customHooks/useWpmCalculationHandler";
 import useThemePreviewerAndSetter from "./customHooks/useThemePreviewerAndSetter";
 import { sampleTexts } from "./data/texts";
 import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
+import useSessionReplay from "./customHooks/useSessionReplay";
 
 // import TypingResults from "./modals/TypingResults";
 
@@ -92,7 +93,7 @@ const TypingApp: React.FC = () => {
   
   const [isFocuceOnText ,setIsFocuceOnText] = useState<boolean>(false) ;
  //  first line shift toggler 
-const [isShiftFirstLine , setIsShiftFirstLine] = useState<boolean>(false) ; 
+// const [isShiftFirstLine , setIsShiftFirstLine] = useState<boolean>(false) ; 
 const line3YRef = useRef<{top : number , wordIndex : number} |null>(null) ;
  
   const totalCorrectedCharsRef =  useRef<number | null>(null);
@@ -127,10 +128,6 @@ const line3YRef = useRef<{top : number , wordIndex : number} |null>(null) ;
 //////////////////////////////////////////////////////
 
 
- useEffect(() => {
-   
- }, [currentLetter.index]);
-
 
 //////////////////////////////////////////////////////////
  
@@ -146,14 +143,6 @@ const line3YRef = useRef<{top : number , wordIndex : number} |null>(null) ;
     ElapsedTimeHandler({ selectedTime, setElapsedTime });
   }, [isTypingStarted]);
 
- 
-
-
-   //  text raws to be rendered slicer
-   useTextRawsSlicer({line3YRef ,  containerWidth , containerRef  , setCurrentText ,textSliceStartIndex ,dynamicTextRange, setDynamicTextRange})
-  
-  // caps listener
-  useCapsLockListener({ setIsCapsOn });
 
   // Focus the hidden input on component mount
   useEffect(() => {
@@ -161,6 +150,19 @@ const line3YRef = useRef<{top : number , wordIndex : number} |null>(null) ;
       hiddenInputRef.current.focus();
     }
   }, [isFocuceOnText]);
+
+
+
+   // store session typing data andtimestamps for relpay 
+
+   useSessionReplay({ inputValue , startTypingTimeRef}) ;   
+
+   //  text raws to be rendered slicer
+   useTextRawsSlicer({line3YRef ,  containerWidth , containerRef  , setCurrentText ,textSliceStartIndex ,dynamicTextRange, setDynamicTextRange})
+  
+  // caps listener
+  useCapsLockListener({ setIsCapsOn });
+
 
   const { nextText, handleReset } = useTypingControlleFunctions({
     sampleTexts,
