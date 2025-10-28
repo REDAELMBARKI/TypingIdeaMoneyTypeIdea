@@ -146,10 +146,16 @@ useEffect(() => {
  
      if(! containerRef.current || currentLetter.index == 0 || !line3YRef.current) return ;
     const spansWord =  containerRef.current?.querySelectorAll('.word') ; 
-    if(spansWord[typedWordsAmount].getBoundingClientRect().top === line3YRef.current?.top){
-      
-      alert('im in line 3')
+
+     const containerTop = containerRef.current.getBoundingClientRect().top;
+
+     const currentWordRelativeTop = spansWord[typedWordsAmount].getBoundingClientRect().top ; 
+    
+    const tolerance = 2;
+    if (Math.abs(line3YRef.current.top - currentWordRelativeTop ) < tolerance) {
+      alert('im in line 3');
     }
+
 
     console.log('current top '  ,spansWord[typedWordsAmount].getBoundingClientRect().top)
       console.log('line 3 ' , line3YRef.current.top)

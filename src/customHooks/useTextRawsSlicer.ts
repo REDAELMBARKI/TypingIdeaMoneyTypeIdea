@@ -24,7 +24,7 @@ const useTextRawsSlicer = ({line3YRef , containerWidth , containerRef  , setCurr
          
           setDynamicTextRange(wordsCountAllowed) ;
           setCurrentText(sliceWordsHandler(textSliceStartIndex , wordsCountAllowed))
-      }, [containerWidth , textSliceStartIndex , dynamicTextRange ]);
+      }, [containerWidth , textSliceStartIndex , dynamicTextRange]);
 }
 
 export default useTextRawsSlicer ; 
