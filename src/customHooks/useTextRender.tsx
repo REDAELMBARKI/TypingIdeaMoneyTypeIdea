@@ -41,7 +41,7 @@ useEffect(() => {
 let globalIndex = 0; 
 return  currentText.split(" ").map((word , wordIndex) => {
      
-    return (<span  key={wordIndex} style={{ whiteSpace: 'nowrap', display: 'inline-block' }} >{word.concat(" ").split("").map((char) => {
+    return (<span  key={wordIndex} className="word" style={{ whiteSpace: 'nowrap', display: 'inline-block' }} >{word.concat(" ").split("").map((char) => {
     const index = globalIndex++;
 
     let charStyle = "";

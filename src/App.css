@@ -157,6 +157,13 @@
 /*  */
 
 
+
+/* tped class */
+.typed{
+  background-color: rgba(3, 92, 62, 0.207);
+}
+/* typed class end  */
+
 @layer utilities {
   .glass-card {
     background: rgba(30, 27, 75, 0.4);

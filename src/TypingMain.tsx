@@ -29,7 +29,7 @@ import useWpmCalculationHandler from "./customHooks/useWpmCalculationHandler";
 import useThemePreviewerAndSetter from "./customHooks/useThemePreviewerAndSetter";
 import { sampleTexts } from "./data/texts";
 import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
-import useSessionReplay from "./customHooks/useSessionReplay";
+// import useSessionReplay from "./customHooks/useSessionReplay";
 
 // import TypingResults from "./modals/TypingResults";
 
@@ -39,10 +39,14 @@ const lasyErrorSoundStoredState = () => JSON.parse(localStorage.getItem('paramet
 
 const TypingApp: React.FC = () => {
   
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | states | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
+    
   // the text sliced index where the text will be sliced from (the text starts from this index )
   const [textSliceStartIndex ] = useState<number>(0) ;
   // current text state 15 words to be genrated at the first time (the text ends in this index)
-  const [sessionWordsCount , setSessionWordsCount] = useState<number>(100) ;
+  const [sessionWordsCount , setSessionWordsCount] = useState<number>(10) ;
 
   const [dynamicTextRange , setDynamicTextRange] = useState<number>(0) ; // the words count that can fit in the container raws
 
@@ -94,13 +98,25 @@ const TypingApp: React.FC = () => {
   const [isFocuceOnText ,setIsFocuceOnText] = useState<boolean>(false) ;
  //  first line shift toggler 
 // const [isShiftFirstLine , setIsShiftFirstLine] = useState<boolean>(false) ; 
-const line3YRef = useRef<{top : number , wordIndex : number} |null>(null) ;
+
+//text conatiner width
+const [containerWidth  ,setContainerWidth] =  useState<number>(0);
+
+   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end states | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
+    
+
+
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | refs | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
+  // line 3 data 
+
+  const line3YRef = useRef<{top : number , wordIndex : number} |null>(null) ;
  
   const totalCorrectedCharsRef =  useRef<number | null>(null);
-  //text conatiner width
-  const [containerWidth  ,setContainerWidth] =  useState<number>(0);
   
-  // refs
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   const amountOfTimeRef = useRef<number | null>(null);
   // text container
@@ -110,53 +126,72 @@ const line3YRef = useRef<{top : number , wordIndex : number} |null>(null) ;
   // underline ref
 
   const startTypingTimeRef = useRef<number>(0);
-  //hooks
+
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end of refs | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
+    
+
  
-
-  // theme state
-
-  // console.log(previewTheme , 'preview theme in main');
-  const {  currentTheme } =  useThemeHook() ;
- 
-
+  
   // console logs ////////////////
-
+  
   ///////////////////////////////////
-
-
+  
+  
 
 //////////////////////////////////////////////////////
 
+useEffect(() => {
+ 
+     if(! containerRef.current || currentLetter.index == 0 || !line3YRef.current) return ;
+    const spansWord =  containerRef.current?.querySelectorAll('.word') ; 
+    if(spansWord[typedWordsAmount].getBoundingClientRect().top === line3YRef.current?.top){
+      
+      alert('im in line 3')
+    }
+
+    console.log('current top '  ,spansWord[typedWordsAmount].getBoundingClientRect().top)
+      console.log('line 3 ' , line3YRef.current.top)
+
+}, [typedWordsAmount , currentLetter.index]);
 
 
 //////////////////////////////////////////////////////////
- 
+  
   // the amount of words typed handler
   useEffect(() => {
     if (inputValue !== " ") return;
     setTypedWordsAmount((prev) => prev + 1);
-  }, [inputValue]);
 
+
+  }, [inputValue]);
+  
   // typing start listener (envocking ellapsed time calculation)
   useEffect(() => {
     if (!isTypingStarted) return;
     ElapsedTimeHandler({ selectedTime, setElapsedTime });
   }, [isTypingStarted]);
 
-
+  
   // Focus the hidden input on component mount
   useEffect(() => {
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
   }, [isFocuceOnText]);
+  
+  
+     // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++hooks++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
+    
+    
+    // theme state
+    const {  currentTheme } =  useThemeHook() ;
 
-
-
-   // store session typing data andtimestamps for relpay 
-
-   useSessionReplay({ inputValue , startTypingTimeRef}) ;   
-
+  // store session typing data andtimestamps for relpay 
+  //  useSessionReplay({ inputValue , startTypingTimeRef , isReplayTime}) ;   
    //  text raws to be rendered slicer
    useTextRawsSlicer({line3YRef ,  containerWidth , containerRef  , setCurrentText ,textSliceStartIndex ,dynamicTextRange, setDynamicTextRange})
   
@@ -265,6 +300,7 @@ const line3YRef = useRef<{top : number , wordIndex : number} |null>(null) ;
     wrongWords,
     wordHistory,
     setWordHistory,
+    setTypedWordsAmount
   });
 
   // audio player

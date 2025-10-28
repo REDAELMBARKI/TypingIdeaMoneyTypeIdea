@@ -1,5 +1,8 @@
 export const sampleTexts = [
 
     "The ancient library stood at the edge of the forgotten city, its towering shelves filled with countless volumes that had witnessed the passage of centuries. Dust particles danced in the golden rays of afternoon sunlight that streamed through the tall arched windows, creating an almost magical atmosphere within the silent halls. Every book contained stories of distant lands, brave heroes, and civilizations that had risen and fallen like waves upon the shore. The leather-bound manuscripts smelled of age and wisdom, their pages yellowed but still legible to those patient enough to decipher the elegant handwriting of scholars long deceased. In the corner of the main reading room, an old wooden desk held a collection of maps that depicted worlds both real and imagined, their borders drawn with meticulous care by cartographers who had dedicated their lives to understanding the geography of their time. The librarian, a gentle soul with silver hair and kind eyes, moved quietly between the aisles, occasionally pausing to straighten a book or run her fingers along the spines with reverence. She knew every volume by heart, could recall the location of any text without consulting the catalog, and often recommended obscure works to visitors who sought knowledge beyond the ordinary. Outside, the modern world rushed by with its constant noise and hurried pace, but within these walls, time seemed to slow down, allowing readers to immerse themselves completely in the written word and lose themselves in tales of adventure, romance, mystery, and discovery that had captivated generations before them."
+
      
 ]
+
+

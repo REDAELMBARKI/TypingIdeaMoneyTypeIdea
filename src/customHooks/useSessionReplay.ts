@@ -1,13 +1,10 @@
 
 import React, { useEffect, useRef } from "react";
-import { recordDeleteTimestimps } from "../functions/recordDeleteTimestimps";
-
-
-
 
 interface sessionReplayProps {
     inputValue : string
     startTypingTimeRef : React.RefObject<number>
+    isReplayTime : boolean
 }
 
 
@@ -16,10 +13,12 @@ type sessionReplayData = {
    timestamp : number 
 }
 
-const useSessionReplay = ({ inputValue , startTypingTimeRef}:sessionReplayProps) => {
+const useSessionReplay = ({ inputValue , startTypingTimeRef , isReplayTime}:sessionReplayProps) => {
 
     const sessionReplayDataRef = useRef<sessionReplayData[]>([]);
+   
 
+    // storin session data for replay 
     useEffect(() => {
         if(inputValue == '') return ;
         // storing here the keys but not delete key or backspace 
@@ -52,6 +51,11 @@ const useSessionReplay = ({ inputValue , startTypingTimeRef}:sessionReplayProps)
     } ,[])
 
     
+    // if replay clicked show the (replay)
+
+    useEffect(()=>{
+     
+    },[isReplayTime])
 
 }
 

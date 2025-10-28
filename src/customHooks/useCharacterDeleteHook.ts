@@ -1,3 +1,4 @@
+
 import type { currentLetterType, WordHistoryItem } from "../types/experementTyping";
 
 interface TextRenderProps {
@@ -19,6 +20,7 @@ interface TextRenderProps {
   wrongWords: { start: number; end: number }[];
   wordHistory: WordHistoryItem[];
   setWordHistory: React.Dispatch<React.SetStateAction<WordHistoryItem[]>>;
+  setTypedWordsAmount : React.Dispatch<React.SetStateAction<number>>;
 }
 
 function useCharacterDeleteHook({
@@ -33,6 +35,7 @@ function useCharacterDeleteHook({
   wrongWords,
   wordHistory,
   setWordHistory,
+  setTypedWordsAmount
 }: TextRenderProps) {
   const handleDeleteChar = () => {
     // pprevent deletin if we pass to next word (no go back if the previous word wass correct )
@@ -70,6 +73,13 @@ function useCharacterDeleteHook({
           wordHistory[wordHistory.length - 1].lastTypedIndex)
     ) {
 
+      // brestorete the typed words -- 
+          // reduce the amount of typed words 
+            if(currentText[currentLetter.index - 1] == " "){
+              setTypedWordsAmount((prev) =>   Math.max(0 , prev - 1 ) )    
+            }
+
+      
       // remove the word from history avoiding mutation here and copy the old array an pop from the copy and set the state again 
       setWordHistory((prev) => {
         const copy = [...prev];
@@ -80,13 +90,24 @@ function useCharacterDeleteHook({
           currentLetter.index !== lastBreakedWord.lastTypedIndex &&
           currentLetter.index !== lastBreakedWord.lastTypedIndex + 1
         ) {
+ 
+
+   
+
 
           // set the index cursor to theindex we stored (the last index before jumpping to next word )
-          setCurrentLetter({
+          setCurrentLetter(() => {
+            
+            return {
+
             index: lastBreakedWord!.lastTypedIndex,
             letter: currentText[lastBreakedWord!.lastTypedIndex] || "",
-          });
+          }
+          }
+        );
 
+          
+          
           // removes the word from wrong words as its now the current word
           // remove any wrongWords that overlap the popped word
           setWrongWords(prevWrong => 
@@ -122,10 +143,21 @@ function useCharacterDeleteHook({
     }
     //////////////////////////////////////////////////////////////////////////
 
-    setCurrentLetter((prev) => ({
+    setCurrentLetter((prev) => {   
+      return { 
       index: prev.index - 1,
       letter: currentText[prev.index - 1],
-    }));
+     }
+  
+    });
+   
+    
+    // // reduce the amount of typed words 
+    if(currentText[currentLetter.index - 1] == " "){
+      setTypedWordsAmount((prev) =>   Math.max(0 , prev - 1 ) )    
+    }
+  
+
 
    
   };
