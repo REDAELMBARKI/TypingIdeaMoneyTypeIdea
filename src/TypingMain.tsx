@@ -44,7 +44,7 @@ const TypingApp: React.FC = () => {
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
     
   // the text sliced index where the text will be sliced from (the text starts from this index )
-  const [textSliceStartIndex ] = useState<number>(0) ;
+  const [textSliceStartIndex  , setTextSliceStartIndex] = useState<number>(0) ;
   // current text state 15 words to be genrated at the first time (the text ends in this index)
   const [sessionWordsCount , setSessionWordsCount] = useState<number>(10) ;
 
@@ -97,7 +97,7 @@ const TypingApp: React.FC = () => {
   
   const [isFocuceOnText ,setIsFocuceOnText] = useState<boolean>(false) ;
  //  first line shift toggler 
-// const [isShiftFirstLine , setIsShiftFirstLine] = useState<boolean>(false) ; 
+const [isShiftFirstLine , setIsShiftFirstLine] = useState<boolean>(false) ; 
 
 //text conatiner width
 const [containerWidth  ,setContainerWidth] =  useState<number>(0);
@@ -114,7 +114,10 @@ const [containerWidth  ,setContainerWidth] =  useState<number>(0);
   // line 3 data 
 
   const line3YRef = useRef<{top : number , wordIndex : number} |null>(null) ;
- 
+  // th epreviousline 
+  const prevLineRef = useRef<number>(0);
+
+
   const totalCorrectedCharsRef =  useRef<number | null>(null);
   
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
@@ -142,25 +145,44 @@ const [containerWidth  ,setContainerWidth] =  useState<number>(0);
 
 //////////////////////////////////////////////////////
 
+
 useEffect(() => {
- 
-     if(! containerRef.current || currentLetter.index == 0 || !line3YRef.current) return ;
-    const spansWord =  containerRef.current?.querySelectorAll('.word') ; 
+  if (!containerRef.current) return;
+  const words = containerRef.current.querySelectorAll('.word');
+  if (!words || words.length === 0) return;
 
-     const containerTop = containerRef.current.getBoundingClientRect().top;
+  const idx = Math.min(typedWordsAmount, words.length - 1);
+  const tops: number[] = [];
+  const firstIndexForTop = new Map<number, number>();
 
-     const currentWordRelativeTop = spansWord[typedWordsAmount].getBoundingClientRect().top ; 
-    
-    const tolerance = 2;
-    if (Math.abs(line3YRef.current.top - currentWordRelativeTop ) < tolerance) {
-      alert('im in line 3');
+  for (let i = 0; i <= idx; i++) {
+    const rect = (words[i] as HTMLElement).getBoundingClientRect();
+    const top = Math.round(rect.top); 
+    if (tops.length === 0 || tops[tops.length - 1] !== top) {
+      tops.push(top);
+      if (!firstIndexForTop.has(top)) firstIndexForTop.set(top, i);
     }
+  }
 
+  const currentLine = Math.max(1, tops.length);
+  const prevLine = prevLineRef.current ?? 0;
 
-    console.log('current top '  ,spansWord[typedWordsAmount].getBoundingClientRect().top)
-      console.log('line 3 ' , line3YRef.current.top)
+  if (currentLine >= 3 && prevLine < 3) {
+    // reached line 3
+    const line3Top = tops[2]; // index 2 -> third line
+    const firstIdxOnLine3 = firstIndexForTop.get(line3Top) ?? 0;
+    line3YRef.current = { top: line3Top, wordIndex: firstIdxOnLine3 };
+    // shift line 1
+    setIsShiftFirstLine(true)
+  }
 
-}, [typedWordsAmount , currentLetter.index]);
+  if (currentLine < 3 && prevLine >= 3) {
+    line3YRef.current = null;
+  }
+
+  prevLineRef.current = currentLine;
+}, [typedWordsAmount, currentLetter.index, containerWidth]); 
+
 
 
 //////////////////////////////////////////////////////////
@@ -199,7 +221,7 @@ useEffect(() => {
   // store session typing data andtimestamps for relpay 
   //  useSessionReplay({ inputValue , startTypingTimeRef , isReplayTime}) ;   
    //  text raws to be rendered slicer
-   useTextRawsSlicer({line3YRef ,  containerWidth , containerRef  , setCurrentText ,textSliceStartIndex ,dynamicTextRange, setDynamicTextRange})
+   useTextRawsSlicer({line3YRef , isShiftFirstLine ,  containerWidth , containerRef  , setCurrentText ,textSliceStartIndex ,dynamicTextRange, setDynamicTextRange})
   
   // caps listener
   useCapsLockListener({ setIsCapsOn });
