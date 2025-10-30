@@ -11,10 +11,11 @@ interface textRawsSlicerProps {
       dynamicTextRange ?: number
       line3YRef : React.RefObject<{top : number , wordIndex : number} | null>
       isShiftFirstLine : boolean ;
+      typedWordsAmount : number 
 }
 
 
-const useTextRawsSlicer = ({isShiftFirstLine , line3YRef , containerWidth , containerRef  , setCurrentText  , textSliceStartIndex , setDynamicTextRange ,dynamicTextRange} : textRawsSlicerProps) => {
+const useTextRawsSlicer = ({isShiftFirstLine ,typedWordsAmount ,  line3YRef , containerWidth , containerRef  , setCurrentText  , textSliceStartIndex , setDynamicTextRange ,dynamicTextRange} : textRawsSlicerProps) => {
       
       const wordsCountAllowed = useRef<number | null>(null);
       useEffect(() => {
@@ -24,14 +25,14 @@ const useTextRawsSlicer = ({isShiftFirstLine , line3YRef , containerWidth , cont
              wordsCountAllowed.current = containerWordsRangeFitHanlder({containerRef , line3YRef} ) ;
             setDynamicTextRange(wordsCountAllowed.current)
             setCurrentText(sliceWordsHandler(textSliceStartIndex , wordsCountAllowed.current))
-      }, [containerWidth , textSliceStartIndex , isShiftFirstLine , dynamicTextRange]);
+      }, [containerWidth , dynamicTextRange]);
 
 
 
 
       useEffect(() => {
         if(!wordsCountAllowed.current) return ; 
-        setCurrentText(sliceWordsHandler(10 , wordsCountAllowed.current))
+        setCurrentText(sliceWordsHandler(typedWordsAmount , wordsCountAllowed.current))
       }, [isShiftFirstLine])
       
 

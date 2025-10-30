@@ -17,7 +17,7 @@ interface TextRenderProps {
 
 export const useTextRender = ({
   currentText,
-  currentLetter,
+  currentLetter, 
   inputValue,
   wrongChars,
   trachWord,
@@ -29,16 +29,17 @@ export const useTextRender = ({
   
 
   
-useEffect(() => {
-  if (currentTheme.isDarkModed) {
-    document.documentElement.style.removeProperty('color-scheme');
-  } else {
-    document.documentElement.style.setProperty('color-scheme', 'normal');
-  }
-}, [currentTheme.isDarkModed]);
+// useEffect(() => {
+//   if (currentTheme.isDarkModed) {
+//     document.documentElement.style.removeProperty('color-scheme');
+//   } else {
+//     document.documentElement.style.setProperty('color-scheme', 'normal');
+//   }
+// }, [currentTheme.isDarkModed]);
 
 
 let globalIndex = 0; 
+console.log(currentText)
 return  currentText.split(" ").map((word , wordIndex) => {
      
     return (<span  key={wordIndex} className="word" style={{ whiteSpace: 'nowrap', display: 'inline-block' }} >{word.concat(" ").split("").map((char) => {

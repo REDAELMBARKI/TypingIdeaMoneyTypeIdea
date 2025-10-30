@@ -221,7 +221,7 @@ useEffect(() => {
   // store session typing data andtimestamps for relpay 
   //  useSessionReplay({ inputValue , startTypingTimeRef , isReplayTime}) ;   
    //  text raws to be rendered slicer
-   useTextRawsSlicer({line3YRef , isShiftFirstLine ,  containerWidth , containerRef  , setCurrentText ,textSliceStartIndex ,dynamicTextRange, setDynamicTextRange})
+   useTextRawsSlicer({line3YRef ,typedWordsAmount ,  isShiftFirstLine ,  containerWidth , containerRef  , setCurrentText ,textSliceStartIndex ,dynamicTextRange, setDynamicTextRange})
   
   // caps listener
   useCapsLockListener({ setIsCapsOn });
