@@ -158,9 +158,20 @@
 
 
 
-/* tped class */
+/* chars and words update classs */
+.active{
+  color: green;
+}
 .typed{
-  background-color: rgba(3, 92, 62, 0.207);
+  background-color: green;
+}
+
+.wrong{
+  color: red;
+}
+
+.wrongWord{
+  border-bottom:  1px solid red;
 }
 /* typed class end  */
 

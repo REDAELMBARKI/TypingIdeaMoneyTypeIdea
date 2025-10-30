@@ -1,14 +1,18 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import useThemeHook from "./customHooks/useThemeHook";
 import Footer from "./partials/Footer";
 import States from "./partials/States";
 import Reseter from "./partials/Reseter";
-import { useTextRender } from "./customHooks/useTextRender";
+import { textRender } from "./functions/textRender";
 import useCharacterDeleteHook from "./customHooks/useCharacterDeleteHook";
 import useTypingSound from "./customHooks/useTypingSound";
 import { allowedKeys } from "./data/allowdKeys";
 import useControlleBoundery from "./customHooks/useControlleBoundery";
-import type { currentLetterType, Mode, WordHistoryItem } from "./types/experementTyping";
+import type {
+  currentLetterType,
+  Mode,
+  WordHistoryItem,
+} from "./types/experementTyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
 import TypingOverModal from "./modals/TypingOverModal";
 import useTypingEnd from "./customHooks/useTypingEnd";
@@ -29,26 +33,31 @@ import useWpmCalculationHandler from "./customHooks/useWpmCalculationHandler";
 import useThemePreviewerAndSetter from "./customHooks/useThemePreviewerAndSetter";
 import { sampleTexts } from "./data/texts";
 import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
+
 // import useSessionReplay from "./customHooks/useSessionReplay";
 
 // import TypingResults from "./modals/TypingResults";
 
-
-const lasySoundStoredState = () => JSON.parse(localStorage.getItem('parameters') ?? `[]`).includes('sound'.toLowerCase()) ; 
-const lasyErrorSoundStoredState = () => JSON.parse(localStorage.getItem('parameters') ?? `[]`).includes('errorSound'.toLowerCase()) ; 
+const lasySoundStoredState = () =>
+  JSON.parse(localStorage.getItem("parameters") ?? `[]`).includes(
+    "sound".toLowerCase()
+  );
+const lasyErrorSoundStoredState = () =>
+  JSON.parse(localStorage.getItem("parameters") ?? `[]`).includes(
+    "errorSound".toLowerCase()
+  );
 
 const TypingApp: React.FC = () => {
-  
-    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | states | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
-    
-  // the text sliced index where the text will be sliced from (the text starts from this index )
-  const [textSliceStartIndex  , setTextSliceStartIndex] = useState<number>(0) ;
-  // current text state 15 words to be genrated at the first time (the text ends in this index)
-  const [sessionWordsCount , setSessionWordsCount] = useState<number>(10) ;
 
-  const [dynamicTextRange , setDynamicTextRange] = useState<number>(0) ; // the words count that can fit in the container raws
+  // the text sliced index where the text will be sliced from (the text starts from this index )
+  const [textSliceStartIndex] = useState<number>(0);
+  // current text state 15 words to be genrated at the first time (the text ends in this index)
+  const [sessionWordsCount, setSessionWordsCount] = useState<number>(10);
+
+  const [dynamicTextRange, setDynamicTextRange] = useState<number>(0); // the words count that can fit in the container raws
 
   const [currentText, setCurrentText] = useState<string>("");
   const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
@@ -59,12 +68,15 @@ const TypingApp: React.FC = () => {
   const [wordHistory, setWordHistory] = useState<WordHistoryItem[]>([]);
   // ----------------------------------------------------------------------
   // sound param (mute / activate)
-  const [isNormalTypingSoundEnabled,setIsNormalTypingSoundEnabled] = useState<boolean>(lasySoundStoredState);
-  const [isErrorSoundEnabled , setIsErrorSoundEnabled] = useState<boolean>(lasyErrorSoundStoredState);
+  const [isNormalTypingSoundEnabled, setIsNormalTypingSoundEnabled] =
+    useState<boolean>(lasySoundStoredState);
+  const [isErrorSoundEnabled, setIsErrorSoundEnabled] = useState<boolean>(
+    lasyErrorSoundStoredState
+  );
   // game end controller state
   const [isTypingEnds, setIsTypingEnds] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
-  // chars that are worong and colored in red 
+  // chars that are worong and colored in red
   const [wrongChars, setWrongChars] = useState<number[]>([]);
 
   const [isWrongWord, setIsWrongWord] = useState<boolean>(false);
@@ -83,43 +95,41 @@ const TypingApp: React.FC = () => {
   // typign begin listener
   const [isTypingStarted, setIsTypingStarted] = useState(false);
   // typing mode (words | time )
-  const [typingModeSelected , setTypingModeSelected] = useState<Mode>('words') ;
+  const [typingModeSelected, setTypingModeSelected] = useState<Mode>("words");
   // the amount of time the typing session took
   // const [amountOfTime,setAmountOfTime] = useState<number>();
   // words typed
   const [typedWordsAmount, setTypedWordsAmount] = useState<number>(0);
-  // correct words final result 
+  // correct words final result
   // const [totalCorrectedChars , setTotalCorrectedChars] =  useState<number>();
   // typing ends model togller
-  const [isShowTypingOverModal , setIsShowTypingOverModal] = useState<boolean>(false)
-    // wpm ref
+  const [isShowTypingOverModal, setIsShowTypingOverModal] =
+    useState<boolean>(false);
+  // wpm ref
   const [wpmFinal, setWpmFinal] = useState<number>(0);
-  
-  const [isFocuceOnText ,setIsFocuceOnText] = useState<boolean>(false) ;
- //  first line shift toggler 
-const [isShiftFirstLine , setIsShiftFirstLine] = useState<boolean>(false) ; 
 
-//text conatiner width
-const [containerWidth  ,setContainerWidth] =  useState<number>(0);
+  const [isFocuceOnText, setIsFocuceOnText] = useState<boolean>(false);
+  //  first line shift toggler
+  const [isShiftFirstLine, setIsShiftFirstLine] = useState<boolean>(false);
 
-   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //text conatiner width
+  const [containerWidth, setContainerWidth] = useState<number>(0);
+
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end states | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
-    
-
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | refs | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
-  // line 3 data 
+  // line 3 data
 
-  const line3YRef = useRef<{top : number , wordIndex : number} |null>(null) ;
-  // th epreviousline 
+  const line3YRef = useRef<{ top: number; wordIndex: number } | null>(null);
+  // th epreviousline
   const prevLineRef = useRef<number>(0);
 
+  const totalCorrectedCharsRef = useRef<number | null>(null);
 
-  const totalCorrectedCharsRef =  useRef<number | null>(null);
-  
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   const amountOfTimeRef = useRef<number | null>(null);
   // text container
@@ -130,102 +140,182 @@ const [containerWidth  ,setContainerWidth] =  useState<number>(0);
 
   const startTypingTimeRef = useRef<number>(0);
 
+  // theme state
+  const { currentTheme } = useThemeHook();
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end of refs | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
-    
 
- 
-  
   // console logs ////////////////
-  
+
   ///////////////////////////////////
-  
-  
 
-//////////////////////////////////////////////////////
+  // indicator updater
+  useEffect(() => {}, [currentLetter.index, currentText]);
 
-
+  // coloring
+ 
 useEffect(() => {
   if (!containerRef.current) return;
-  const words = containerRef.current.querySelectorAll('.word');
-  if (!words || words.length === 0) return;
-
-  const idx = Math.min(typedWordsAmount, words.length - 1);
-  const tops: number[] = [];
-  const firstIndexForTop = new Map<number, number>();
-
-  for (let i = 0; i <= idx; i++) {
-    const rect = (words[i] as HTMLElement).getBoundingClientRect();
-    const top = Math.round(rect.top); 
-    if (tops.length === 0 || tops[tops.length - 1] !== top) {
-      tops.push(top);
-      if (!firstIndexForTop.has(top)) firstIndexForTop.set(top, i);
-    }
-  }
-
-  const currentLine = Math.max(1, tops.length);
-  const prevLine = prevLineRef.current ?? 0;
-
-  if (currentLine >= 3 && prevLine < 3) {
-    // reached line 3
-    const line3Top = tops[2]; // index 2 -> third line
-    const firstIdxOnLine3 = firstIndexForTop.get(line3Top) ?? 0;
-    line3YRef.current = { top: line3Top, wordIndex: firstIdxOnLine3 };
-    // shift line 1
-    setIsShiftFirstLine(true)
-  }
-
-  if (currentLine < 3 && prevLine >= 3) {
-    line3YRef.current = null;
-  }
-
-  prevLineRef.current = currentLine;
-}, [typedWordsAmount, currentLetter.index, containerWidth]); 
-
-
-
-//////////////////////////////////////////////////////////
+  const chars = containerRef.current?.querySelectorAll(".word > span");
+  let globalIndex = 0;
   
+  chars.forEach((span) => {
+    const spanIndex = globalIndex++;
+    const el = span as HTMLElement;
+    el.classList.toggle("active", spanIndex === currentLetter.index);
+    
+    // Check if this char is part of a wrong word - if yes, SKIP coloring here
+    const isPartOfWrongWord = wrongWords.some(
+      (obj) => spanIndex >= obj.start && spanIndex <= obj.end
+    );
+    
+    if (!isPartOfWrongWord) {
+      // Only color if NOT part of wrong word
+      el.style.color =
+        spanIndex < currentLetter.index
+          ? wrongChars.includes(spanIndex)
+            ? currentTheme.red
+            : currentTheme.white
+          : currentTheme.gray;
+    }
+    
+    // the full word
+    const range = wrongWords.find((r) => r.start === spanIndex);
+    if (range) {
+       
+      const allLetters = Array.from(
+        containerRef.current!.querySelectorAll(".word > span")
+      ) as HTMLElement[];
+      
+
+      const wordSpan = allLetters[range.start].closest(".word") as HTMLElement;
+
+      const wordHistoryIndexing = wordHistory.find(
+        (wH) => wH.start === range.start && wH.end === range.end
+      );
+      const wordChildrenElements = Array.from(
+        wordSpan.querySelectorAll("span")
+      ) as HTMLElement[];
+
+      const wordlen = wordChildrenElements.length - 1;
+      
+      wordSpan.classList.add("underLineBefore");
+      wordSpan.style.setProperty("--underlineColor", currentTheme.red);
+      
+      // char left point
+      wordChildrenElements.forEach((char, i) => {
+        let compactedwordColor = "";
+        if (wordHistoryIndexing) {
+          const remaining = wordHistoryIndexing.end - wordHistoryIndexing.lastTypedIndex;
+          const grayStart = wordlen - remaining - 1;
+          
+          if (i >= grayStart) {
+            compactedwordColor = currentTheme.gray;
+          }
+        }
+        const globalCharIndex = range.start + i;
+        
+        char.classList.add("uptyped");
+        char.style.color = wrongChars.includes(globalCharIndex)
+          ? currentTheme.red
+          : (compactedwordColor || currentTheme.white);
+      });
+    }
+  });
+}, [currentLetter.index, wrongChars, currentText, wrongWords, wordHistory]);
+
+
+
+  //////////////////////////////////////////////////////
+
+  useEffect(() => {
+    if (currentTheme.isDarkModed) {
+      document.documentElement.style.removeProperty("color-scheme");
+    } else {
+      document.documentElement.style.setProperty("color-scheme", "normal");
+    }
+  }, [currentTheme.isDarkModed]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const words = containerRef.current.querySelectorAll(".word");
+    if (!words || words.length === 0) return;
+
+    const idx = Math.min(typedWordsAmount, words.length - 1);
+    const tops: number[] = [];
+    const firstIndexForTop = new Map<number, number>();
+
+    for (let i = 0; i <= idx; i++) {
+      const rect = (words[i] as HTMLElement).getBoundingClientRect();
+      const top = Math.round(rect.top);
+      if (tops.length === 0 || tops[tops.length - 1] !== top) {
+        tops.push(top);
+        if (!firstIndexForTop.has(top)) firstIndexForTop.set(top, i);
+      }
+    }
+
+    const currentLine = Math.max(1, tops.length);
+    const prevLine = prevLineRef.current ?? 0;
+
+    if (currentLine >= 3 && prevLine < 3) {
+      // reached line 3
+      const line3Top = tops[2]; // index 2 -> third line
+      const firstIdxOnLine3 = firstIndexForTop.get(line3Top) ?? 0;
+      line3YRef.current = { top: line3Top, wordIndex: firstIdxOnLine3 };
+      // shift line 1
+      setIsShiftFirstLine(true);
+    }
+
+    if (currentLine < 3 && prevLine >= 3) {
+      line3YRef.current = null;
+    }
+
+    prevLineRef.current = currentLine;
+  }, [typedWordsAmount, currentLetter.index, containerWidth]);
+
+  //////////////////////////////////////////////////////////
+
   // the amount of words typed handler
   useEffect(() => {
     if (inputValue !== " ") return;
     setTypedWordsAmount((prev) => prev + 1);
-
-
   }, [inputValue]);
-  
+
   // typing start listener (envocking ellapsed time calculation)
   useEffect(() => {
     if (!isTypingStarted) return;
     ElapsedTimeHandler({ selectedTime, setElapsedTime });
   }, [isTypingStarted]);
 
-  
   // Focus the hidden input on component mount
   useEffect(() => {
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
   }, [isFocuceOnText]);
-  
-  
-     // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++hooks++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
-    
-    
-    // theme state
-    const {  currentTheme } =  useThemeHook() ;
 
-  // store session typing data andtimestamps for relpay 
-  //  useSessionReplay({ inputValue , startTypingTimeRef , isReplayTime}) ;   
-   //  text raws to be rendered slicer
-   useTextRawsSlicer({line3YRef ,typedWordsAmount ,  isShiftFirstLine ,  containerWidth , containerRef  , setCurrentText ,textSliceStartIndex ,dynamicTextRange, setDynamicTextRange})
-  
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++hooks++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
+
+  // store session typing data andtimestamps for relpay
+  //  useSessionReplay({ inputValue , startTypingTimeRef , isReplayTime}) ;
+  //  text raws to be rendered slicer
+  useTextRawsSlicer({
+    line3YRef,
+    typedWordsAmount,
+    isShiftFirstLine,
+    containerWidth,
+    containerRef,
+    setCurrentText,
+    textSliceStartIndex,
+    dynamicTextRange,
+    setDynamicTextRange,
+  });
+
   // caps listener
   useCapsLockListener({ setIsCapsOn });
-
 
   const { nextText, handleReset } = useTypingControlleFunctions({
     sampleTexts,
@@ -237,25 +327,43 @@ useEffect(() => {
     setIsTypingEnds,
     setCurrentText,
     setInputValue,
-    setTypedWordsAmount ,
-    setIsShowTypingOverModal
+    setTypedWordsAmount,
+    setIsShowTypingOverModal,
   });
 
   // hooks call
   // window resize
-  useWindowResize({containerRef  ,setContainerWidth})
-  
+  useWindowResize({ containerRef, setContainerWidth });
+
   // ########################  wpm services and calculations reset ###########################
-     // wpm calculations handlers
-     useWpmCalculationHandler({setIsShowTypingOverModal , setWpmFinal , isTypingEnds,startTypingTimeRef,amountOfTimeRef ,wordHistory , wrongChars ,  currentText , totalCorrectedCharsRef }) ;
-     // wpm reset service
-     useWpmServiceReset({wpmFinal ,totalCorrectedCharsRef , amountOfTimeRef , startTypingTimeRef , setWpmFinal , setTypedWordsAmount , isTypingEnds})
+  // wpm calculations handlers
+  useWpmCalculationHandler({
+    setIsShowTypingOverModal,
+    setWpmFinal,
+    isTypingEnds,
+    startTypingTimeRef,
+    amountOfTimeRef,
+    wordHistory,
+    wrongChars,
+    currentText,
+    totalCorrectedCharsRef,
+  });
+  // wpm reset service
+  useWpmServiceReset({
+    wpmFinal,
+    totalCorrectedCharsRef,
+    amountOfTimeRef,
+    startTypingTimeRef,
+    setWpmFinal,
+    setTypedWordsAmount,
+    isTypingEnds,
+  });
   // ########################  ###############  // ###########################
 
-     // theme previewer
-    useThemePreviewerAndSetter() ;
-  // end theme setter 
-  
+  // theme previewer
+  useThemePreviewerAndSetter();
+  // end theme setter
+
   // starting timer listener (typing session start listener)
   useSessionTimerCountDown({
     startTypingTimeRef,
@@ -275,7 +383,7 @@ useEffect(() => {
   });
 
   // typing watcher (typing active or not)
-  useTypingWatcher({ setIsTypingActive , isFocuceOnText , setIsFocuceOnText });
+  useTypingWatcher({ setIsTypingActive, isFocuceOnText, setIsFocuceOnText });
 
   // index incriment controller
   useIndexIncrementer({
@@ -301,21 +409,24 @@ useEffect(() => {
   });
 
   // text chars render function
-  const renderText = useTextRender({
-    currentTheme ,
-    currentText,
-    currentLetter,
-    inputValue,
-    wrongChars,
-    isWrongWord,
-    trachWord,
-    wrongWords,
-    isTypingActive,
-    wordHistory
-  });
+  const renderedText = useMemo(
+    () =>
+      textRender({
+        currentTheme,
+        currentText,
+        currentLetter,
+        inputValue,
+        wrongChars,
+        isWrongWord,
+        trachWord,
+        wrongWords,
+        isTypingActive,
+        wordHistory,
+      }),
+    [currentText, currentTheme] // only rebuild when text or theme changes
+  );
 
-
-   // delete click handler
+  // delete click handler
   const handleDeleteChar = useCharacterDeleteHook({
     currentText,
     currentLetter,
@@ -328,7 +439,7 @@ useEffect(() => {
     wrongWords,
     wordHistory,
     setWordHistory,
-    setTypedWordsAmount
+    setTypedWordsAmount,
   });
 
   // audio player
@@ -355,7 +466,6 @@ useEffect(() => {
     trachWord,
     setTrachWord,
   });
-
 
   //   const sampleSessionStats = {
   //   wpm: 85,
@@ -386,11 +496,10 @@ useEffect(() => {
   //   { time: 60, wpm: 85 }
   // ];
 
-
   return (
     <div
       className={`min-h-screen transition-colors duration-300  `}
-      style={{background :  currentTheme.page_bg}}
+      style={{ background: currentTheme.page_bg }}
     >
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pb-20">
@@ -400,25 +509,24 @@ useEffect(() => {
 
         {/* Text Display */}
         <div className="w-full max-w-screen mx-auto mt-[100px] ">
-          
           {/* chow controlls only if we dont type any more line 1000 no keydown */}
 
-          {! isFocuceOnText && <section className="opacity-0 animate-appear-smooth"> 
-            <TypingBoardControls
-              setIsNormalTypingSoundEnabled={setIsNormalTypingSoundEnabled}
-              setIsErrorSoundEnabled={setIsErrorSoundEnabled}
-              setSessionWordsCount={setSessionWordsCount}
-              currentTheme={currentTheme}
-              setTypingModeSelected={setTypingModeSelected}
-              typingModeSelected={typingModeSelected}
-            
-              isTypingStarted={isTypingStarted}
-              selectedTime={selectedTime}
-              setSelectedTime={setSelectedTime}
-           
-            />
-          </section>} 
-           
+          {!isFocuceOnText && (
+            <section className="opacity-0 animate-appear-smooth">
+              <TypingBoardControls
+                setIsNormalTypingSoundEnabled={setIsNormalTypingSoundEnabled}
+                setIsErrorSoundEnabled={setIsErrorSoundEnabled}
+                setSessionWordsCount={setSessionWordsCount}
+                currentTheme={currentTheme}
+                setTypingModeSelected={setTypingModeSelected}
+                typingModeSelected={typingModeSelected}
+                isTypingStarted={isTypingStarted}
+                selectedTime={selectedTime}
+                setSelectedTime={setSelectedTime}
+              />
+            </section>
+          )}
+
           <div
             className={`
             text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
@@ -427,47 +535,55 @@ useEffect(() => {
           `}
           >
             {/* // words counter  */}
-             {isFocuceOnText && typingModeSelected === 'time' ?
-                        <div className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none text-center w-[4em] `}
-                        style={{
-                           background : isTypingStarted ? ( elapsedTime < 10 ? '#ef4444' : elapsedTime < 15 ? '#f97316' : '#16a34a' ) : currentTheme.buttonPrimary
-                        }}          
-                        
-                        >
-                           
-                          {typingModeSelected === 'time' && elapsedTime}
-                        
-                        </div>
+            {isFocuceOnText && typingModeSelected === "time" ? (
+              <div
+                className={`px-4 py-2 rounded-lg text-white font-bold shadow-md cursor-default select-none text-center w-[4em] `}
+                style={{
+                  background: isTypingStarted
+                    ? elapsedTime < 10
+                      ? "#ef4444"
+                      : elapsedTime < 15
+                      ? "#f97316"
+                      : "#16a34a"
+                    : currentTheme.buttonPrimary,
+                }}
+              >
+                {typingModeSelected === "time" && elapsedTime}
+              </div>
+            ) : (
+              <div
+                className={`px-4 py-2 rounded-lg text-white font-bold  cursor-default select-none  text-center w-[4em]`}
+                style={{ color: currentTheme.buttonSecondary }}
+              >
+                {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
+                {isFocuceOnText &&
+                  typingModeSelected === "words" &&
+                  typedWordsAmount + "/" + sessionWordsCount}
+              </div>
+            )}
 
-                        :
-                      <div className={`px-4 py-2 rounded-lg text-white font-bold  cursor-default select-none  text-center w-[4em]`}
-                        style={{color : currentTheme.buttonSecondary}}
-                       >
-                        
-                        {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
-                        {isFocuceOnText && typingModeSelected === 'words' && typedWordsAmount + "/" + sessionWordsCount}  
-                      
-                      </div>
-                }
-          
-            
             <div
               className="mx-w-full hitespace-normal break-words break-keep h-[180px]"
               ref={containerRef}
-              style={{ textAlign: "start" , fontSize : `${fontSizeRef.current}px`, overflowY:'hidden' }}
+              style={{
+                textAlign: "start",
+                fontSize: `${fontSizeRef.current}px`,
+                overflowY: "hidden",
+              }}
             >
-
-               
               {/* // text render */}
-              {renderText}
-
+              {renderedText}
             </div>
-       
 
             <div className="">
               {/* // typing over div model  */}
-              {isShowTypingOverModal  && <TypingOverModal
-                    wpmFinal={wpmFinal}  nextText={nextText} handleReset={handleReset} />}
+              {isShowTypingOverModal && (
+                <TypingOverModal
+                  wpmFinal={wpmFinal}
+                  nextText={nextText}
+                  handleReset={handleReset}
+                />
+              )}
             </div>
 
             <div>
@@ -486,13 +602,12 @@ useEffect(() => {
           onPaste={(e) => e.preventDefault()}
           ref={hiddenInputRef}
           onChange={(e) => {
-            
             if (
               (currentText[currentLetter.index - 1] === " " ||
                 currentLetter.index === 0) &&
               e.target.value === " "
             )
-            return; // dont allow space as in the begening of each word
+              return; // dont allow space as in the begening of each word
 
             // Only allow one character
             const value = e.target.value;
@@ -519,24 +634,26 @@ useEffect(() => {
 
         {/* Controls */}
         <div className="flex items-center justify-center mt-8 space-x-4">
-          { ! isFocuceOnText &&  
+          {!isFocuceOnText && (
             <section className="opacity-0 animate-appear-smooth flex gap-3">
               <Reseter
                 isBlured={currentLetter.index === 0 ? true : false}
-                currentTheme={currentTheme} 
+                currentTheme={currentTheme}
                 handleReset={handleReset}
               />
-              <NextText  nextText={nextText} />
+              <NextText nextText={nextText} />
             </section>
-          }
+          )}
         </div>
 
         {/* Stats Placeholder */}
-        {! isFocuceOnText &&  <States  wpmFinal={wpmFinal} currentTheme={currentTheme} />}
+        {!isFocuceOnText && (
+          <States wpmFinal={wpmFinal} currentTheme={currentTheme} />
+        )}
       </main>
 
       {/* Footer */}
-      <Footer  />
+      <Footer />
     </div>
   );
 };
