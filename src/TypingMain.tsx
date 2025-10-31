@@ -33,6 +33,9 @@ import useWpmCalculationHandler from "./customHooks/useWpmCalculationHandler";
 import useThemePreviewerAndSetter from "./customHooks/useThemePreviewerAndSetter";
 import { sampleTexts } from "./data/texts";
 import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
+import useLine3Listener from "./customHooks/useLine3Listener";
+import useColoringEffect from "./customHooks/useColoringEffect";
+// import useCharacterDeleteHookV2 from "./customHooks/useCharacterDeleteHook2";
 
 // import useSessionReplay from "./customHooks/useSessionReplay";
 
@@ -149,144 +152,32 @@ const TypingApp: React.FC = () => {
   // console logs ////////////////
 
   ///////////////////////////////////
-useEffect(() => {
-  if (!containerRef.current) return;
-  
-  const allChars = containerRef.current.querySelectorAll(".word > span ");
-  
-  // First pass: remove all indicators
-  allChars.forEach((element) => {
-    element.classList.remove("display-indicator");
-    const charSpans = element.querySelectorAll(".char-spa");
-    charSpans.forEach((char) => char.classList.remove("display-indicator"));
-  });
-  
-  // Second pass: color and add indicator
-  let globalIndex = 0;
 
-  allChars.forEach((element) => {
-    const el = element as HTMLElement;
-    
-    // Check if this is a wrong word wrapper (already has the class from render)
-    if (el.classList.contains("underLineBefore")) {
-      const charSpans = el.querySelectorAll(".char-spa") as NodeListOf<HTMLElement>;
-      const firstCharIndex = globalIndex;
-    
-      // Find the range for this wrong word
-      const range = wrongWords.find(r => r.start === firstCharIndex);
-      if (range) {
-        const wordHistoryIndexing = wordHistory.find(
-          (wH) => wH.start === range.start && wH.end === range.end
-        );
-        
 
-        const wordlen = charSpans.length;
-        
-        charSpans.forEach((char, i) => {
-          let compactedwordColor = "";
-         
-          if (wordHistoryIndexing) {
-            const remaining = wordHistoryIndexing.end - wordHistoryIndexing.lastTypedIndex;
-            const grayStart = wordlen - remaining -1 ;
-            
-            if (i >= grayStart) {
-              compactedwordColor = currentTheme.gray;
-            }
-          }
-          
-          const globalCharIndex = firstCharIndex + i;
-          
-          // Add indicator if this is the current position
-          if ((inputValue !== "" && globalCharIndex === currentLetter.index + 1) || 
-              (inputValue === "" && globalCharIndex === currentLetter.index)) {
-             char.classList.add("display-indicator");
-          }
-          
-          char.style.color = wrongChars.includes(globalCharIndex)
-            ? currentTheme.red
-            : compactedwordColor;
-        });
-      }
-      
-      globalIndex += charSpans.length;
-    } else {
-      // Regular char
-      const spanIndex = globalIndex++;
-      
-      // Skip if this char is part of a wrong word range
-      const isPartOfWrongWord = wrongWords.some(
-        (range) => spanIndex >= range.start && spanIndex <= range.end
-      );
-      
-      if (!isPartOfWrongWord) {
-        // Add indicator if this is the current position
-        if ((inputValue !== "" && spanIndex === currentLetter.index + 1) || 
-            (inputValue === "" && spanIndex === currentLetter.index)) {
-          el.classList.add("display-indicator");
-        }
-        
-        el.style.color =
-          spanIndex > currentLetter.index - 1
-            ? currentTheme.gray
-            : wrongChars.includes(spanIndex)
-            ? currentTheme.red
-            : currentTheme.white;
-      }
-    }
-  });
-}, [currentLetter.index , wrongChars, wrongWords, wordHistory, currentTheme, inputValue]);
+// coloring effect 
+useColoringEffect({  
+  currentTheme,
+  containerRef,
+  currentLetter,
+  inputValue , 
+  wrongWords , 
+  wrongChars , 
+  wordHistory
+})
 
 
 
-
-
-  useEffect(() => {
-    if (currentTheme.isDarkModed) {
-      document.documentElement.style.removeProperty("color-scheme");
-    } else {
-      document.documentElement.style.setProperty("color-scheme", "normal");
-    }
-  }, [currentTheme.isDarkModed]);
-
-
-
-  // detects the line 3
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const words = containerRef.current.querySelectorAll(".word");
-    if (!words || words.length === 0) return;
-
-    const idx = Math.min(typedWordsAmount, words.length - 1);
-    const tops: number[] = [];
-    const firstIndexForTop = new Map<number, number>();
-
-    for (let i = 0; i <= idx; i++) {
-      const rect = (words[i] as HTMLElement).getBoundingClientRect();
-      const top = Math.round(rect.top);
-      if (tops.length === 0 || tops[tops.length - 1] !== top) {
-        tops.push(top);
-        if (!firstIndexForTop.has(top)) firstIndexForTop.set(top, i);
-      }
-    }
-
-    const currentLine = Math.max(1, tops.length);
-    const prevLine = prevLineRef.current ?? 0;
-
-    if (currentLine >= 3 && prevLine < 3) {
-      // reached line 3
-      const line3Top = tops[2]; // index 2 -> third line
-      const firstIdxOnLine3 = firstIndexForTop.get(line3Top) ?? 0;
-      line3YRef.current = { top: line3Top, wordIndex: firstIdxOnLine3 };
-      // shift line 1
-      setIsShiftFirstLine(true);
-    }
-
-    if (currentLine < 3 && prevLine >= 3) {
-      line3YRef.current = null;
-    }
-
-    prevLineRef.current = currentLine;
-  }, [typedWordsAmount, currentLetter.index, containerWidth]);
+// ddetects onece we hit the line 3
+ useLine3Listener({
+  currentTheme,
+  containerRef,
+  typedWordsAmount,
+  prevLineRef,
+  line3YRef,
+  setIsShiftFirstLine,
+  currentLetter ,
+  containerWidth
+});
 
   //////////////////////////////////////////////////////////
 
@@ -455,6 +346,25 @@ useEffect(() => {
     setWordHistory,
     setTypedWordsAmount,
   });
+
+
+  //   const handleDeleteChar = useCharacterDeleteHookV2({
+  //    currentText,
+  // currentLetter,
+  // setCurrentLetter,
+  // wrongChars,
+  // setWrongChars,
+  // trachWord,
+  // setTrachWord,
+  // setWrongWords,
+  // wrongWords,
+  // wordHistory,
+  // setWordHistory,
+  // setTypedWordsAmount,
+  // typedWordsAmount,
+  // });
+
+
 
   // audio player
   // regular typing sound
