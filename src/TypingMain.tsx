@@ -149,85 +149,96 @@ const TypingApp: React.FC = () => {
   // console logs ////////////////
 
   ///////////////////////////////////
-
-  // indicator updater
-  useEffect(() => {}, [currentLetter.index, currentText]);
-
-  // coloring
- 
 useEffect(() => {
   if (!containerRef.current) return;
-  const chars = containerRef.current?.querySelectorAll(".word > span");
-  let globalIndex = 0;
   
-  chars.forEach((span) => {
-    const spanIndex = globalIndex++;
-    const el = span as HTMLElement;
-    el.classList.toggle("active", spanIndex === currentLetter.index);
-    
-    // Check if this char is part of a wrong word - if yes, SKIP coloring here
-    const isPartOfWrongWord = wrongWords.some(
-      (obj) => spanIndex >= obj.start && spanIndex <= obj.end
-    );
-    
-    if (!isPartOfWrongWord) {
-      // Only color if NOT part of wrong word
-      el.style.color =
-        spanIndex < currentLetter.index
-          ? wrongChars.includes(spanIndex)
-            ? currentTheme.red
-            : currentTheme.white
-          : currentTheme.gray;
-    }
-    
-    // the full word
-    const range = wrongWords.find((r) => r.start === spanIndex);
-    if (range) {
-       
-      const allLetters = Array.from(
-        containerRef.current!.querySelectorAll(".word > span")
-      ) as HTMLElement[];
-      
+  const allChars = containerRef.current.querySelectorAll(".word > span ");
+  
+  // First pass: remove all indicators
+  allChars.forEach((element) => {
+    element.classList.remove("display-indicator");
+    const charSpans = element.querySelectorAll(".char-spa");
+    charSpans.forEach((char) => char.classList.remove("display-indicator"));
+  });
+  
+  // Second pass: color and add indicator
+  let globalIndex = 0;
 
-      const wordSpan = allLetters[range.start].closest(".word") as HTMLElement;
-
-      const wordHistoryIndexing = wordHistory.find(
-        (wH) => wH.start === range.start && wH.end === range.end
-      );
-      const wordChildrenElements = Array.from(
-        wordSpan.querySelectorAll("span")
-      ) as HTMLElement[];
-
-      const wordlen = wordChildrenElements.length - 1;
-      
-      wordSpan.classList.add("underLineBefore");
-      wordSpan.style.setProperty("--underlineColor", currentTheme.red);
-      
-      // char left point
-      wordChildrenElements.forEach((char, i) => {
-        let compactedwordColor = "";
-        if (wordHistoryIndexing) {
-          const remaining = wordHistoryIndexing.end - wordHistoryIndexing.lastTypedIndex;
-          const grayStart = wordlen - remaining - 1;
-          
-          if (i >= grayStart) {
-            compactedwordColor = currentTheme.gray;
-          }
-        }
-        const globalCharIndex = range.start + i;
+  allChars.forEach((element) => {
+    const el = element as HTMLElement;
+    
+    // Check if this is a wrong word wrapper (already has the class from render)
+    if (el.classList.contains("underLineBefore")) {
+      const charSpans = el.querySelectorAll(".char-spa") as NodeListOf<HTMLElement>;
+      const firstCharIndex = globalIndex;
+    
+      // Find the range for this wrong word
+      const range = wrongWords.find(r => r.start === firstCharIndex);
+      if (range) {
+        const wordHistoryIndexing = wordHistory.find(
+          (wH) => wH.start === range.start && wH.end === range.end
+        );
         
-        char.classList.add("uptyped");
-        char.style.color = wrongChars.includes(globalCharIndex)
-          ? currentTheme.red
-          : (compactedwordColor || currentTheme.white);
-      });
+
+        const wordlen = charSpans.length;
+        
+        charSpans.forEach((char, i) => {
+          let compactedwordColor = "";
+         
+          if (wordHistoryIndexing) {
+            const remaining = wordHistoryIndexing.end - wordHistoryIndexing.lastTypedIndex;
+            const grayStart = wordlen - remaining -1 ;
+            
+            if (i >= grayStart) {
+              compactedwordColor = currentTheme.gray;
+            }
+          }
+          
+          const globalCharIndex = firstCharIndex + i;
+          
+          // Add indicator if this is the current position
+          if ((inputValue !== "" && globalCharIndex === currentLetter.index + 1) || 
+              (inputValue === "" && globalCharIndex === currentLetter.index)) {
+             char.classList.add("display-indicator");
+          }
+          
+          char.style.color = wrongChars.includes(globalCharIndex)
+            ? currentTheme.red
+            : compactedwordColor;
+        });
+      }
+      
+      globalIndex += charSpans.length;
+    } else {
+      // Regular char
+      const spanIndex = globalIndex++;
+      
+      // Skip if this char is part of a wrong word range
+      const isPartOfWrongWord = wrongWords.some(
+        (range) => spanIndex >= range.start && spanIndex <= range.end
+      );
+      
+      if (!isPartOfWrongWord) {
+        // Add indicator if this is the current position
+        if ((inputValue !== "" && spanIndex === currentLetter.index + 1) || 
+            (inputValue === "" && spanIndex === currentLetter.index)) {
+          el.classList.add("display-indicator");
+        }
+        
+        el.style.color =
+          spanIndex > currentLetter.index - 1
+            ? currentTheme.gray
+            : wrongChars.includes(spanIndex)
+            ? currentTheme.red
+            : currentTheme.white;
+      }
     }
   });
-}, [currentLetter.index, wrongChars, currentText, wrongWords, wordHistory]);
+}, [currentLetter.index , wrongChars, wrongWords, wordHistory, currentTheme, inputValue]);
 
 
 
-  //////////////////////////////////////////////////////
+
 
   useEffect(() => {
     if (currentTheme.isDarkModed) {
@@ -237,6 +248,9 @@ useEffect(() => {
     }
   }, [currentTheme.isDarkModed]);
 
+
+
+  // detects the line 3
   useEffect(() => {
     if (!containerRef.current) return;
     const words = containerRef.current.querySelectorAll(".word");
@@ -423,7 +437,7 @@ useEffect(() => {
         isTypingActive,
         wordHistory,
       }),
-    [currentText, currentTheme] // only rebuild when text or theme changes
+    [currentText, currentTheme , trachWord  , wordHistory] // only rebuild when text or theme changes
   );
 
   // delete click handler

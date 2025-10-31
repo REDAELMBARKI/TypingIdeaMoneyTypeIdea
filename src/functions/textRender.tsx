@@ -69,7 +69,7 @@ export const textRender = ({
           return (
           <span
                 key={`wrong-${range.start}`}
-                className="underLineBefore " 
+                className="underLineBefore parent" 
                 style={{ display: "inline-block", position: "relative", whiteSpace: "nowrap" ,  ["--underlineColor" as string] : currentTheme.red }}
               >
                 <span className={`char-wrapper `}   style={{whiteSpace : "nowrap" ,  }}
@@ -125,14 +125,16 @@ export const textRender = ({
         {/* trach words */}
           {char === " " &&
             index === currentLetter.index &&
-            trachWord.length > 0 && (
-              <span className={`trach-word inline-block ` }  
+            trachWord.length > 0 && trachWord.map(char => {
+                return ( <label className={`trach-word inline-block ` }  
               
               style={{ whiteSpace : "nowrap" ,color : currentTheme.darkRed }} 
               >
-                {trachWord.join("")}
-              </span>
-            )}
+                {char}
+              </label>)
+            })
+            
+            }
           {/* original text chars */}
           
           { 
