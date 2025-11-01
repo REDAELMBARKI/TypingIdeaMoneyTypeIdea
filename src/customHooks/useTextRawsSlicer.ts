@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { sliceWordsHandler } from "../functions/sliceWordsHandler";
-import { containerWordsRangeFitHanlder } from "../functions/containerWordsRangeFitHanlder";
+import { containerWordsRangeFitHandler } from "../functions/containerWordsRangeFitHandler";
+
 
 interface textRawsSlicerProps {
      containerWidth : number
@@ -22,9 +23,10 @@ const useTextRawsSlicer = ({isShiftFirstLine ,typedWordsAmount ,  line3YRef , co
             
             if(! containerRef.current ) return ;
          
-             wordsCountAllowed.current = containerWordsRangeFitHanlder({containerRef , line3YRef} ) ;
-            setDynamicTextRange(wordsCountAllowed.current)
-            setCurrentText(sliceWordsHandler(textSliceStartIndex , wordsCountAllowed.current))
+             wordsCountAllowed.current = containerWordsRangeFitHandler({containerRef , line3YRef} ) || 0 ;
+            setDynamicTextRange(wordsCountAllowed.current!)
+            const text = sliceWordsHandler(textSliceStartIndex , wordsCountAllowed.current!) ; 
+            setCurrentText(text)
       }, [containerWidth , dynamicTextRange]);
 
 
@@ -36,8 +38,13 @@ const useTextRawsSlicer = ({isShiftFirstLine ,typedWordsAmount ,  line3YRef , co
       }, [isShiftFirstLine])
       
 
-
-      
+      useEffect(() => {
+        setTimeout(() => {
+             const text = sliceWordsHandler(15 , 30) ; 
+             setCurrentText(text)
+        },8000)
+      },[])
+            
 }
 
 export default useTextRawsSlicer ; 

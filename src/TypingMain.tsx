@@ -150,7 +150,9 @@ const TypingApp: React.FC = () => {
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
 
   // console logs ////////////////
-
+  useEffect(() => {
+    
+  }, [isShiftFirstLine]);
   ///////////////////////////////////
 
 
@@ -307,6 +309,8 @@ useColoringEffect({
     inputValue,
   });
 
+
+
   // text chars render function
   const renderedText = useMemo(
     () =>
@@ -334,24 +338,6 @@ useColoringEffect({
     setTrachWord,
     setTypedWordsAmount,
   });
-
-
-  //   const handleDeleteChar = useCharacterDeleteHookV2({
-  //    currentText,
-  // currentLetter,
-  // setCurrentLetter,
-  // wrongChars,
-  // setWrongChars,
-  // trachWord,
-  // setTrachWord,
-  // setWrongWords,
-  // wrongWords,
-  // wordHistory,
-  // setWordHistory,
-  // setTypedWordsAmount,
-  // typedWordsAmount,
-  // });
-
 
 
   // audio player

@@ -55,12 +55,12 @@ const useLine3Listener = ({
 
     if (currentLine >= 3 && prevLine < 3) {
       // reached line 3
-      const line3Top = tops[2]; // index 2 -> third line
+      const line3Top = tops[2]; 
       const firstIdxOnLine3 = firstIndexForTop.get(line3Top) ?? 0;
       line3YRef.current = { top: line3Top, wordIndex: firstIdxOnLine3 };
       // shift line 1
       setIsShiftFirstLine(true);
-      setTimeout(()=> setIsShiftFirstLine(false) , 100)
+      // setTimeout(()=> setIsShiftFirstLine(false) , 100)
     }
 
     if (currentLine < 3 && prevLine >= 3) {

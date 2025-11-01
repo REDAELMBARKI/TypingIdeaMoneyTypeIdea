@@ -1,27 +1,25 @@
 
-
-
 interface containerWordsProps  {
      containerRef:React.RefObject<HTMLDivElement | null > 
       line3YRef : React.RefObject<{top : number , wordIndex : number} | null>
     }
-export const containerWordsRangeFitHanlder = ({containerRef , line3YRef}:containerWordsProps ) => {
+export const containerWordsRangeFitHandler = ({containerRef , line3YRef}:containerWordsProps ) => {
 
    let wordsCountAllowed = 0;
 let currentLine = 1;
 
-const spans = containerRef.current?.querySelectorAll('span') || [];
-if (spans.length === 0) return 0;
+const words = containerRef.current?.querySelectorAll('.word') || [];
 
-let prevY = spans[0].getBoundingClientRect().top;
+if (words.length === 0) return 0;
+
+let prevY = words[0].getBoundingClientRect().top;
 let line3Y = null;
 
 
-
 // Now do your main loop with dynamic buffer
-for (let i = 0; i < spans.length; i++) {
-  const span = spans[i];
-  const currentY = span.getBoundingClientRect().top;
+for (let i = 0; i < words.length; i++) {
+  const word = words[i];
+  const currentY = word.getBoundingClientRect().top;
   
 
   if (currentY !== prevY) {
@@ -37,10 +35,9 @@ for (let i = 0; i < spans.length; i++) {
     line3YRef.current = {top : line3Y , wordIndex : i } ;
     
   }
+
+  wordsCountAllowed++;
   
-  if (span.textContent === "\u00A0" ) {
-    wordsCountAllowed++;
-  }
 }
 
 return wordsCountAllowed;

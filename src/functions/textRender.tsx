@@ -28,10 +28,18 @@ export const textRender = ({
 
 
   let globalIndex = 0; 
+
+   return  currentText.split(/(\s+)/).map((word , wordIndex) => {
    
-   return  currentText.split(" ").map((word , wordIndex) => {
+      return (    <span 
       
-      return (<span  key={wordIndex} className="word" style={{ whiteSpace: 'nowrap', display: 'inline-block' }} >{word.concat(" ").split("").map((char) => {
+      key={wordIndex} 
+      className="word" 
+      style={{ whiteSpace: 'nowrap', display: 'inline-block' }} >
+        
+        {word.split("").map((char) => {
+
+
       const index = globalIndex++;
 
       let charStyle = "";
@@ -87,7 +95,7 @@ export const textRender = ({
                       // the compacted words the ones who are underlined also the untyped ones
                       <span
                         key={charIndex}
-                        className={`char-spa inline-block transition-all duration-150  ${isTypingActive ? 'stop-animation' : ''}`}
+                        className={`char-spa inline-block transition-all duration-150 letter ${isTypingActive ? 'stop-animation' : ''}`}
                         style={{
                           whiteSpace: "nowrap",
                           color: wrongChars.includes(globalCharIndex) 
@@ -135,9 +143,8 @@ export const textRender = ({
           
           { 
           
-
           
-          <span key={index} style={{    whiteSpace: "pre" , color : charStyle  ,  textWrap : char === " " ?  'nowrap' : 'balance' }} className={`inline-block  transition-all duration-150   ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}>
+          <span key={index} style={{    whiteSpace: "pre" , color : charStyle  ,  textWrap : char === " " ?  'nowrap' : 'balance' }} className={`letter inline-block  transition-all duration-150   ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}>
             { char === " " ?  "\u00A0" :  char } 
           </span>
             
