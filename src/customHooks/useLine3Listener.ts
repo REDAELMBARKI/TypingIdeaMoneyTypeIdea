@@ -60,6 +60,7 @@ const useLine3Listener = ({
       line3YRef.current = { top: line3Top, wordIndex: firstIdxOnLine3 };
       // shift line 1
       setIsShiftFirstLine(true);
+      setTimeout(()=> setIsShiftFirstLine(false) , 100)
     }
 
     if (currentLine < 3 && prevLine >= 3) {

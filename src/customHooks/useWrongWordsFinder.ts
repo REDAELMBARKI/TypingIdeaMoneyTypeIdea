@@ -1,4 +1,4 @@
-import type { currentLetterType } from "../types/experementTyping";
+import type { currentLetterType, globalStatetype } from "../types/experementTyping";
 
 import { useEffect } from "react";
 // Import just the function
@@ -7,17 +7,16 @@ import { useEffect } from "react";
 interface wrongWordsProps {
         currentText: string;
         currentLetter: currentLetterType;
-        setWrongWords: React.Dispatch<React.SetStateAction<{ start: number;end: number;}[]>> ;
-       wrongChars: number[];
        inputValue : string ;
-       wrongWords : { start: number;end: number;}[] ;
+       setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>> 
+       globalState : globalStatetype
 
 }
 
 
 
 
-export const useWrongWordsFinder = ({currentLetter , currentText , setWrongWords , wrongChars , inputValue}:wrongWordsProps) =>{
+export const useWrongWordsFinder = ({currentLetter , currentText , setGlobalState , globalState :{wrongChars} , inputValue}:wrongWordsProps) =>{
 
       useEffect(()=>{
 
@@ -28,9 +27,6 @@ export const useWrongWordsFinder = ({currentLetter , currentText , setWrongWords
         const asignPreviousWordAsWrong = (e:KeyboardEvent) => {
           
           if(e.key !== ' ' ) return ;
-          
-
-
           //  we get the last index of the char of the previous word with currentLetter.index - 1
           //  we search for the first char index of the word after space 
            let wordFirstIndex:number = currentLetter.index - 1;
@@ -42,21 +38,22 @@ export const useWrongWordsFinder = ({currentLetter , currentText , setWrongWords
        
             // check if the word range first index letter - last index letter is in wrongchars array
             const isInWrongChars = wrongChars.some(el_index =>  el_index >= wordFirstIndex && el_index <= currentLetter.index - 1 )
-         
-          
+            // aadd wrong word to array
             if (isInWrongChars) {
-                setWrongWords((prev) => [
-                  ...prev,
+              
+                setGlobalState(prev => ({
+                  ...prev , 
+                  wrongWords : [
+                  ...prev.wrongWords,
                   { start: wordFirstIndex, end: currentLetter.index - 1 }
-                ]);  
+                ]
+                }))
              }
         }
 
         window.addEventListener('keydown' , asignPreviousWordAsWrong)
-    
-    
         return () => window.removeEventListener('keydown' , asignPreviousWordAsWrong)
-      },[wrongChars,inputValue , currentLetter.index])
+      },[wrongChars,inputValue , currentLetter.index , currentText])
 
 
 

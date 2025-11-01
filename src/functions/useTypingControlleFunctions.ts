@@ -1,20 +1,12 @@
 import { useCallback } from "react";
-import type { currentLetterType } from "../types/experementTyping";
+import type { currentLetterType, globalStatetype } from "../types/experementTyping";
 
 interface VarsResterProps {
   setCurrentLetter: React.Dispatch<React.SetStateAction<currentLetterType>>;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
-  setWrongWords: React.Dispatch<
-    React.SetStateAction<
-      {
-        start: number;
-        end: number;
-      }[]
-    >
-  >;
   setTypedWordsAmount: React.Dispatch<React.SetStateAction<number>>;
-  setWrongChars: React.Dispatch<React.SetStateAction<number[]>>;
   setIsShowTypingOverModal: React.Dispatch<React.SetStateAction<boolean>>
+  setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>>
 }
 
 interface TypingControlleFunctionsProps extends VarsResterProps {
@@ -32,28 +24,29 @@ export default function useTypingControlleFunctions({
   sampleTexts,
   hiddenInputRef,
   currentText,
-  setWrongChars,
   setCurrentLetter,
-  setWrongWords,
   setIsTypingEnds,
   setCurrentText,
   setInputValue,
-  setIsShowTypingOverModal
+  setIsShowTypingOverModal , 
+  setGlobalState 
 }: TypingControlleFunctionsProps) {
 
   // --- Define varsRester FIRST ---
   const varsRester = useCallback(({
     setCurrentLetter,
     setInputValue,
-    setWrongWords,
+    setGlobalState ,
     setTypedWordsAmount,
-    setWrongChars,
     setIsShowTypingOverModal
   }: VarsResterProps) => {
     setCurrentLetter({ index: 0, letter: "" });
     setInputValue("");
-    setWrongWords([]);
-    setWrongChars([]);
+    setGlobalState(prev => ({
+       ...prev , 
+       wrongChars : [] , 
+       wrongWords : []
+    }))
     setTypedWordsAmount(0);
     setIsShowTypingOverModal(false) ; 
   }, []);
@@ -62,9 +55,8 @@ export default function useTypingControlleFunctions({
     varsRester({
       setCurrentLetter,
       setInputValue,
-      setWrongWords,
+      setGlobalState ,
       setTypedWordsAmount,
-      setWrongChars,
       setIsShowTypingOverModal 
     });
 
@@ -80,9 +72,8 @@ export default function useTypingControlleFunctions({
     varsRester({
       setCurrentLetter,
       setInputValue,
-      setWrongWords,
+      setGlobalState ,
       setTypedWordsAmount,
-      setWrongChars,
       setIsShowTypingOverModal
     });
 

@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
-import type { currentLetterType } from "../types/experementTyping";
+import type { currentLetterType, globalStatetype } from "../types/experementTyping";
 
 interface useIncrimenterProps {
-     
-      wrongChars: number[];
       currentLetter: currentLetterType;
       currentText: string;
         setCurrentLetter: React.Dispatch<
@@ -15,13 +13,14 @@ interface useIncrimenterProps {
       setIsWrongWord: React.Dispatch<React.SetStateAction<boolean>>;
       setInputValue: React.Dispatch<React.SetStateAction<string>>;
        inputValue : string ;
-        setWrongChars: React.Dispatch<React.SetStateAction<number[]>>;
         isWrongWord : boolean ; 
+        setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>>
+        globalState : globalStatetype
      
 }
 
 
-function useIndexIncrementer({currentText , currentLetter , inputValue , setInputValue , wrongChars ,isWrongWord, setIsWrongWord , setWrongChars ,setCurrentLetter}:useIncrimenterProps) {
+function useIndexIncrementer({currentText , currentLetter , inputValue , setInputValue , globalState : {wrongChars} ,isWrongWord, setIsWrongWord ,setGlobalState ,setCurrentLetter}:useIncrimenterProps) {
    useEffect(() => {
     
     // prevent space click to be treated as wrongchar (eather jump to next word or stick) as we are not in space position 
@@ -80,7 +79,10 @@ function useIndexIncrementer({currentText , currentLetter , inputValue , setInpu
 
         // skip spaces dont add then to wrong chars 
         if(currentText[currentLetter.index] !== " "){
-          setWrongChars((prev) => [...prev, currentLetter.index]);
+          setGlobalState(prev => ({
+            ...prev , 
+              wrongChars : [...prev.wrongChars, currentLetter.index]
+          }))
         }
         setCurrentLetter((prev) => ({ ...prev, index: prev.index + 1 }));
       }

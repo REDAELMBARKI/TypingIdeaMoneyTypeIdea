@@ -10,9 +10,8 @@ import { allowedKeys } from "./data/allowdKeys";
 import useControlleBoundery from "./customHooks/useControlleBoundery";
 import type {
   currentLetterType,
-  globalStatetype,
   Mode,
-  // WordHistoryItem,
+  WordHistoryItem,
 } from "./types/experementTyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
 import TypingOverModal from "./modals/TypingOverModal";
@@ -69,6 +68,7 @@ const TypingApp: React.FC = () => {
     letter: "",
   });
   // spaces tracker where the word left of before landing to next word
+  const [wordHistory, setWordHistory] = useState<WordHistoryItem[]>([]);
   // ----------------------------------------------------------------------
   // sound param (mute / activate)
   const [isNormalTypingSoundEnabled, setIsNormalTypingSoundEnabled] =
@@ -80,11 +80,15 @@ const TypingApp: React.FC = () => {
   const [isTypingEnds, setIsTypingEnds] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
   // chars that are worong and colored in red
+  const [wrongChars, setWrongChars] = useState<number[]>([]);
+
   const [isWrongWord, setIsWrongWord] = useState<boolean>(false);
   // wrong chars is not preserving the chars its deletes them after jumping to next word
   const [trachWord, setTrachWord] = useState<string[]>([]);
   const [isTypingActive, setIsTypingActive] = useState<boolean>(false);
-
+  const [wrongWords, setWrongWords] = useState<
+    { start: number; end: number }[]
+  >([]);
 
   const [isCapsOn, setIsCapsOn] = useState<boolean>(false);
   // select time fo session typing
@@ -100,6 +104,7 @@ const TypingApp: React.FC = () => {
   // words typed
   const [typedWordsAmount, setTypedWordsAmount] = useState<number>(0);
   // correct words final result
+  // const [totalCorrectedChars , setTotalCorrectedChars] =  useState<number>();
   // typing ends model togller
   const [isShowTypingOverModal, setIsShowTypingOverModal] =
     useState<boolean>(false);
@@ -112,12 +117,12 @@ const TypingApp: React.FC = () => {
 
   //text conatiner width
   const [containerWidth, setContainerWidth] = useState<number>(0);
-  
-  const [globalState , setGlobalState] = useState<globalStatetype>({
-       wrongChars: [] ,
-       wrongWords: [] ,
-       wordHistory: []
-  }) 
+
+  // const [globalState , setGlobalState] = useState({
+  //    wrongChars , 
+  //    wrongWords , 
+  //    wordHistory
+  // }) 
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end states | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
@@ -160,7 +165,9 @@ useColoringEffect({
   containerRef,
   currentLetter,
   inputValue , 
-  globalState
+  wrongWords , 
+  wrongChars , 
+  wordHistory
 })
 
 
@@ -224,8 +231,9 @@ useColoringEffect({
     sampleTexts,
     hiddenInputRef,
     currentText,
-    setGlobalState ,
+    setWrongChars,
     setCurrentLetter,
+    setWrongWords,
     setIsTypingEnds,
     setCurrentText,
     setInputValue,
@@ -245,7 +253,8 @@ useColoringEffect({
     isTypingEnds,
     startTypingTimeRef,
     amountOfTimeRef,
-    globalState ,
+    wordHistory,
+    wrongChars,
     currentText,
     totalCorrectedCharsRef,
   });
@@ -279,7 +288,8 @@ useColoringEffect({
     currentLetter,
     currentText,
     setCurrentLetter,
-    setGlobalState ,
+    setWordHistory,
+    setWrongWords,
   });
 
   // typing watcher (typing active or not)
@@ -291,10 +301,10 @@ useColoringEffect({
     currentLetter,
     inputValue,
     setInputValue,
-    globalState ,
-    setGlobalState ,
+    wrongChars,
     isWrongWord,
     setIsWrongWord,
+    setWrongChars,
     setCurrentLetter,
   });
 
@@ -302,9 +312,10 @@ useColoringEffect({
   useWrongWordsFinder({
     currentLetter,
     currentText,
-     globalState ,
-    setGlobalState ,
+    setWrongWords,
+    wrongChars,
     inputValue,
+    wrongWords,
   });
 
   // text chars render function
@@ -315,12 +326,14 @@ useColoringEffect({
         currentText,
         currentLetter,
         inputValue,
+        wrongChars,
         isWrongWord,
         trachWord,
-        globalState ,
+        wrongWords,
         isTypingActive,
+        wordHistory,
       }),
-    [currentText, currentTheme , trachWord  , globalState.wordHistory ,globalState.wrongWords , containerWidth , isShiftFirstLine] // only rebuild when text or theme changes
+    [currentText, currentTheme , trachWord  , wordHistory] // only rebuild when text or theme changes
   );
 
   // delete click handler
@@ -328,10 +341,14 @@ useColoringEffect({
     currentText,
     currentLetter,
     setCurrentLetter,
-    globalState , 
-    setGlobalState ,
+    wrongChars,
+    setWrongChars,
     trachWord,
     setTrachWord,
+    setWrongWords,
+    wrongWords,
+    wordHistory,
+    setWordHistory,
     setTypedWordsAmount,
   });
 
@@ -369,7 +386,7 @@ useColoringEffect({
   useTypingEnd({ currentLetter, currentText, setIsTypingEnds });
 
   useControlleBoundery({
-    globalState , 
+    wrongChars,
     hiddenInputRef,
     currentLetter,
     currentText,

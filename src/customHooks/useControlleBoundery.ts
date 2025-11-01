@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import type { currentLetterType } from "../types/experementTyping";
+import type { currentLetterType, globalStatetype } from "../types/experementTyping";
 
 interface BlureType {
   hiddenInputRef: React.RefObject<HTMLInputElement | null>;
-  wrongChars: number[];
+
   currentLetter: currentLetterType;
   currentText: string;
 
@@ -11,10 +11,11 @@ interface BlureType {
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   trachWord: string[];
   setTrachWord: React.Dispatch<React.SetStateAction<string[]>>;
+  globalState: globalStatetype
 }
 
 const useControlleBoundery = ({
-  wrongChars,
+  globalState : {wrongChars },
   hiddenInputRef,
   currentLetter,
   currentText,

@@ -1,17 +1,16 @@
 import { useEffect } from "react";
-import type { currentLetterType, WordHistoryItem } from "../types/experementTyping";
+import type { currentLetterType, globalStatetype } from "../types/experementTyping";
 
 interface spaceJumpPropps {
    inputValue : string ;
    currentLetter : currentLetterType ;
    currentText :string ;
    setCurrentLetter: React.Dispatch<React.SetStateAction<currentLetterType>> ;
-   setWordHistory: React.Dispatch<React.SetStateAction<WordHistoryItem[]>> ;
-   setWrongWords: React.Dispatch<React.SetStateAction<{start: number;end: number;}[]>>
+    setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>>
 }
 
  
-const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentLetter ,setWordHistory , setWrongWords}:spaceJumpPropps) => {
+const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentLetter , setGlobalState}:spaceJumpPropps) => {
   
       useEffect(()=>{
                         
@@ -51,13 +50,19 @@ const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentL
                 }
 
              
-                setWordHistory(prev => ([...prev , {start: wordStart ,lastTypedIndex:currentLetter.index , end : wordEnd}]))
-                
+    
+                setGlobalState(prev => ({
+                    ...prev,  
+                    wordHistory : [...prev.wordHistory , {start: wordStart ,lastTypedIndex:currentLetter.index  , end : wordEnd}]
+                }))
                 // asign the word as wrong after we jump it ;
-                setWrongWords(prev => ([...prev , 
+            
+                setGlobalState(prev => ({
+                    ...prev,  
+                    wrongWords : [...prev.wrongWords , 
                     {start :wordStart , end:nextWordFirstIndexStarts - 1}
-                ]))
-                
+                    ]
+                }))
 
                 // set current index to next word begining
                 setCurrentLetter(()=> { 
@@ -71,7 +76,7 @@ const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentL
 
            
                  
-      },[inputValue , currentLetter.index,currentText , setCurrentLetter , setWordHistory , setWrongWords])
+      },[inputValue , currentLetter.index,currentText , setCurrentLetter , setGlobalState])
 
 }
 

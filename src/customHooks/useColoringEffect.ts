@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { currentLetterType, ThemeColors, WordHistoryItem } from "../types/experementTyping";
+import type { currentLetterType, globalStatetype, ThemeColors } from "../types/experementTyping";
 
 
 
@@ -8,14 +8,7 @@ interface  coloringEffectprops {
       containerRef : React.RefObject<HTMLDivElement | null >
         currentTheme: ThemeColors ;
         inputValue : string ; 
-        wrongWords: {
-            start: number;
-            end: number;
-        }[]
-
-
-        wrongChars: number[] ;
-        wordHistory: WordHistoryItem[]
+        globalState : globalStatetype
 
 }
 
@@ -25,17 +18,16 @@ const useColoringEffect = ({
   containerRef,
   currentLetter,
   inputValue , 
-  wrongWords , 
-  wrongChars , 
-  wordHistory
+  globalState 
  
 }: coloringEffectprops) => {
-
+  const  {wrongWords , wordHistory , wrongChars } = globalState ;
     useEffect(() => {
   if (!containerRef.current) return;
-  
+
+
   const allChars = containerRef.current.querySelectorAll(".word > span ");
-  
+
   // First pass: remove all indicators
   allChars.forEach((element) => {
     element.classList.remove("display-indicator");
@@ -49,6 +41,17 @@ const useColoringEffect = ({
   allChars.forEach((element) => {
     const el = element as HTMLElement;
     
+
+
+    // remove coloring ishues
+    if(globalIndex >= currentLetter.index){
+        if(element.closest('.word')?.classList.contains('underLineBefore')){
+           element.closest('.word')?.classList.remove('underLineBefore')
+        }
+      }
+
+
+
     // Check if this is a wrong word wrapper (already has the class from render)
     if (el.classList.contains("underLineBefore")) {
       const charSpans = el.querySelectorAll(".char-spa") as NodeListOf<HTMLElement>;
@@ -116,7 +119,7 @@ const useColoringEffect = ({
       }
     }
   });
-}, [currentLetter.index , wrongChars, wrongWords, wordHistory, currentTheme, inputValue]);
+}, [currentLetter.index , wrongChars, wrongWords, wordHistory, currentTheme, inputValue , containerRef]);
 
 
 }

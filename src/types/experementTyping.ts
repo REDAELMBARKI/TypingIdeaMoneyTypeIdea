@@ -41,3 +41,10 @@ export interface ThemeColors {
 
 
 export type soundOptions = 'sound' | 'errorSound' ; 
+
+
+export type globalStatetype = {
+     wrongChars: number[]
+     wrongWords: { start: number; end: number }[]
+    wordHistory: WordHistoryItem[]
+  }

@@ -1,5 +1,7 @@
-
-import type { currentLetterType, WordHistoryItem } from "../types/experementTyping";
+import type { 
+  currentLetterType, 
+  globalStatetype 
+} from "../types/experementTyping";
 
 interface TextRenderProps {
   currentLetter: currentLetterType;
@@ -10,156 +12,129 @@ interface TextRenderProps {
       letter: string;
     }>
   >;
-  wrongChars: number[];
-  setWrongChars: React.Dispatch<React.SetStateAction<number[]>>;
   trachWord: string[];
   setTrachWord: React.Dispatch<React.SetStateAction<string[]>>;
-  setWrongWords: React.Dispatch<
-    React.SetStateAction<{ start: number; end: number }[]>
-  >;
-  wrongWords: { start: number; end: number }[];
-  wordHistory: WordHistoryItem[];
-  setWordHistory: React.Dispatch<React.SetStateAction<WordHistoryItem[]>>;
-  setTypedWordsAmount : React.Dispatch<React.SetStateAction<number>>;
+  setTypedWordsAmount: React.Dispatch<React.SetStateAction<number>>;
+  setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>>;
+  globalState: globalStatetype;
 }
 
 function useCharacterDeleteHook({
   currentText,
   currentLetter,
   setCurrentLetter,
-  wrongChars,
-  setWrongChars,
+  setGlobalState,
   trachWord,
   setTrachWord,
-  setWrongWords,
-  wrongWords,
-  wordHistory,
-  setWordHistory,
-  setTypedWordsAmount
+  globalState ,
+  globalState : { wrongChars, wrongWords, wordHistory },
+  setTypedWordsAmount,
 }: TextRenderProps) {
   const handleDeleteChar = () => {
-    // pprevent deletin if we pass to next word (no go back if the previous word wass correct )
-    //currentText[currentLetter.index - 2] is the last char in previous if that last char index === the last wrongWord then ppreviuos word is wrong
+    const currentIndex = currentLetter.index;
+    
 
+    // Early return: can't delete at position 0
+    if (currentIndex === 0) return;
+
+    // Early return: prevent deletion if we're at a space and previous word was correct
     const isPreviousWordWrong =
-      wrongWords[wrongWords.length - 1]?.end === currentLetter.index - 2;
+      wrongWords[wrongWords.length - 1]?.end === currentIndex - 2;
 
-    if (
-      (currentText[currentLetter.index - 1] === " " && !isPreviousWordWrong) ||
-      currentLetter.index === 0
-    )
+    if (currentText[currentIndex - 1] === " " && !isPreviousWordWrong) {
       return;
+    }
 
+    // Case 1: Deleting extra characters (trachWord)
     if (trachWord.length > 0) {
-      // check if this charactre was wrong already if wrong remove it from wrongindexes
-
       setTrachWord((prev) => prev.slice(0, -1));
-
       return;
     }
 
-    // delete the word from wrong chars (the chars indexes the char by char) ;
-    if (wrongChars.includes(currentLetter.index - 1)) {
-      setWrongChars((prev) =>
-        prev.filter((i) => i !== currentLetter.index - 1)
-      );
-    }
-
-    // go back to index where we left off the previous word (delete from wrong words the histored wourds or the words that gets jumped )
+    // Case 2: Word history restoration logic
     if (
       wordHistory.length > 0 &&
-      (currentText[currentLetter.index - 1] === " " ||
-        currentLetter.index ===
-          wordHistory[wordHistory.length - 1].lastTypedIndex)
+      (currentText[currentIndex - 1] === " " ||
+        currentIndex === wordHistory[wordHistory.length - 1].lastTypedIndex)
     ) {
+      // Reduce typed words if at space
+      if (currentText[currentIndex - 1] === " ") {
+        setTypedWordsAmount((prev) => Math.max(0, prev - 1));
+      }
 
-      // brestorete the typed words -- 
-          // reduce the amount of typed words 
-            if(currentText[currentLetter.index - 1] == " "){
-              setTypedWordsAmount((prev) =>   Math.max(0 , prev - 1 ) )    
-            }
+      // Calculate all changes in one go
+      const historyCopy = [...wordHistory];
+      const lastBreakedWord = historyCopy.pop();
 
-      
-      // remove the word from history avoiding mutation here and copy the old array an pop from the copy and set the state again 
-      setWordHistory((prev) => {
-        const copy = [...prev];
-        const lastBreakedWord = copy.pop();
+      if (
+        lastBreakedWord &&
+        currentIndex !== lastBreakedWord.lastTypedIndex &&
+        currentIndex !== lastBreakedWord.lastTypedIndex + 1
+      ) {
+        // Restore cursor to the saved position
+        setCurrentLetter({
+          index: lastBreakedWord.lastTypedIndex,
+          letter: currentText[lastBreakedWord.lastTypedIndex] || "",
+        });
 
-        if (
-          lastBreakedWord &&
-          currentLetter.index !== lastBreakedWord.lastTypedIndex &&
-          currentLetter.index !== lastBreakedWord.lastTypedIndex + 1
-        ) {
- 
+        // Update global state with both history and wrongWords
+        setGlobalState({
+          ...globalState,
+          wordHistory: historyCopy,
+          wrongWords: wrongWords.filter(
+            (el) => !(el.start <= lastBreakedWord.end && el.end >= lastBreakedWord.start)
+          ),
+        });
 
-   
+        return;
+      }
 
-
-          // set the index cursor to theindex we stored (the last index before jumpping to next word )
-          setCurrentLetter(() => {
-            
-            return {
-
-            index: lastBreakedWord!.lastTypedIndex,
-            letter: currentText[lastBreakedWord!.lastTypedIndex] || "",
-          }
-          }
-        );
-
-          
-          
-          // removes the word from wrong words as its now the current word
-          // remove any wrongWords that overlap the popped word
-          setWrongWords(prevWrong => 
-            // fresh overlap removal
-           ( prevWrong.filter(
-              (el) => !(el.start <= lastBreakedWord.end && el.end >= lastBreakedWord.start)
-            ))
-
-       
-          );
-
-          
-
-          return copy;
-        }
-
-        return copy;
+      // Just pop from history without cursor restoration
+      setGlobalState({
+        ...globalState,
+        wordHistory: historyCopy,
       });
 
       return;
     }
 
-    // removes the word from wrong words as its now the current word (normal flow the word is not in history words it fully typed by the user )
-    setWrongWords((prev) =>
-      prev.filter((el) => el.end + 1 !== currentLetter.index - 1)
-    );
+    // Case 3: Normal deletion - CALCULATE EVERYTHING FIRST, UPDATE ONCE
+    let newWrongChars = [...wrongChars];
+    let newWrongWords = [...wrongWords];
 
-    // this is an other layaer deletes the wrongs chars tha did not get pop up in cases of long delete clicks (just fo)
-    const misPopedWrongWords =  wrongWords.filter(el => el.start >= currentLetter.index ) ;
-
-    if(misPopedWrongWords.length > 0){
-        setWrongWords(prev => prev.filter(el => ! (misPopedWrongWords.some(misPoped => misPoped.start === el.start )) ))
+    // Remove current index from wrong chars if it was marked wrong
+    if (newWrongChars.includes(currentIndex - 1)) {
+      newWrongChars = newWrongChars.filter((i) => i !== currentIndex - 1);
     }
-    //////////////////////////////////////////////////////////////////////////
 
-    setCurrentLetter((prev) => {   
-      return { 
-      index: prev.index - 1,
-      letter: currentText[prev.index - 1],
-     }
-  
+    // Remove wrong word if we're deleting back into it
+    newWrongWords = newWrongWords.filter((el) => el.end + 1 !== currentIndex - 1);
+
+    // Clean up mis-popped wrong words (ahead of current position)
+    const misPopedWrongWords = newWrongWords.filter((el) => el.start >= currentIndex);
+    if (misPopedWrongWords.length > 0) {
+      newWrongWords = newWrongWords.filter(
+        (el) => !misPopedWrongWords.some((misPoped) => misPoped.start === el.start)
+      );
+    }
+
+    // Update global state with all changes at once
+    setGlobalState({
+      ...globalState,
+      wrongChars: newWrongChars,
+      wrongWords: newWrongWords,
     });
-   
-    
-    // // reduce the amount of typed words 
-    if(currentText[currentLetter.index - 1] == " "){
-      setTypedWordsAmount((prev) =>   Math.max(0 , prev - 1 ) )    
+
+    // Update cursor position
+    setCurrentLetter({
+      index: currentIndex - 1,
+      letter: currentText[currentIndex - 1],
+    });
+
+    // Reduce typed words count if deleting a space
+    if (currentText[currentIndex - 1] === " ") {
+      setTypedWordsAmount((prev) => Math.max(0, prev - 1));
     }
-  
-
-
-   
   };
 
   return handleDeleteChar;

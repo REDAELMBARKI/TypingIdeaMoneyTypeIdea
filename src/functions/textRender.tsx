@@ -1,17 +1,15 @@
 import React from "react";
-import type { currentLetterType, ThemeColors, WordHistoryItem } from "../types/experementTyping";
+import type { currentLetterType, globalStatetype, ThemeColors } from "../types/experementTyping";
 
 interface TextRenderProps {
   currentLetter: currentLetterType;
   currentText: string;
   inputValue: string;
-  wrongChars: number[];
   isTypingActive :boolean ;
   isWrongWord: boolean;
   trachWord: string[];
-  wrongWords:{start : number , end:number}[];
-  wordHistory: WordHistoryItem[] ;
   currentTheme: ThemeColors ;
+  globalState : globalStatetype
 
 }
 
@@ -19,12 +17,10 @@ export const textRender = ({
   currentText,
   currentLetter, 
   inputValue,
-  wrongChars,
   trachWord,
-  wrongWords ,
+  globalState : {wrongChars, wrongWords ,wordHistory},
   isTypingActive ,
-  wordHistory ,
- currentTheme 
+  currentTheme 
 }: TextRenderProps) => {
   
 
@@ -32,7 +28,7 @@ export const textRender = ({
 
 
   let globalIndex = 0; 
-
+   
    return  currentText.split(" ").map((word , wordIndex) => {
       
       return (<span  key={wordIndex} className="word" style={{ whiteSpace: 'nowrap', display: 'inline-block' }} >{word.concat(" ").split("").map((char) => {
@@ -141,7 +137,7 @@ export const textRender = ({
           
 
           
-          <span key={index} style={{ whiteSpace : "nowrap" , color : charStyle  ,  textWrap : char === " " ?  'nowrap' : 'balance' }} className={`inline-block  transition-all duration-150   ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}>
+          <span key={index} style={{    whiteSpace: "pre" , color : charStyle  ,  textWrap : char === " " ?  'nowrap' : 'balance' }} className={`inline-block  transition-all duration-150   ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}>
             { char === " " ?  "\u00A0" :  char } 
           </span>
             
