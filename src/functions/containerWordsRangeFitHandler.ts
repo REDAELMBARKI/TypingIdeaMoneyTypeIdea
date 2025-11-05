@@ -1,7 +1,7 @@
 
 interface containerWordsProps  {
      containerRef:React.RefObject<HTMLDivElement | null > 
-      line3YRef : React.RefObject<{top : number , wordIndex : number} | null>
+      line3YRef : React.RefObject<{top : number } | null>
     }
 export const containerWordsRangeFitHandler = ({containerRef , line3YRef}:containerWordsProps ) => {
 
@@ -32,7 +32,7 @@ for (let i = 0; i < words.length; i++) {
   if (currentLine === 3 && line3Y === null) {
     
     line3Y = currentY;
-    line3YRef.current = {top : line3Y , wordIndex : i } ;
+    line3YRef.current = {top : line3Y } ;
     
   }
 

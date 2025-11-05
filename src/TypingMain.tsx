@@ -36,6 +36,7 @@ import { sampleTexts } from "./data/texts";
 import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
 import useLine3Listener from "./customHooks/useLine3Listener";
 import useColoringEffect from "./customHooks/useColoringEffect";
+import { sliceWordsHandler } from "./functions/sliceWordsHandler";
 // import useCharacterDeleteHookV2 from "./customHooks/useCharacterDeleteHook2";
 
 // import useSessionReplay from "./customHooks/useSessionReplay";
@@ -127,7 +128,7 @@ const TypingApp: React.FC = () => {
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
   // line 3 data
 
-  const line3YRef = useRef<{ top: number; wordIndex: number } | null>(null);
+  const line3YRef = useRef<{ top: number } | null>(null);
   // th epreviousline
   const prevLineRef = useRef<number>(0);
 
@@ -151,8 +152,8 @@ const TypingApp: React.FC = () => {
 
   // console logs ////////////////
   useEffect(() => {
-    
-  }, [isShiftFirstLine]);
+     setCurrentText(sliceWordsHandler(0, sessionWordsCount))
+  }, [sessionWordsCount]);
   ///////////////////////////////////
 
 
@@ -169,14 +170,14 @@ useColoringEffect({
 
 // ddetects onece we hit the line 3
  useLine3Listener({
-  currentTheme,
   containerRef,
   typedWordsAmount,
   prevLineRef,
   line3YRef,
   setIsShiftFirstLine,
   currentLetter ,
-  containerWidth
+  containerWidth , 
+  sessionWordsCount
 });
 
   //////////////////////////////////////////////////////////

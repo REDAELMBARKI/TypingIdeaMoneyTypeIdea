@@ -4,7 +4,7 @@ import useThemeHook from "./useThemeHook";
 
 
 const useThemePreviewerAndSetter = () => {
-   const { selectedTheme , isThemeConfirmed , previewTheme  , setCurrentTheme  } = useThemeHook(); 
+   const { selectedTheme , isThemeConfirmed , previewTheme  , setCurrentTheme  ,currentTheme } = useThemeHook(); 
   
   useEffect(() => {
     setCurrentTheme(previewTheme ?? selectedTheme) ;
@@ -17,6 +17,16 @@ const useThemePreviewerAndSetter = () => {
     setCurrentTheme(selectedTheme);
     localStorage.setItem("selectedTheme", JSON.stringify(selectedTheme))
   }, [selectedTheme , isThemeConfirmed]);
+
+
+   useEffect(() => {
+    if (currentTheme.isDarkModed) {
+      document.documentElement.style.removeProperty("color-scheme");
+    } else {
+      document.documentElement.style.setProperty("color-scheme", "normal");
+    }
+  }, [currentTheme.isDarkModed]);
+
 
 }
 

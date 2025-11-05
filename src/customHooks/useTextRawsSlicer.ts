@@ -10,7 +10,7 @@ interface textRawsSlicerProps {
      textSliceStartIndex : number
      setDynamicTextRange : React.Dispatch<React.SetStateAction<number>> // the words count that can fit in the container raws
       dynamicTextRange ?: number
-      line3YRef : React.RefObject<{top : number , wordIndex : number} | null>
+      line3YRef : React.RefObject<{top : number } | null>
       isShiftFirstLine : boolean ;
       typedWordsAmount : number 
 }
@@ -38,12 +38,6 @@ const useTextRawsSlicer = ({isShiftFirstLine ,typedWordsAmount ,  line3YRef , co
       }, [isShiftFirstLine])
       
 
-      useEffect(() => {
-        setTimeout(() => {
-             const text = sliceWordsHandler(15 , 30) ; 
-             setCurrentText(text)
-        },8000)
-      },[])
             
 }
 
