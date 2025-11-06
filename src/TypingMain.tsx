@@ -143,6 +143,7 @@ const TypingApp: React.FC = () => {
 
   const startTypingTimeRef = useRef<number>(0);
   // words count to shirft in the first row
+  const firstRowWordsCountToShiftRef = useRef<number>(0)
   // theme state
   const { currentTheme } = useThemeHook();
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -150,11 +151,17 @@ const TypingApp: React.FC = () => {
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
 
   // console logs ////////////////
+  ///////////////////////////////////
+  
+
+  // update wrongs chars / hystorywords / wrongWords after shiting the line 3
+
+  // get the coun of words in the first line to shift
   useEffect(() => {
      // remove the chifted line from wrong chars
       if(!containerRef.current || !isShiftFirstLine ) return ;
  
-      let wordsCountTheFirstRow = 0  ;
+     
       let wordsWidthAccum = 0 ;
       const words = Array.from(containerRef.current.querySelectorAll(".word")) as HTMLElement[]; 
       const containerWidth = containerRef.current.getBoundingClientRect().width ; 
@@ -164,7 +171,7 @@ const TypingApp: React.FC = () => {
 
         const elementWidth = element.getBoundingClientRect().width ;
         if (elementWidth === 0) {
-          wordsCountTheFirstRow++;
+          firstRowWordsCountToShiftRef.current++;
           continue;
         }
 
@@ -174,12 +181,13 @@ const TypingApp: React.FC = () => {
         }
 
         wordsWidthAccum += elementWidth;
-        wordsCountTheFirstRow++;
+        firstRowWordsCountToShiftRef.current++;
       }
-      console.log(wordsCountTheFirstRow)
+
   }, [isShiftFirstLine]);
-  ///////////////////////////////////
-  
+
+
+
   useEffect(() => {
     
      setCurrentText(sampleTexts[0].split(" ").slice(0, sessionWordsCount).join(" ")) 
@@ -187,7 +195,6 @@ const TypingApp: React.FC = () => {
   }, [sessionWordsCount]);
 
   
-
 // coloring effect 
 useColoringEffect({  
   currentTheme,
@@ -240,9 +247,9 @@ useColoringEffect({
   //  useSessionReplay({ inputValue , startTypingTimeRef , isReplayTime}) ;
   //  text raws to be rendered slicer
   useTextRawsSlicer({
+    firstRowWordsCountToShiftRef , 
     sessionWordsCount,
     line3YRef,
-    typedWordsAmount,
     isShiftFirstLine,
     containerWidth,
     containerRef,
