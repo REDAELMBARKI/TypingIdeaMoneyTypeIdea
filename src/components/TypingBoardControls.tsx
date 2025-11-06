@@ -203,6 +203,7 @@ const ExpandedWordsCountOptionsList = ({optionsList , showWords , setShowWords ,
       {/* exapan options */}
      
           {optionsList.map((option,ind) => (
+             
             <button
               key={ind}
               onClick={() => {
@@ -213,7 +214,7 @@ const ExpandedWordsCountOptionsList = ({optionsList , showWords , setShowWords ,
               className="flex items-center gap-2 text-xs   hover:text-slate-700 transition"
             >
               <ChartBar size={18} className="text-slate-700" />
-              <span>{option}s</span>
+              <span>{option}</span>
             </button>
           ))}
         </div>

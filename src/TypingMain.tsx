@@ -36,7 +36,6 @@ import { sampleTexts } from "./data/texts";
 import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
 import useLine3Listener from "./customHooks/useLine3Listener";
 import useColoringEffect from "./customHooks/useColoringEffect";
-import { sliceWordsHandler } from "./functions/sliceWordsHandler";
 // import useCharacterDeleteHookV2 from "./customHooks/useCharacterDeleteHook2";
 
 // import useSessionReplay from "./customHooks/useSessionReplay";
@@ -60,7 +59,7 @@ const TypingApp: React.FC = () => {
   // the text sliced index where the text will be sliced from (the text starts from this index )
   const [textSliceStartIndex] = useState<number>(0);
   // current text state 15 words to be genrated at the first time (the text ends in this index)
-  const [sessionWordsCount, setSessionWordsCount] = useState<number>(10);
+  const [sessionWordsCount, setSessionWordsCount] = useState<number>(50);
 
   const [dynamicTextRange, setDynamicTextRange] = useState<number>(0); // the words count that can fit in the container raws
 
@@ -143,7 +142,7 @@ const TypingApp: React.FC = () => {
   // underline ref
 
   const startTypingTimeRef = useRef<number>(0);
-
+  // words count to shirft in the first row
   // theme state
   const { currentTheme } = useThemeHook();
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -152,10 +151,42 @@ const TypingApp: React.FC = () => {
 
   // console logs ////////////////
   useEffect(() => {
-     setCurrentText(sliceWordsHandler(0, sessionWordsCount))
-  }, [sessionWordsCount]);
-  ///////////////////////////////////
+     // remove the chifted line from wrong chars
+      if(!containerRef.current || !isShiftFirstLine ) return ;
+ 
+      let wordsCountTheFirstRow = 0  ;
+      let wordsWidthAccum = 0 ;
+      const words = Array.from(containerRef.current.querySelectorAll(".word")) as HTMLElement[]; 
+      const containerWidth = containerRef.current.getBoundingClientRect().width ; 
+      
+      for(let i = 0 ; i < words.length ; i++){
+        const element  =  words[i] ; // how can i make this to mave a width even if its a space
 
+        const elementWidth = element.getBoundingClientRect().width ;
+        if (elementWidth === 0) {
+          wordsCountTheFirstRow++;
+          continue;
+        }
+
+        
+        if(wordsWidthAccum + elementWidth > containerWidth){
+          break ;
+        }
+
+        wordsWidthAccum += elementWidth;
+        wordsCountTheFirstRow++;
+      }
+      console.log(wordsCountTheFirstRow)
+  }, [isShiftFirstLine]);
+  ///////////////////////////////////
+  
+  useEffect(() => {
+    
+     setCurrentText(sampleTexts[0].split(" ").slice(0, sessionWordsCount).join(" ")) 
+
+  }, [sessionWordsCount]);
+
+  
 
 // coloring effect 
 useColoringEffect({  
@@ -209,6 +240,7 @@ useColoringEffect({
   //  useSessionReplay({ inputValue , startTypingTimeRef , isReplayTime}) ;
   //  text raws to be rendered slicer
   useTextRawsSlicer({
+    sessionWordsCount,
     line3YRef,
     typedWordsAmount,
     isShiftFirstLine,

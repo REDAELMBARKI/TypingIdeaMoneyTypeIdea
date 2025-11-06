@@ -1,3 +1,4 @@
+
 import type { currentLetterType } from "./../types/experementTyping";
 import { useEffect, useRef } from "react";
 
@@ -9,8 +10,8 @@ interface line3listenerprops {
   line3YRef : React.RefObject<{ top: number} | null >;
   setIsShiftFirstLine : React.Dispatch<React.SetStateAction<boolean>>;
   currentLetter: currentLetterType
-  containerWidth : number
-  sessionWordsCount : number
+  containerWidth : number 
+   sessionWordsCount : number
 }
 
 const useLine3Listener = ({
@@ -18,70 +19,77 @@ const useLine3Listener = ({
   containerRef,
   typedWordsAmount,
   prevLineRef,
-  line3YRef,
   setIsShiftFirstLine,
-  containerWidth ,
   sessionWordsCount
 }: line3listenerprops) => {
-    
-  const wordsRef = useRef<HTMLElement[]>([])
+  const wordsRef = useRef<HTMLElement[]>([]) ;
+
 
   useEffect(() => {
-     if (!containerRef.current) return;
-    const interval = setInterval(()=>{
-          wordsRef.current = Array.from(containerRef.current!.querySelectorAll(".word"));
-          if(wordsRef.current.length >= sessionWordsCount ) {
-            clearInterval(interval)
-            console.log(wordsRef.current)
-          }
-    },50)
 
-    return () => clearInterval(interval);
-  }, [containerRef.current])
-  
+  if (!containerRef.current || !wordsRef.current) return;
 
-  
-  // detects the line 3
-  useEffect(() => {
-  
-    if (!wordsRef.current || wordsRef.current.length === 0) return;
+  const interval = setInterval(() => {
+     wordsRef.current = Array.from(containerRef.current!.querySelectorAll(".word"));
+    if (wordsRef.current.length >= sessionWordsCount * 2 ) { // include spaces becus every space is a words in how i render the etxt
+      clearInterval(interval);
+    }
     
-
-    const idx = Math.min(typedWordsAmount, wordsRef.current.length - 1);
-    const tops: number[] = [];
-    
-
-    for (let i = 0; i <= idx; i++) {
-      const rect = (wordsRef.current[i] as HTMLElement).getBoundingClientRect();
-      const top = Math.floor(rect.top);
-      if (tops.length === 0 || tops[tops.length - 1] !== top) {
-        tops.push(top);
-        
-      }
-      
-      console.log(tops)
-    }
-
-    const currentLine = Math.max(1, tops.length);
-    const prevLine = prevLineRef.current ?? 0;
-
-    if (currentLine >= 3 && prevLine < 3) {
-      // reached line 3
-      const line3Top = tops[2]; 
+  }, 50);
   
-      line3YRef.current = { top: line3Top };
-      // shift line 1
-      setIsShiftFirstLine(true);
-      // setTimeout(()=> setIsShiftFirstLine(false) , 100)
-    }
+  return () => clearInterval(interval);
+}, [containerRef , sessionWordsCount ]);
 
-    if (currentLine < 3 && prevLine >= 3) {
-      line3YRef.current = null;
-    }
 
-    prevLineRef.current = currentLine;
-  }, [typedWordsAmount, containerWidth , containerRef ]);
-};
+
+// detects the line 3
+// detects the line 3
+useEffect(() => {
+  if (!containerRef.current) return;
+  if (!wordsRef.current || wordsRef.current.length === 0) return;
+
+  const containerWidth = containerRef.current.getBoundingClientRect().width;
+  
+  let currentLineWidth = 0;
+  let lineCount = 1;
+
+
+  const idx = Math.min(typedWordsAmount * 2, wordsRef.current.length - 1);
+
+  for (let i = 0; i <= idx; i++) {
+    const element = wordsRef.current[i] as HTMLElement;
+    if (!element) continue;
+    
+    const rect = element.getBoundingClientRect();
+    const wordWidth = rect.width;
+    
+    if (wordWidth === 0) continue;
+    
+    const willOverflow = currentLineWidth + wordWidth > containerWidth;
+    
+    if (willOverflow && currentLineWidth > 0) {
+      lineCount++;
+      currentLineWidth = wordWidth;
+    } else {
+      currentLineWidth += wordWidth;
+    }
+  }
+
+
+  const prevLine = prevLineRef.current ?? 0;
+
+  if (lineCount >= 3 && prevLine < 3) {
+    console.log('🎯 REACHED LINE 3!');
+    setIsShiftFirstLine(true);
+  }
+
+  if (lineCount < 3 && prevLine >= 3) {
+    setIsShiftFirstLine(false);
+  }
+
+  prevLineRef.current = lineCount;
+}, [typedWordsAmount, containerRef]);
+}
 
 
 export default useLine3Listener ;

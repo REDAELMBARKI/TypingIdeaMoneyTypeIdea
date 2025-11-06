@@ -28,14 +28,20 @@ export const textRender = ({
 
 
   let globalIndex = 0; 
-
-   return  currentText.split(/(\s+)/).map((word , wordIndex) => {
    
+   return  currentText.split(/(\s+)/).map((word , wordIndex) => {
+      // const isSpace = /^\s+$/.test(word);
+
       return (    <span 
       
       key={wordIndex} 
-      className="word" 
-      style={{ whiteSpace: 'nowrap', display: 'inline-block' }} >
+      className={`word`} 
+      style={{
+        display: 'inline-block',
+        // ✅ Add this for space-only spans
+        // ...(isSpace && { minWidth: '0.5ch' })
+      }}
+       >
         
         {word.split("").map((char) => {
 
@@ -74,9 +80,9 @@ export const textRender = ({
           <span
                 key={`wrong-${range.start}`}
                 className="underLineBefore parent" 
-                style={{ display: "inline-block", position: "relative", whiteSpace: "nowrap" ,  ["--underlineColor" as string] : currentTheme.red }}
+                style={{ display: "", position: "relative", whiteSpace: "nowrap" ,  ["--underlineColor" as string] : currentTheme.red }}
               >
-                <span className={`char-wrapper `}   style={{whiteSpace : "nowrap" ,  }}
+                <span className={`char-wrapper `}   style={{whiteSpace : "nowrap"}}
                         >
                   {word.split("").map((wordCompacted, charIndex) => {
                       let compactedwordColor = '' ;          
@@ -95,7 +101,7 @@ export const textRender = ({
                       // the compacted words the ones who are underlined also the untyped ones
                       <span
                         key={charIndex}
-                        className={`char-spa inline-block transition-all duration-150 letter ${isTypingActive ? 'stop-animation' : ''}`}
+                        className={`char-spa  transition-all duration-150 letter ${isTypingActive ? 'stop-animation' : ''}`}
                         style={{
                           whiteSpace: "nowrap",
                           color: wrongChars.includes(globalCharIndex) 
@@ -130,7 +136,7 @@ export const textRender = ({
           {char === " " &&
             index === currentLetter.index &&
             trachWord.length > 0 && trachWord.map(char => {
-                return ( <label className={`trach-word inline-block ` }  
+                return ( <label className={`trach-word inline-block` }  
               
               style={{ whiteSpace : "nowrap" ,color : currentTheme.darkRed }} 
               >
@@ -144,7 +150,7 @@ export const textRender = ({
           { 
           
           
-          <span key={index} style={{    whiteSpace: "pre" , color : charStyle  ,  textWrap : char === " " ?  'nowrap' : 'balance' }} className={`letter inline-block  transition-all duration-150   ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}>
+          <span key={index} style={{  color : charStyle  ,  textWrap : char === " " ?  'nowrap' : 'balance' }} className={`letter  transition-all duration-150   ${indicator} ${isTypingActive ? 'stop-animation' : ''}`}>
             { char === " " ?  "\u00A0" :  char } 
           </span>
             
