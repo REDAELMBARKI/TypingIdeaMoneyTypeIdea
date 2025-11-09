@@ -157,30 +157,29 @@ const TypingApp: React.FC = () => {
   
   // get the coun of words in the first line to shift
 useEffect(() => {
-  if(!containerRef.current || !isShiftFirstLine) return;
-  
+  if (!containerRef.current || !isShiftFirstLine) return;
+
   let wordsWidthAccum = 0;
-  const words = Array.from(containerRef.current.querySelectorAll(".word")) as HTMLElement[]; 
-  const containerWidth = containerRef.current.getBoundingClientRect().width; 
-  
-  for(let i = 0; i < words.length; i++){
+  firstRowLastIndexRef.current = 0 ;
+  const words = Array.from(containerRef.current.querySelectorAll(".word")) as HTMLElement[];
+  const containerWidth = containerRef.current.getBoundingClientRect().width;
+
+  for (let i = 0; i < words.length; i++) {
     const element = words[i];
     const elementWidth = element.getBoundingClientRect().width;
-    const isSpace = /^\s+$/.test(element.textContent || '');
-         
-    if (isSpace) {
-      firstRowLastIndexRef.current += 1;
-      continue;
-    }
-    
-    if(wordsWidthAccum + elementWidth > containerWidth){
-      break;
-    }
-    
+    const nextAccum = wordsWidthAccum + elementWidth;
+
+    // If adding this word would exceed container width, stop
+    if (nextAccum > containerWidth) break;
+
+    // Add text length
     firstRowLastIndexRef.current += element.textContent?.length || 0;
-    wordsWidthAccum += elementWidth;
+
+    // Include margin to be more accurate
+    const style = getComputedStyle(element);
+    const marginRight = parseFloat(style.marginRight) || 0;
+    wordsWidthAccum = nextAccum + marginRight;
   }
-   
 }, [isShiftFirstLine]);
 
 
@@ -188,6 +187,9 @@ useEffect(() => {
   if(!isShiftFirstLine) {
     return ;
   }
+
+
+  console.log('last index' , firstRowLastIndexRef.current)
   
   }, [isShiftFirstLine]);
 
@@ -366,7 +368,6 @@ useColoringEffect({
         globalState ,
         isTypingActive,
         firstRowLastIndexRef , 
-        isShiftFirstLine
       }),
     [currentText, currentTheme , trachWord  , globalState.wordHistory ,globalState.wrongWords , containerWidth , isShiftFirstLine] // only rebuild when text or theme changes
   );

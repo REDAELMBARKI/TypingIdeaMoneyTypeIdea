@@ -11,7 +11,6 @@ interface TextRenderProps {
   currentTheme: ThemeColors ;
   globalState : globalStatetype ;
   firstRowLastIndexRef: React.RefObject<number>
-  isShiftFirstLine : boolean
 }
 
 export const textRender = ({
@@ -22,8 +21,7 @@ export const textRender = ({
   globalState : {wrongChars, wrongWords ,wordHistory},
   isTypingActive ,
   currentTheme ,
-  firstRowLastIndexRef , 
-  isShiftFirstLine
+  firstRowLastIndexRef 
 }: TextRenderProps) => {
   
 
@@ -33,7 +31,8 @@ export const textRender = ({
   let globalIndex = 0; 
    
    return  currentText.split(/(\s+)/).map((word , wordIndex) => {
-     console.log('isshift' , isShiftFirstLine)
+    //  if(isShiftFirstLine ) console.log({'global index' : globalIndex , 'lastindex' : firstRowLastIndexRef.current}) ;
+      // if(word === 'stood'){console.log("ksdfhksd" , globalIndex + word.length + 1)}
      const wordEndIndex = globalIndex;
     
       return (    <span 
@@ -41,7 +40,7 @@ export const textRender = ({
       key={wordIndex} 
       className={`word inline-block`} 
 
-      style={(currentLetter.index > 0 && firstRowLastIndexRef.current > 0  && wordEndIndex <= firstRowLastIndexRef.current) ? {background:"red"} : {}}
+      style={(currentLetter.index > 0 && firstRowLastIndexRef.current > 0  && wordEndIndex < firstRowLastIndexRef.current) ? {display:"none"} : {}}
        >
         
         {word.split("").map((char) => {
