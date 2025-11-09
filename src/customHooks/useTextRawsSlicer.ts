@@ -11,13 +11,12 @@ interface textRawsSlicerProps {
      setDynamicTextRange : React.Dispatch<React.SetStateAction<number>> // the words count that can fit in the container raws
       dynamicTextRange ?: number
       line3YRef : React.RefObject<{top : number } | null>
-      isShiftFirstLine : boolean ;
       sessionWordsCount : number
-      firstRowWordsCountToShiftRef: React.RefObject<number>
+    
 }
 
 
-const useTextRawsSlicer = ({sessionWordsCount ,firstRowWordsCountToShiftRef ,  isShiftFirstLine ,  line3YRef , containerWidth , containerRef  , setCurrentText  , textSliceStartIndex , setDynamicTextRange ,dynamicTextRange} : textRawsSlicerProps) => {
+const useTextRawsSlicer = ({sessionWordsCount ,line3YRef , containerWidth , containerRef  , setCurrentText  , textSliceStartIndex , setDynamicTextRange ,dynamicTextRange} : textRawsSlicerProps) => {
       
       const wordsCountAllowed = useRef<number | undefined>(undefined);
       useEffect(() => {
@@ -35,13 +34,13 @@ const useTextRawsSlicer = ({sessionWordsCount ,firstRowWordsCountToShiftRef ,  i
 
        // shift the text once we hit the line 3
         // firstIndexInSecondLIne in the first word indenx in the second line 
-      useEffect(() => {
-        if(!wordsCountAllowed.current) return ; 
+      // useEffect(() => {
+      //   if(!wordsCountAllowed.current) return ; 
         
-        setCurrentText(prevText => {
-            return prevText.split(/(\s+)/).slice(firstRowWordsCountToShiftRef.current).join(' ')
-        }) ; 
-      }, [isShiftFirstLine])
+      //   setCurrentText(prevText => {
+      //       return prevText.split(/(\s+)/).slice(firstRowWordsCountToShiftRef.current).join(' ')
+      //   }) ; 
+      // }, [isShiftFirstLine])
       
 
             

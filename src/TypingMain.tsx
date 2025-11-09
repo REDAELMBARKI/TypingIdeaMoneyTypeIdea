@@ -144,6 +144,7 @@ const TypingApp: React.FC = () => {
   const startTypingTimeRef = useRef<number>(0);
   // words count to shirft in the first row
   const firstRowWordsCountToShiftRef = useRef<number>(0)
+  const firstRowLastIndexRef = useRef<number>(0)
   // theme state
   const { currentTheme } = useThemeHook();
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -153,38 +154,37 @@ const TypingApp: React.FC = () => {
   // console logs ////////////////
   ///////////////////////////////////
   
-
-  // update wrongs chars / hystorywords / wrongWords after shiting the line 3
-
   // get the coun of words in the first line to shift
-  useEffect(() => {
-     // remove the chifted line from wrong chars
-      if(!containerRef.current || !isShiftFirstLine ) return ;
- 
-     
-      let wordsWidthAccum = 0 ;
-      const words = Array.from(containerRef.current.querySelectorAll(".word")) as HTMLElement[]; 
-      const containerWidth = containerRef.current.getBoundingClientRect().width ; 
-      
-      for(let i = 0 ; i < words.length ; i++){
-        const element  =  words[i] ; // how can i make this to mave a width even if its a space
+useEffect(() => {
+  if(!containerRef.current || !isShiftFirstLine) return;
+  
+  // reset the last index at the starrt
+  firstRowLastIndexRef.current = 0;
+  
+  let wordsWidthAccum = 0;
+  const words = Array.from(containerRef.current.querySelectorAll(".word")) as HTMLElement[]; 
+  const containerWidth = containerRef.current.getBoundingClientRect().width; 
+  
+  for(let i = 0; i < words.length; i++){
+    const element = words[i];
+    const elementWidth = element.getBoundingClientRect().width;
+    const isSpace = /^\s+$/.test(element.textContent || '');
+         
+    if (isSpace) {
+      firstRowLastIndexRef.current += 1;
+      continue;
+    }
+    
+    if(wordsWidthAccum + elementWidth > containerWidth){
+      break;
+    }
+    
+    firstRowLastIndexRef.current += element.textContent?.length || 0;
+    wordsWidthAccum += elementWidth;
+  }
+  
+}, [isShiftFirstLine]);
 
-        const elementWidth = element.getBoundingClientRect().width ;
-        if (elementWidth === 0) {
-          firstRowWordsCountToShiftRef.current++;
-          continue;
-        }
-
-        
-        if(wordsWidthAccum + elementWidth > containerWidth){
-          break ;
-        }
-
-        wordsWidthAccum += elementWidth;
-        firstRowWordsCountToShiftRef.current++;
-      }
-
-  }, [isShiftFirstLine]);
 
 
 
@@ -230,7 +230,7 @@ useColoringEffect({
   useEffect(() => {
     if (!isTypingStarted) return;
     ElapsedTimeHandler({ selectedTime, setElapsedTime });
-  }, [isTypingStarted]);
+  }, [isTypingStarted , selectedTime]);
 
   // Focus the hidden input on component mount
   useEffect(() => {
@@ -247,10 +247,8 @@ useColoringEffect({
   //  useSessionReplay({ inputValue , startTypingTimeRef , isReplayTime}) ;
   //  text raws to be rendered slicer
   useTextRawsSlicer({
-    firstRowWordsCountToShiftRef , 
     sessionWordsCount,
     line3YRef,
-    isShiftFirstLine,
     containerWidth,
     containerRef,
     setCurrentText,
@@ -363,6 +361,7 @@ useColoringEffect({
         trachWord,
         globalState ,
         isTypingActive,
+        firstRowWordsCountToShiftRef , 
       }),
     [currentText, currentTheme , trachWord  , globalState.wordHistory ,globalState.wrongWords , containerWidth , isShiftFirstLine] // only rebuild when text or theme changes
   );

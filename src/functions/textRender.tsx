@@ -9,7 +9,8 @@ interface TextRenderProps {
   isWrongWord: boolean;
   trachWord: string[];
   currentTheme: ThemeColors ;
-  globalState : globalStatetype
+  globalState : globalStatetype ;
+  firstRowWordsCountToShiftRef: React.RefObject<number>
 
 }
 
@@ -20,7 +21,8 @@ export const textRender = ({
   trachWord,
   globalState : {wrongChars, wrongWords ,wordHistory},
   isTypingActive ,
-  currentTheme 
+  currentTheme ,
+  firstRowWordsCountToShiftRef
 }: TextRenderProps) => {
   
 
