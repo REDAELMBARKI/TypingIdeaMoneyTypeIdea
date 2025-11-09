@@ -142,8 +142,8 @@ const TypingApp: React.FC = () => {
   // underline ref
 
   const startTypingTimeRef = useRef<number>(0);
-  // words count to shirft in the first row
-  const firstRowWordsCountToShiftRef = useRef<number>(0)
+
+  // words count of the chars in every first line 
   const firstRowLastIndexRef = useRef<number>(0)
   // theme state
   const { currentTheme } = useThemeHook();
@@ -152,14 +152,12 @@ const TypingApp: React.FC = () => {
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
 
   // console logs ////////////////
+ 
   ///////////////////////////////////
   
   // get the coun of words in the first line to shift
 useEffect(() => {
   if(!containerRef.current || !isShiftFirstLine) return;
-  
-  // reset the last index at the starrt
-  firstRowLastIndexRef.current = 0;
   
   let wordsWidthAccum = 0;
   const words = Array.from(containerRef.current.querySelectorAll(".word")) as HTMLElement[]; 
@@ -182,10 +180,16 @@ useEffect(() => {
     firstRowLastIndexRef.current += element.textContent?.length || 0;
     wordsWidthAccum += elementWidth;
   }
-  
+   
 }, [isShiftFirstLine]);
 
 
+ useEffect(() => {
+  if(!isShiftFirstLine) {
+    return ;
+  }
+  
+  }, [isShiftFirstLine]);
 
 
   useEffect(() => {
@@ -361,7 +365,8 @@ useColoringEffect({
         trachWord,
         globalState ,
         isTypingActive,
-        firstRowWordsCountToShiftRef , 
+        firstRowLastIndexRef , 
+        isShiftFirstLine
       }),
     [currentText, currentTheme , trachWord  , globalState.wordHistory ,globalState.wrongWords , containerWidth , isShiftFirstLine] // only rebuild when text or theme changes
   );

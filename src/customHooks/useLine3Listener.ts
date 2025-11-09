@@ -79,8 +79,9 @@ useEffect(() => {
   const prevLine = prevLineRef.current ?? 0;
 
   if (lineCount >= 3 && prevLine < 3) {
-    console.log('🎯 REACHED LINE 3!');
     setIsShiftFirstLine(true);
+
+    setTimeout(()=>{ setIsShiftFirstLine(false)},50)
   }
 
   if (lineCount < 3 && prevLine >= 3) {

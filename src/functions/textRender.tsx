@@ -10,8 +10,8 @@ interface TextRenderProps {
   trachWord: string[];
   currentTheme: ThemeColors ;
   globalState : globalStatetype ;
-  firstRowWordsCountToShiftRef: React.RefObject<number>
-
+  firstRowLastIndexRef: React.RefObject<number>
+  isShiftFirstLine : boolean
 }
 
 export const textRender = ({
@@ -22,7 +22,8 @@ export const textRender = ({
   globalState : {wrongChars, wrongWords ,wordHistory},
   isTypingActive ,
   currentTheme ,
-  firstRowWordsCountToShiftRef
+  firstRowLastIndexRef , 
+  isShiftFirstLine
 }: TextRenderProps) => {
   
 
@@ -32,17 +33,15 @@ export const textRender = ({
   let globalIndex = 0; 
    
    return  currentText.split(/(\s+)/).map((word , wordIndex) => {
-      // const isSpace = /^\s+$/.test(word);
-
+     console.log('isshift' , isShiftFirstLine)
+     const wordEndIndex = globalIndex;
+    
       return (    <span 
       
       key={wordIndex} 
-      className={`word`} 
-      style={{
-        display: 'inline-block',
-        // ✅ Add this for space-only spans
-        // ...(isSpace && { minWidth: '0.5ch' })
-      }}
+      className={`word inline-block`} 
+
+      style={(currentLetter.index > 0 && firstRowLastIndexRef.current > 0  && wordEndIndex <= firstRowLastIndexRef.current) ? {background:"red"} : {}}
        >
         
         {word.split("").map((char) => {
