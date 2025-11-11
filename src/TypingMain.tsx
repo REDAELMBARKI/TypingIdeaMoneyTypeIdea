@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import useThemeHook from "./customHooks/useThemeHook";
 import Footer from "./partials/Footer";
-import States from "./partials/States";
+
 import Reseter from "./partials/Reseter";
 import { textRender } from "./functions/textRender";
 import useCharacterDeleteHook from "./customHooks/useCharacterDeleteHook";
@@ -23,7 +23,7 @@ import useTypingWatcher from "./customHooks/useTypingWatcher";
 import useErrorTypingSound from "./customHooks/useErrorTypingSound";
 import useSpaceJump from "./customHooks/useSpaceJump";
 import useWindowResize from "./customHooks/useWindowResize";
-import NextText from "./partials/NextText";
+
 import TypingBoardControls from "./components/TypingBoardControls";
 import { ElapsedTimeHandler } from "./functions/elapsedTimeHandler";
 import useSessionTimerCountDown from "./customHooks/useSessionTimerCountDown";
@@ -36,20 +36,14 @@ import { sampleTexts } from "./data/texts";
 import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
 import useLine3Listener from "./customHooks/useLine3Listener";
 import useColoringEffect from "./customHooks/useColoringEffect";
+import usePersistantSelectedSessionParams from "./customHooks/usePersistantSelectedSessionParams";
+import { lasyErrorSoundStoredState, lasySoundStoredState, lazyLoadedSelectedTime, lazyLoadedSessionWordsCount } from "./functions/lazyLoadedSessionData";
 // import useCharacterDeleteHookV2 from "./customHooks/useCharacterDeleteHook2";
 
 // import useSessionReplay from "./customHooks/useSessionReplay";
 
-// import TypingResults from "./modals/TypingResults";
 
-const lasySoundStoredState = () =>
-  JSON.parse(localStorage.getItem("parameters") ?? `[]`).includes(
-    "sound".toLowerCase()
-  );
-const lasyErrorSoundStoredState = () =>
-  JSON.parse(localStorage.getItem("parameters") ?? `[]`).includes(
-    "errorSound".toLowerCase()
-  );
+
 
 const TypingApp: React.FC = () => {
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -59,7 +53,7 @@ const TypingApp: React.FC = () => {
   // the text sliced index where the text will be sliced from (the text starts from this index )
   const [textSliceStartIndex] = useState<number>(0);
   // current text state 15 words to be genrated at the first time (the text ends in this index)
-  const [sessionWordsCount, setSessionWordsCount] = useState<number>(50);
+  const [sessionWordsCount, setSessionWordsCount] = useState<number>(lazyLoadedSessionWordsCount);
 
   const [dynamicTextRange, setDynamicTextRange] = useState<number>(0); // the words count that can fit in the container raws
 
@@ -88,9 +82,9 @@ const TypingApp: React.FC = () => {
 
   const [isCapsOn, setIsCapsOn] = useState<boolean>(false);
   // select time fo session typing
-  const [selectedTime, setSelectedTime] = useState<number>(30);
+  const [selectedTime, setSelectedTime] = useState<number>(lazyLoadedSelectedTime);
   // time elased or count down realstate
-  const [elapsedTime, setElapsedTime] = useState<number>(selectedTime);
+  const [elapsedTime, setElapsedTime] = useState<number>(lazyLoadedSelectedTime);
   // typign begin listener
   const [isTypingStarted, setIsTypingStarted] = useState(false);
   // typing mode (words | time )
@@ -145,6 +139,14 @@ const TypingApp: React.FC = () => {
 
   // words count of the chars in every first line 
   const firstRowLastIndexRef = useRef<number>(0)
+
+  // did mount for skipping the initial effect render 
+
+  const didMountsessionWordsCount = useRef(false); 
+  const didMountSelectedTime= useRef(false); 
+
+
+
   // theme state
   const { currentTheme } = useThemeHook();
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -152,7 +154,7 @@ const TypingApp: React.FC = () => {
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
 
   // console logs ////////////////
- 
+
   ///////////////////////////////////
   
   // get the coun of words in the first line to shift
@@ -200,6 +202,10 @@ useEffect(() => {
 
   }, [sessionWordsCount]);
 
+
+  // session's selected time and words count persistance
+  usePersistantSelectedSessionParams({sessionWordsCount , selectedTime , didMountsessionWordsCount , didMountSelectedTime })
+
   
 // coloring effect 
 useColoringEffect({  
@@ -245,6 +251,12 @@ useColoringEffect({
     }
   }, [isFocuceOnText]);
 
+
+
+  useEffect(() => {
+
+    // console.log('isTypingEnds' , isTypingEnds)
+  }, [isTypingEnds]); ;
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++hooks++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
@@ -321,6 +333,7 @@ useColoringEffect({
 
   // jumps to next word in space clicking (before the current word ends)
   useSpaceJump({
+    setIsTypingEnds ,
     inputValue,
     currentLetter,
     currentText,
@@ -383,6 +396,7 @@ useColoringEffect({
     setTrachWord,
     setTypedWordsAmount,
   });
+
 
 
   // audio player
@@ -455,8 +469,10 @@ useColoringEffect({
           {/* chow controlls only if we dont type any more line 1000 no keydown */}
 
           {!isFocuceOnText && (
-            <section className="opacity-0 animate-appear-smooth">
-              <TypingBoardControls
+            <section className="opacity-0 animate-appear-smooth  ">
+              <TypingBoardControls 
+
+                sessionWordsCount={sessionWordsCount}
                 setIsNormalTypingSoundEnabled={setIsNormalTypingSoundEnabled}
                 setIsErrorSoundEnabled={setIsErrorSoundEnabled}
                 setSessionWordsCount={setSessionWordsCount}
@@ -494,24 +510,27 @@ useColoringEffect({
                 {typingModeSelected === "time" && elapsedTime}
               </div>
             ) : (
-              <div
-                className={`px-4 py-2 rounded-lg text-white font-bold  cursor-default select-none  text-center w-[4em]`}
-                style={{ color: currentTheme.buttonSecondary }}
-              >
-                {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
-                {isFocuceOnText &&
-                  typingModeSelected === "words" &&
-                  typedWordsAmount + "/" + sessionWordsCount}
-              </div>
+                <div
+                  className={`px-4 py-2 rounded-lg text-white font-bold  cursor-default select-none  text-center w-[4em]   right-4`}
+                  style={{ color: currentTheme.buttonSecondary }}
+                >
+                  {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
+                  {isFocuceOnText &&
+                    typingModeSelected === "words" &&
+                    typedWordsAmount + "/" + sessionWordsCount}
+                </div>
             )}
 
             <div
-              className="mx-w-full hitespace-normal break-words break-keep h-[180px]"
+              className="mx-w-full hitespace-normal break-words break-keep h-[180px] "
+
               ref={containerRef}
               style={{
                 textAlign: "start",
                 fontSize: `${fontSizeRef.current}px`,
                 overflowY: "hidden",
+                position : 'absolute',
+                top:'200px'
               }}
             >
               {/* // text render */}
@@ -576,7 +595,9 @@ useColoringEffect({
         />
 
         {/* Controls */}
-        <div className="flex items-center justify-center mt-8 space-x-4">
+        <div className="flex items-center justify-center mt-8 space-x-4 " 
+         style={{ position: 'absolute'  , top : '400px'}}
+         >
           {!isFocuceOnText && (
             <section className="opacity-0 animate-appear-smooth flex gap-3">
               <Reseter
@@ -584,19 +605,28 @@ useColoringEffect({
                 currentTheme={currentTheme}
                 handleReset={handleReset}
               />
-              <NextText nextText={nextText} />
+    
             </section>
           )}
         </div>
 
+
         {/* Stats Placeholder */}
+        {/* <div style={{ position: 'absolute'  , top : '500px'}}>
+
         {!isFocuceOnText && (
           <States wpmFinal={wpmFinal} currentTheme={currentTheme} />
         )}
+
+        </div> */}
+
       </main>
 
       {/* Footer */}
+      <footer style={{ position: 'absolute'  , bottom : '10%' , width: '100%'}}>
+
       <Footer />
+      </footer>
     </div>
   );
 };

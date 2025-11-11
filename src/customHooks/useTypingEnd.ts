@@ -11,12 +11,12 @@ interface typingEndProps {
 const useTypingEnd = ({currentLetter , currentText , setIsTypingEnds}:typingEndProps) => {
     useEffect(()=>{
     // shows end typing model 
-
-    if(currentLetter.index < currentText.length || currentText == "" ) return ;
     
+    
+    if(currentLetter.index === 0 || currentLetter.index < currentText.length) return ;
     setIsTypingEnds(true) ;
     
-  },[currentLetter.index])
+  },[currentLetter.index , currentText , setIsTypingEnds]) ;
 
 
 }

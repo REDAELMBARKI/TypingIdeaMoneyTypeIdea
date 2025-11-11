@@ -7,10 +7,11 @@ interface spaceJumpPropps {
    currentText :string ;
    setCurrentLetter: React.Dispatch<React.SetStateAction<currentLetterType>> ;
     setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>>
+    setIsTypingEnds: React.Dispatch<React.SetStateAction<boolean>>
 }
 
  
-const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentLetter , setGlobalState}:spaceJumpPropps) => {
+const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentLetter , setGlobalState,setIsTypingEnds}:spaceJumpPropps) => {
   
       useEffect(()=>{
                         
@@ -46,7 +47,11 @@ const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentL
                 let wordEnd = currentLetter.index;
 
                 while(wordEnd > 0 && currentText[wordEnd + 1] !== ' ') {
-                wordEnd++;
+                        if(currentText[wordEnd + 1] === undefined){
+                            setIsTypingEnds(true) ;
+                            break ;
+                        }
+                        wordEnd++;
                 }
 
              

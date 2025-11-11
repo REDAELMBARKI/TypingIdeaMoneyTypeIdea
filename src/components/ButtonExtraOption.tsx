@@ -8,20 +8,26 @@ interface buttonExtraOptionProps {
      label : string 
       Icon : React.ComponentType<React.SVGProps<SVGSVGElement>> ;
       handleParamOption ? : (paramType: string) => void
+      handleSoundSettingOption?: (soundSet: string) => void
       action? : () => void
-      selectedParameters : string[] 
+      selectedParameters?: string[] 
+      soundSettings?: string[] 
+
 }
 
-const  ButtonExtraOption = ({  selectedParameters , action , currentTheme , label  , Icon , handleParamOption}:buttonExtraOptionProps) => {
+const  ButtonExtraOption = ({ soundSettings = [] ,  selectedParameters = [] , action , currentTheme , label  , Icon , handleParamOption , handleSoundSettingOption}:buttonExtraOptionProps) => {
     const ButtonRef = useRef<HTMLButtonElement | null>(null);
     const spanRef = useRef<HTMLSpanElement | null>(null);
-    const [isCheckedParam , setIsCheckedParam] = useState<boolean>(selectedParameters.includes(label.toLowerCase()));
-    const [isHighlighted , setIsHighlighted] = useState<boolean>(selectedParameters.includes(label.toLowerCase()))
+    const isBoolean = selectedParameters
+                      .concat(soundSettings)
+                      .includes(label.toLowerCase())
+    const [isCheckedParam , setIsCheckedParam] = useState<boolean>(isBoolean);
+    const [isHighlighted , setIsHighlighted] = useState<boolean>(isBoolean)
     
     useEffect(() => {
         const shouldHighlight= selectedParameters.includes(label.toLowerCase());
         setIsHighlighted(shouldHighlight) ;
-    } , [selectedParameters , label])
+    } , [soundSettings , selectedParameters , label])
 
 
 
@@ -67,7 +73,8 @@ const  ButtonExtraOption = ({  selectedParameters , action , currentTheme , labe
                                             
                                             setIsCheckedParam(prev => !prev)
                                             handleParamOption?.(label.toLowerCase());
-                                            action?.(); 
+                                            action?.();
+                                            handleSoundSettingOption?.(label.toLowerCase());
                                        
                                         }}
                                         ></button>

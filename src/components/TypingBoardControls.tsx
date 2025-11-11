@@ -1,38 +1,42 @@
 import React, { useEffect, useState } from "react";
 import {
   Timer,
-  
-  Clock,
   Hash,
   SquareAsteriskIcon,
   CaseSensitive,
   TextInitial,
-  ChartBar,
+  Volume2,
+  XCircle,
+  Quote,
 } from "lucide-react";
 import type { Mode, ThemeColors } from "../types/experementTyping";
 import ButtonExtraOption from "./ButtonExtraOption";
 import { isEqual } from "lodash";
+import useThemeHook from "../customHooks/useThemeHook";
+import { lazyLoadedSoundSettings, lazyLoadeStoredParams } from "../functions/lazyLoadedSessionData";
 
 
 interface TypingBoardControlsProps {
- selectedTime:number ;
- setSelectedTime:React.Dispatch<React.SetStateAction<number>>;
- isTypingStarted:boolean ;
- typingModeSelected :  Mode ;
+  setSelectedTime:React.Dispatch<React.SetStateAction<number>>;
+  isTypingStarted:boolean ;
+  typingModeSelected :  Mode ;
  setTypingModeSelected: React.Dispatch<React.SetStateAction<Mode>>
-  currentTheme : ThemeColors ;
-  setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
+ currentTheme : ThemeColors ;
+ setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
 
   setIsErrorSoundEnabled : React.Dispatch<React.SetStateAction<boolean>>
-  setIsNormalTypingSoundEnabled : React.Dispatch<React.SetStateAction<boolean>>
+  setIsNormalTypingSoundEnabled : React.Dispatch<React.SetStateAction<boolean>> 
+   sessionWordsCount : number ;
+   selectedTime:number ;
 }
 
-const lazyLoadeStoredParams  = () => JSON.parse(localStorage.getItem('parameters') ?? `[]`) ;
-export default function TypingBoardControls({setSessionWordsCount , setIsNormalTypingSoundEnabled , setIsErrorSoundEnabled  , currentTheme ,setTypingModeSelected,typingModeSelected  ,selectedTime , setSelectedTime}:TypingBoardControlsProps) {
+
+export default function TypingBoardControls({sessionWordsCount,setSessionWordsCount , setIsNormalTypingSoundEnabled , setIsErrorSoundEnabled  , currentTheme ,setTypingModeSelected,typingModeSelected  ,selectedTime , setSelectedTime}:TypingBoardControlsProps) {
   
   const [showTimes, setShowTimes] = useState(false);
   const [showWords,setShowWords] =  useState(false);
   const [selectedParameters , setSelectedParameters] = useState<string[]>(lazyLoadeStoredParams) ;
+  const [soundSettings , setSoundSettings] = useState<string[]>(lazyLoadedSoundSettings) ;
   const timesOpt = [30, 60, 120];
   const wordsOpt= [10,20,30,50];
   
@@ -43,9 +47,18 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
               setSelectedParameters(selectedParameters.filter(param => param !== paramType))
               return ;
            }
-            setSelectedParameters([...selectedParameters , paramType.toLowerCase()]) 
+          setSelectedParameters([...selectedParameters , paramType.toLowerCase()]) 
       } 
 
+
+   const  handleSoundSettingOption = (soundSet:string) => {
+          
+           if(soundSettings.includes(soundSet)){
+              setSoundSettings(soundSettings.filter(soundOp => soundOp !== soundSet))
+              return ;
+           }
+          setSoundSettings([...soundSettings , soundSet.toLowerCase()]) 
+      } 
 
 
       useEffect(() => { 
@@ -55,8 +68,20 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
     
         localStorage.setItem('parameters' , JSON.stringify(selectedParameters)) ; 
       }
- 
-  }, [selectedParameters]); 
+     
+      }, [selectedParameters]); 
+    
+
+
+     useEffect(() => { 
+      const   oldSoundSettings: string[] =  JSON.parse(localStorage.getItem('soundSettings') ?? `[]`) ; 
+      
+      if(! isEqual(oldSoundSettings ,  soundSettings)) {
+    
+        localStorage.setItem('soundSettings' , JSON.stringify(soundSettings)) ; 
+      }
+     
+      }, [soundSettings]); 
 
 
   const NSoundHandler = ()=> setIsNormalTypingSoundEnabled(prev => !prev)  ; 
@@ -75,7 +100,7 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
             setShowTimes(!showTimes)
             setTypingModeSelected('time')
           }}
-          className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700"
+          className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700 cursor-pointer"
         >
           <Timer size={22} style={{color:typingModeSelected == "time" ? currentTheme.buttonHover : currentTheme.white}}   />
           <span className="text-xs  leading-none" style={{color:typingModeSelected == "time" ? currentTheme.buttonHover : currentTheme.white}} >{selectedTime}</span>
@@ -84,7 +109,7 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
     
       
       {/* Words Mode (new button) first level has top label of typing mods */}
-      <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700"
+      <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700 cursor-pointer"
       onClick={()=> { 
                       if(showTimes) setShowTimes(false) ;
                       setTypingModeSelected('words') 
@@ -105,14 +130,15 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
       {/* Other Functional Buttons // these are on the seconds level option or extra options  */}
       <div className="flex items-center gap-5 ml-2">
           <ButtonExtraOption  selectedParameters={selectedParameters}  handleParamOption={handleParamOption} label="Numbers" Icon={Hash} currentTheme={currentTheme} />
+          <ButtonExtraOption  selectedParameters={selectedParameters}  handleParamOption={handleParamOption} label="Quote" Icon={Quote} currentTheme={currentTheme} />
           <ButtonExtraOption  selectedParameters={selectedParameters}  handleParamOption={handleParamOption}  label="Symbols" Icon={SquareAsteriskIcon} currentTheme={currentTheme} />
           <ButtonExtraOption selectedParameters={selectedParameters}  handleParamOption={handleParamOption}  label="Punctuation" Icon={CaseSensitive} currentTheme={currentTheme} />
 
           {/* // sound buttons activation */}
           {/* normal sound */}
-          <ButtonExtraOption selectedParameters={selectedParameters} handleParamOption={handleParamOption} action={NSoundHandler} label="sound" Icon={CaseSensitive} currentTheme={currentTheme} />
+          <ButtonExtraOption  soundSettings={soundSettings} handleSoundSettingOption={handleSoundSettingOption} action={NSoundHandler} label="sound" Icon={Volume2} currentTheme={currentTheme} />
           {/* erro sound */}
-          <ButtonExtraOption selectedParameters={selectedParameters} handleParamOption={handleParamOption} action={ErrSoundHandler} label="errorSound" Icon={CaseSensitive} currentTheme={currentTheme} />
+          <ButtonExtraOption soundSettings={soundSettings} handleSoundSettingOption={handleSoundSettingOption} action={ErrSoundHandler} label="errorSound" Icon={XCircle} currentTheme={currentTheme} />
           
       </div>
      
@@ -127,8 +153,8 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
 
         {
           typingModeSelected == 'time' ? 
-           <ExpandedTimesOptionsList  optionsList={optionsList} showTimes={showTimes} setSelectedTime={setSelectedTime}  setShowTimes={setShowTimes}  /> 
-           : <ExpandedWordsCountOptionsList  optionsList={optionsList}  showWords={showWords} setShowWords={setShowWords} setSessionWordsCount={setSessionWordsCount}  />
+           <ExpandedTimesOptionsList  selectedTime={selectedTime}  optionsList={optionsList} showTimes={showTimes} setSelectedTime={setSelectedTime}  setShowTimes={setShowTimes}  /> 
+           : <ExpandedWordsCountOptionsList  sessionWordsCount={sessionWordsCount} optionsList={optionsList}  showWords={showWords} setShowWords={setShowWords} setSessionWordsCount={setSessionWordsCount}  />
         }
         
       </div>
@@ -143,13 +169,13 @@ interface expandedTimesOptionsProps {
   setSelectedTime:React.Dispatch<React.SetStateAction<number>>;
   setShowTimes: React.Dispatch<React.SetStateAction<boolean>> ;
   optionsList : number[];
-
-
+  selectedTime : number ;
+ 
 }
 
 
-const ExpandedTimesOptionsList = ({showTimes , setSelectedTime , setShowTimes , optionsList}:expandedTimesOptionsProps) => {
-
+const ExpandedTimesOptionsList = ({selectedTime , showTimes , setSelectedTime , setShowTimes , optionsList}:expandedTimesOptionsProps) => {
+  const {currentTheme} = useThemeHook();
   return (
      <div
           className={`flex items-center gap-3 overflow-hidden transition-all duration-500  
@@ -170,10 +196,10 @@ const ExpandedTimesOptionsList = ({showTimes , setSelectedTime , setShowTimes , 
                 setShowTimes(false);
                 
               }}
-              className="flex items-center gap-2 text-xs   hover:text-slate-700 transition"
+              style={selectedTime === option ? {color : currentTheme.buttonHover} : {}}
+              className="flex items-center gap-2 text-xs   hover:text-slate-700 transition cursor-pointer"
             >
-              <Clock size={18} className="text-slate-700" />
-              <span>{option}s</span>
+              <span>{option}</span>
             </button>
           ))}
         </div>
@@ -188,10 +214,10 @@ interface expandedWordsCountOptionsProps {
    setShowWords: React.Dispatch<React.SetStateAction<boolean>>
    optionsList : number[];
    setSessionWordsCount : React.Dispatch<React.SetStateAction<number>>
-
+   sessionWordsCount : number ;
 }
-const ExpandedWordsCountOptionsList = ({optionsList , showWords , setShowWords , setSessionWordsCount}:expandedWordsCountOptionsProps) => {
-
+const ExpandedWordsCountOptionsList = ({sessionWordsCount,optionsList , showWords , setShowWords , setSessionWordsCount}:expandedWordsCountOptionsProps) => {
+  const {currentTheme} = useThemeHook();
   return (
      <div
           className={`flex items-center gap-3 overflow-hidden transition-all duration-500 optionFade
@@ -211,9 +237,9 @@ const ExpandedWordsCountOptionsList = ({optionsList , showWords , setShowWords ,
                 setShowWords(false);
                 
               }}
-              className="flex items-center gap-2 text-xs   hover:text-slate-700 transition"
+              style={sessionWordsCount === option ? {color : currentTheme.buttonHover} : {}}
+              className="flex items-center gap-2 text-xs   hover:text-slate-700 transition cursor-pointer"
             >
-              <ChartBar size={18} className="text-slate-700" />
               <span>{option}</span>
             </button>
           ))}
