@@ -59,7 +59,7 @@ export default function TypingBoardControls({sessionWordsCount,setSessionWordsCo
            }
           setSoundSettings([...soundSettings , soundSet.toLowerCase()]) 
       } 
-
+ 
 
       useEffect(() => { 
       const   oldStoredParams : string[] =  JSON.parse(localStorage.getItem('parameters') ?? `[]`) ; 
@@ -82,6 +82,17 @@ export default function TypingBoardControls({sessionWordsCount,setSessionWordsCo
       }
      
       }, [soundSettings]); 
+
+
+
+
+    useEffect(() => {
+        const oldTypingModeSelected : string = JSON.parse(localStorage.getItem('selectedMode') ?? '""') ;
+        
+        if(!isEqual(oldTypingModeSelected , typingModeSelected)) {
+            localStorage.setItem('selectedMode' , JSON.stringify(typingModeSelected)) ; 
+        }
+    }, [typingModeSelected]);
 
 
   const NSoundHandler = ()=> setIsNormalTypingSoundEnabled(prev => !prev)  ; 
@@ -109,7 +120,7 @@ export default function TypingBoardControls({sessionWordsCount,setSessionWordsCo
     
       
       {/* Words Mode (new button) first level has top label of typing mods */}
-      <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700 cursor-pointer"
+      {/* <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700 cursor-pointer"
       onClick={()=> { 
                       if(showTimes) setShowTimes(false) ;
                       setTypingModeSelected('words') 
@@ -118,8 +129,18 @@ export default function TypingBoardControls({sessionWordsCount,setSessionWordsCo
       >
         <TextInitial size={22} style={{color: typingModeSelected == "words" ? currentTheme.buttonHover : currentTheme.white }}  />
         <span className="text-xs " style={{color: typingModeSelected == "words" ? currentTheme.buttonHover : currentTheme.white }} >Words</span>
-      </button>
+      </button> */}
+      
+       <ButtonExtraOption
+           action={()=> { 
+                      if(showTimes) setShowTimes(false) ;
+                      setTypingModeSelected('words') 
+                      setShowWords(!showWords)
+                    }}
 
+           style={{background: typingModeSelected == "words" ? currentTheme.buttonPrimary :  '', color: '!important black' }} 
+           label="Words" Icon={TextInitial} currentTheme={currentTheme} />
+     
 
       {/* separator */}
       <div className="bg-gray-500 w-[6px] h-[20px] rounded-lg"></div >

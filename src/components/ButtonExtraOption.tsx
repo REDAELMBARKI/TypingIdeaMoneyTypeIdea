@@ -12,15 +12,17 @@ interface buttonExtraOptionProps {
       action? : () => void
       selectedParameters?: string[] 
       soundSettings?: string[] 
-
+      style? : React.CSSProperties
 }
 
-const  ButtonExtraOption = ({ soundSettings = [] ,  selectedParameters = [] , action , currentTheme , label  , Icon , handleParamOption , handleSoundSettingOption}:buttonExtraOptionProps) => {
+const  ButtonExtraOption = ({style ,  soundSettings = [] ,  selectedParameters = [] , action , currentTheme , label  , Icon , handleParamOption , handleSoundSettingOption}:buttonExtraOptionProps) => {
     const ButtonRef = useRef<HTMLButtonElement | null>(null);
     const spanRef = useRef<HTMLSpanElement | null>(null);
     const isBoolean = selectedParameters
                       .concat(soundSettings)
-                      .includes(label.toLowerCase())
+                      .includes(label.toLowerCase());
+
+
     const [isCheckedParam , setIsCheckedParam] = useState<boolean>(isBoolean);
     const [isHighlighted , setIsHighlighted] = useState<boolean>(isBoolean)
     
@@ -64,11 +66,13 @@ const  ButtonExtraOption = ({ soundSettings = [] ,  selectedParameters = [] , ac
    
                     <div 
                     
-                    className={`flex items-center gap-2 text-sm hover:scale-110 transition `}>
-                                    <label className="cursor-pointer relative flex items-center ">
+                    className={`flex items-center gap-2 text-sm hover:scale-110 transition  rounded-lg`}>
+                                    <label className="cursor-pointer relative flex items-center rounded-lg" 
+                                    
+                                    style={style ?? {}}
+                                    >
                                         <button
                                         ref={ButtonRef}
-                                     
                                         onClick={() => {
                                             
                                             setIsCheckedParam(prev => !prev)
@@ -81,6 +85,7 @@ const  ButtonExtraOption = ({ soundSettings = [] ,  selectedParameters = [] , ac
 
                                         {/* Styled Label Content */}
                                         <span
+                                        
                                         ref={spanRef}
                                         className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 relative text-xs font-medium "
                                         style={{

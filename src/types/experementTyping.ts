@@ -48,3 +48,11 @@ export type globalStatetype = {
      wrongWords: { start: number; end: number }[]
     wordHistory: WordHistoryItem[]
   }
+
+
+
+  export type KeyRecord = {
+  key: string;
+  timestamp: number; // ms relative to session start
+  currentLetterIndex: number ;
+};

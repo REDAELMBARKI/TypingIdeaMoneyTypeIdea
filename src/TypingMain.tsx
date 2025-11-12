@@ -11,6 +11,7 @@ import useControlleBoundery from "./customHooks/useControlleBoundery";
 import type {
   currentLetterType,
   globalStatetype,
+  KeyRecord,
   Mode,
   // WordHistoryItem,
 } from "./types/experementTyping";
@@ -37,7 +38,8 @@ import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
 import useLine3Listener from "./customHooks/useLine3Listener";
 import useColoringEffect from "./customHooks/useColoringEffect";
 import usePersistantSelectedSessionParams from "./customHooks/usePersistantSelectedSessionParams";
-import { lasyErrorSoundStoredState, lasySoundStoredState, lazyLoadedSelectedTime, lazyLoadedSessionWordsCount } from "./functions/lazyLoadedSessionData";
+import { lasyErrorSoundStoredState, lasySoundStoredState, lazyLoadedSelectedMode, lazyLoadedSelectedTime, lazyLoadedSessionWordsCount } from "./functions/lazyLoadedSessionData";
+import { recordKeyStroke } from "./functions/typeSessionRecord";
 // import useCharacterDeleteHookV2 from "./customHooks/useCharacterDeleteHook2";
 
 // import useSessionReplay from "./customHooks/useSessionReplay";
@@ -88,7 +90,7 @@ const TypingApp: React.FC = () => {
   // typign begin listener
   const [isTypingStarted, setIsTypingStarted] = useState(false);
   // typing mode (words | time )
-  const [typingModeSelected, setTypingModeSelected] = useState<Mode>("words");
+  const [typingModeSelected, setTypingModeSelected] = useState<Mode>(lazyLoadedSelectedMode);
   // the amount of time the typing session took
   // const [amountOfTime,setAmountOfTime] = useState<number>();
   // words typed
@@ -145,7 +147,8 @@ const TypingApp: React.FC = () => {
   const didMountsessionWordsCount = useRef(false); 
   const didMountSelectedTime= useRef(false); 
 
-
+ // sessionRecord 
+  const  sessionRecordRef = useRef<KeyRecord[]>([]) ;
 
   // theme state
   const { currentTheme } = useThemeHook();
@@ -244,8 +247,9 @@ useColoringEffect({
     ElapsedTimeHandler({ selectedTime, setElapsedTime });
   }, [isTypingStarted , selectedTime]);
 
-  // Focus the hidden input on component mount
+  
   useEffect(() => {
+    // Focus the hidden input on component mount
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
@@ -253,10 +257,12 @@ useColoringEffect({
 
 
 
-  useEffect(() => {
+  
 
-    // console.log('isTypingEnds' , isTypingEnds)
-  }, [isTypingEnds]); ;
+  useEffect(() => {
+    console.log(sessionRecordRef.current)
+  }, [currentLetter.index]);
+
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++hooks++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
@@ -573,6 +579,7 @@ useColoringEffect({
 
             // Only allow one character
             const value = e.target.value;
+            recordKeyStroke({inputKey:value, sessionRecordRef, startTypingTimeRef, currentLetter});
             if (value.length > 1) {
               setInputValue(value.slice(-1));
             } else {

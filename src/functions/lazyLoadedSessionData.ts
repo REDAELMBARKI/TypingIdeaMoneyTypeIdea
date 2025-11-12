@@ -4,11 +4,11 @@
 
 
     export const lasySoundStoredState = () =>
-      JSON.parse(localStorage.getItem("parameters") ?? `[]`).includes(
+      JSON.parse(localStorage.getItem("soundSettings") ?? `[]`).includes(
         "sound".toLowerCase()
       );
     export const lasyErrorSoundStoredState = () =>
-      JSON.parse(localStorage.getItem("parameters") ?? `[]`).includes(
+      JSON.parse(localStorage.getItem("soundSettings") ?? `[]`).includes(
         "errorSound".toLowerCase()
       );
     
@@ -28,3 +28,8 @@
 
 
     export const lazyLoadedSoundSettings = () => JSON.parse(localStorage.getItem('soundSettings') ?? `[]` ) ;
+
+
+    export const lazyLoadedSelectedMode = () => {
+        return JSON.parse(localStorage.getItem('selectedMode') ?? `"words"` ) ;
+    }
