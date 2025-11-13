@@ -7,7 +7,7 @@ const  useWindowResize = ({containerRef  ,setContainerWidth }:windowResizeProps)
 
    
     useEffect(()=>{
-         if(! containerRef) return ;
+         if(! containerRef.current) return ;
          // initialy set the container width 
          setContainerWidth(containerRef.current!.offsetWidth) ;
         

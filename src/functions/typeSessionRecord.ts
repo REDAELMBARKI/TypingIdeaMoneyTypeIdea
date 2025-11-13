@@ -6,11 +6,15 @@ interface KeyRecordProps {
   startTypingTimeRef: React.RefObject<number>
   currentLetter: { index: number; letter: string }
   inputKey: string
+  currentText : string
 }
-export const recordKeyStroke = ({inputKey , sessionRecordRef ,currentLetter , startTypingTimeRef }:KeyRecordProps) => {
+export const recordKeyStroke = ({inputKey ,currentText , sessionRecordRef ,currentLetter , startTypingTimeRef }:KeyRecordProps) => {
     sessionRecordRef.current.push({
-      key: inputKey,
+      isWrong : currentText[currentLetter.index] !== inputKey, 
+      isTyped : true ,
       timestamp: Date.now() - startTypingTimeRef.current,
       currentLetterIndex: currentLetter.index 
     })
+
+
   }

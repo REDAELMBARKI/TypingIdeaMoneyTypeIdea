@@ -14,6 +14,7 @@ interface  coloringEffectprops {
 
 
 const useColoringEffect = ({
+  
   currentTheme,
   containerRef,
   currentLetter,

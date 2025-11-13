@@ -11,9 +11,11 @@ interface TextRenderProps {
   currentTheme: ThemeColors ;
   globalState : globalStatetype ;
   firstRowLastIndexRef: React.RefObject<number>
+  isRecordPanelOpen : boolean ;
 }
 
 export const textRender = ({
+  isRecordPanelOpen ,
   currentText,
   currentLetter, 
   inputValue,
@@ -31,8 +33,7 @@ export const textRender = ({
   let globalIndex = 0; 
    
    return  currentText.split(/(\s+)/).map((word , wordIndex) => {
-    //  if(isShiftFirstLine ) console.log({'global index' : globalIndex , 'lastindex' : firstRowLastIndexRef.current}) ;
-      // if(word === 'stood'){console.log("ksdfhksd" , globalIndex + word.length + 1)}
+
      const wordEndIndex = globalIndex;
     
       return (    <span 
@@ -64,13 +65,13 @@ export const textRender = ({
       // Custom indicator logic
       let indicator = "";
       if (
-        (inputValue !== "" && index === currentLetter.index + 1) || (inputValue === "" && index === currentLetter.index) 
+       (inputValue !== "" && index === currentLetter.index + 1) || (inputValue === "" && index === currentLetter.index) 
       ) {
-        indicator = "display-indicator";
+        indicator = !isRecordPanelOpen ? "display-indicator" : '';
       }
 
       const range = wrongWords.find(r => r.start === index);
-      if(range){
+      if(range ){
         const word = currentText.slice(range.start, range.end + 1);
         const wordHistoryIndexing = wordHistory.find(wH =>  wH.start === range.start && wH.end === range.end ) ;
       

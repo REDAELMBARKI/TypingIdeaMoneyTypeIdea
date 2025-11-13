@@ -52,7 +52,9 @@ export type globalStatetype = {
 
 
   export type KeyRecord = {
-  key: string;
+
   timestamp: number; // ms relative to session start
   currentLetterIndex: number ;
+  isWrong : boolean ;
+  isTyped : boolean ;
 };

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo, type JSX } from "react";
 import useThemeHook from "./customHooks/useThemeHook";
 import Footer from "./partials/Footer";
 
@@ -13,6 +13,7 @@ import type {
   globalStatetype,
   KeyRecord,
   Mode,
+  WordHistoryItem,
   // WordHistoryItem,
 } from "./types/experementTyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
@@ -40,6 +41,8 @@ import useColoringEffect from "./customHooks/useColoringEffect";
 import usePersistantSelectedSessionParams from "./customHooks/usePersistantSelectedSessionParams";
 import { lasyErrorSoundStoredState, lasySoundStoredState, lazyLoadedSelectedMode, lazyLoadedSelectedTime, lazyLoadedSessionWordsCount } from "./functions/lazyLoadedSessionData";
 import { recordKeyStroke } from "./functions/typeSessionRecord";
+import { RecordedTypeSession } from "./components/recordedTypeSession";
+import { replayTextRenderer } from "./functions/replayTextTRenderer";
 // import useCharacterDeleteHookV2 from "./customHooks/useCharacterDeleteHook2";
 
 // import useSessionReplay from "./customHooks/useSessionReplay";
@@ -114,6 +117,11 @@ const TypingApp: React.FC = () => {
        wrongWords: [] ,
        wordHistory: []
   }) 
+
+
+  // recorded session typing modal
+  const [isRecordPanelOpen,setIsRecordPanelOpen] =  useState<boolean>(false);
+  const [isRecordActive,setIsRecordActive] =  useState<boolean>(false);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end states | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
@@ -122,7 +130,7 @@ const TypingApp: React.FC = () => {
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | refs | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
   // line 3 data
-
+  
   const line3YRef = useRef<{ top: number } | null>(null);
   // th epreviousline
   const prevLineRef = useRef<number>(0);
@@ -150,6 +158,10 @@ const TypingApp: React.FC = () => {
  // sessionRecord 
   const  sessionRecordRef = useRef<KeyRecord[]>([]) ;
 
+
+  // storeed copy of words history for replaying
+  const wordHistoryCopyRef = useRef<WordHistoryItem[]>([]) ; 
+
   // theme state
   const { currentTheme } = useThemeHook();
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -157,7 +169,26 @@ const TypingApp: React.FC = () => {
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
 
   // console logs ////////////////
+   useEffect(() => {
+    if(!isRecordActive) return ;
+    const letters = Array.from(document.querySelectorAll('.letter')) as HTMLElement[] ;
+    console.log(letters)
+    sessionRecordRef.current.forEach((record) => {
+      setTimeout(() => {
+         const letter = letters[record.currentLetterIndex] ;
+          if (record.isTyped && !record.isWrong) {
+            letter.style.color = currentTheme.white; // correct
+          } else if (record.isWrong) {
+            letter.style.color = currentTheme.red;   // wrong
+          }else{
+            letter.style.color = currentTheme.gray;   // wrong
+          }
 
+      }, record.timestamp);
+    });
+
+     console.log(wordHistoryCopyRef.current)
+   }, [isRecordActive]);
   ///////////////////////////////////
   
   // get the coun of words in the first line to shift
@@ -259,16 +290,13 @@ useColoringEffect({
 
   
 
-  useEffect(() => {
-    console.log(sessionRecordRef.current)
-  }, [currentLetter.index]);
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++hooks++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
 
   // store session typing data andtimestamps for relpay
-  //  useSessionReplay({ inputValue , startTypingTimeRef , isReplayTime}) ;
+ 
   //  text raws to be rendered slicer
   useTextRawsSlicer({
     sessionWordsCount,
@@ -378,6 +406,7 @@ useColoringEffect({
   const renderedText = useMemo(
     () =>
       textRender({
+        isRecordPanelOpen ,
         currentTheme,
         currentText,
         currentLetter,
@@ -388,7 +417,7 @@ useColoringEffect({
         isTypingActive,
         firstRowLastIndexRef , 
       }),
-    [currentText, currentTheme , trachWord  , globalState.wordHistory ,globalState.wrongWords , containerWidth , isShiftFirstLine] // only rebuild when text or theme changes
+    [currentText, currentTheme , trachWord  , globalState.wordHistory ,globalState.wrongWords , containerWidth , isShiftFirstLine ] // only rebuild when text or theme changes
   );
 
   // delete click handler
@@ -430,6 +459,11 @@ useColoringEffect({
     setTrachWord,
   });
 
+
+  const replayRenderedText = replayTextRenderer({currentText , currentTheme}) as JSX.Element[] ;
+
+  
+
   //   const sampleSessionStats = {
   //   wpm: 85,
   //   rawWpm: 92,
@@ -458,7 +492,7 @@ useColoringEffect({
   //   { time: 55, wpm: 98 },
   //   { time: 60, wpm: 85 }
   // ];
-
+  if(isRecordPanelOpen) return <RecordedTypeSession setIsRecordPanelOpen={setIsRecordPanelOpen} replayRenderedText={replayRenderedText}  setIsRecordActive={setIsRecordActive}  containerRef={containerRef} />
   return (
     <div
       className={`min-h-screen transition-colors duration-300  `}
@@ -546,7 +580,11 @@ useColoringEffect({
             <div className="">
               {/* // typing over div model  */}
               {isShowTypingOverModal && (
-                <TypingOverModal
+                <TypingOverModal 
+                  wordHistoryCopyRef={wordHistoryCopyRef}
+                  globalState={globalState}
+                  setGlobalState={setGlobalState}
+                  setIsRecordPanelOpen={setIsRecordPanelOpen}
                   wpmFinal={wpmFinal}
                   nextText={nextText}
                   handleReset={handleReset}
@@ -579,7 +617,7 @@ useColoringEffect({
 
             // Only allow one character
             const value = e.target.value;
-            recordKeyStroke({inputKey:value, sessionRecordRef, startTypingTimeRef, currentLetter});
+            recordKeyStroke({inputKey:value, currentText , sessionRecordRef, startTypingTimeRef, currentLetter});
             if (value.length > 1) {
               setInputValue(value.slice(-1));
             } else {
