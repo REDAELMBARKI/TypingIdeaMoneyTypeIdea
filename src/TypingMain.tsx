@@ -142,7 +142,7 @@ const TypingApp: React.FC = () => {
   // text container
   const containerRef = useRef<HTMLDivElement | null>(null);
   // text font size ref
-  const fontSizeRef = useRef<number>(36);
+  const fontSizeRef = useRef<number>(40);
   // underline ref
 
   const startTypingTimeRef = useRef<number>(0);
@@ -158,7 +158,8 @@ const TypingApp: React.FC = () => {
  // sessionRecord 
   const  sessionRecordRef = useRef<KeyRecord[]>([]) ;
 
-
+  // previous index ref for replaying
+  const previousIndexRef = useRef<number>(0) ;
   // storeed copy of words history for replaying
   const wordHistoryCopyRef = useRef<WordHistoryItem[]>([]) ; 
 
@@ -172,25 +173,48 @@ const TypingApp: React.FC = () => {
    useEffect(() => {
     if(!isRecordActive) return ;
     const letters = Array.from(document.querySelectorAll('.letter')) as HTMLElement[] ;
-    console.log(letters)
+   
     sessionRecordRef.current.forEach((record) => {
       setTimeout(() => {
          const letter = letters[record.currentLetterIndex] ;
-          if (record.isTyped && !record.isWrong) {
+          if (record.isTyped && !record.isWrong ) {
             letter.style.color = currentTheme.white; // correct
           } else if (record.isWrong) {
             letter.style.color = currentTheme.red;   // wrong
-          }else{
+          }
+          else{
             letter.style.color = currentTheme.gray;   // wrong
           }
+       
+          if(record.isDelete){
+            letter.style.color = currentTheme.gray;   // deleted
+          }
+
+
+          
+          
 
       }, record.timestamp);
     });
 
-     console.log(wordHistoryCopyRef.current)
    }, [isRecordActive]);
   ///////////////////////////////////
   
+
+
+  useEffect(() => {
+    if(previousIndexRef.current > currentLetter.index) {
+         sessionRecordRef.current.push({
+           isDelete: true ,
+           isWrong: false,
+           isTyped: false,
+          timestamp: Date.now() - startTypingTimeRef.current,
+          currentLetterIndex: currentLetter.index ,
+        }
+        );
+      }
+      previousIndexRef.current = currentLetter.index ;
+  }, [currentLetter.index]);
   // get the coun of words in the first line to shift
 useEffect(() => {
   if (!containerRef.current || !isShiftFirstLine) return;
@@ -492,7 +516,9 @@ useColoringEffect({
   //   { time: 55, wpm: 98 },
   //   { time: 60, wpm: 85 }
   // ];
-  if(isRecordPanelOpen) return <RecordedTypeSession setIsRecordPanelOpen={setIsRecordPanelOpen} replayRenderedText={replayRenderedText}  setIsRecordActive={setIsRecordActive}  containerRef={containerRef} />
+  if(isRecordPanelOpen) return <RecordedTypeSession setIsRecordPanelOpen={setIsRecordPanelOpen} fontSizeRef={fontSizeRef}
+                                                     replayRenderedText={replayRenderedText}  setIsRecordActive={setIsRecordActive}  
+                                                     containerRef={containerRef} />
   return (
     <div
       className={`min-h-screen transition-colors duration-300  `}

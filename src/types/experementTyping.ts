@@ -57,4 +57,5 @@ export type globalStatetype = {
   currentLetterIndex: number ;
   isWrong : boolean ;
   isTyped : boolean ;
+  isDelete? : boolean ;
 };

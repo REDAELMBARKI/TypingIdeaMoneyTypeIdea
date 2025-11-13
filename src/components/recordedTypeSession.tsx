@@ -5,13 +5,15 @@ interface ModalProps {
   setIsRecordActive: React.Dispatch<React.SetStateAction<boolean>>;
   replayRenderedText: JSX.Element[]; // your rendered typing session
   containerRef: React.RefObject<HTMLDivElement  | null>;
+  fontSizeRef: React.RefObject<number>
 }
 
 export const RecordedTypeSession: React.FC<ModalProps> = ({
   setIsRecordPanelOpen,
   setIsRecordActive,
   replayRenderedText,
-  containerRef
+  containerRef , 
+  fontSizeRef
 }) => {
 
   const handleClose = () => {
@@ -43,7 +45,13 @@ export const RecordedTypeSession: React.FC<ModalProps> = ({
         <div className="absolute inset-0  opacity-20 blur-3xl rounded-2xl pointer-events-none"></div>
 
         {/* Modal content */}
-        <div ref={containerRef} className="relative z-10 text-white flex-1 flex items-center justify-center">
+        <div ref={containerRef} 
+          style={{
+                textAlign: "start",
+                fontSize: `${fontSizeRef.current}px`,
+                overflowY: "hidden",
+              }}
+          className="relative z-10 text-white flex-1 flex items-center justify-center">
           {replayRenderedText}
         </div>
 

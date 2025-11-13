@@ -10,6 +10,7 @@ interface KeyRecordProps {
 }
 export const recordKeyStroke = ({inputKey ,currentText , sessionRecordRef ,currentLetter , startTypingTimeRef }:KeyRecordProps) => {
     sessionRecordRef.current.push({
+      isDelete : false ,
       isWrong : currentText[currentLetter.index] !== inputKey, 
       isTyped : true ,
       timestamp: Date.now() - startTypingTimeRef.current,
