@@ -43,6 +43,7 @@ import { lasyErrorSoundStoredState, lasySoundStoredState, lazyLoadedSelectedMode
 import { recordKeyStroke } from "./functions/typeSessionRecord";
 import { RecordedTypeSession } from "./components/recordedTypeSession";
 import { replayTextRenderer } from "./functions/replayTextTRenderer";
+import TypingChartResult from "./components/TypingChartResult";
 // import useCharacterDeleteHookV2 from "./customHooks/useCharacterDeleteHook2";
 
 // import useSessionReplay from "./customHooks/useSessionReplay";
@@ -489,6 +490,21 @@ useColoringEffect({
   const replayRenderedText = replayTextRenderer({currentText , currentTheme}) as JSX.Element[] ;
 
   
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ end of hooks +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
+  if(isShowTypingOverModal) return   <TypingChartResult 
+                                                          //  wordHistoryCopyRef={wordHistoryCopyRef}
+                                                          // globalState={globalState}
+                                                          // setGlobalState={setGlobalState}
+                                                          // setIsRecordPanelOpen={setIsRecordPanelOpen}
+                                                          // wpmFinal={wpmFinal}
+                                                          // nextText={nextText}
+                                                          // handleReset={handleReset}
+                                                        
+                                                        />
+  
+
 
   //   const sampleSessionStats = {
   //   wpm: 85,
@@ -627,7 +643,7 @@ useColoringEffect({
 
             <div className="">
               {/* // typing over div model  */}
-              {isShowTypingOverModal && (
+              {/* {isShowTypingOverModal && (
                 <TypingOverModal 
                   wordHistoryCopyRef={wordHistoryCopyRef}
                   globalState={globalState}
@@ -637,17 +653,9 @@ useColoringEffect({
                   nextText={nextText}
                   handleReset={handleReset}
                 />
-              )}
+              )} */}
             </div>
 
-            <div>
-              {/* { isShowTypingOverModal &&
-                 <TypingResults
-                  sessionStats={sampleSessionStats}
-                  chartData={sampleChartData}
-                />
-              } */}
-            </div>
           </div>
         </div>
 
