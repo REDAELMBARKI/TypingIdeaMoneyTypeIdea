@@ -333,6 +333,8 @@ useColoringEffect({
     setDynamicTextRange,
   });
 
+
+
   // caps listener
   useCapsLockListener({ setIsCapsOn });
 
@@ -525,13 +527,13 @@ useColoringEffect({
       style={{ background: currentTheme.page_bg }}
     >
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pb-20">
+      <main className="flex-1  flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pb-20 ">
         {/* inform for caps on case  */}
         {isCapsOn && <CapsOnModel />}
         {/* cntrolls  */}
 
         {/* Text Display */}
-        <div className="w-full max-w-screen mx-auto mt-[100px] ">
+        <div className="w-full max-w-screen mx-auto mt-[100px]  ">
           {/* chow controlls only if we dont type any more line 1000 no keydown */}
 
           {!isFocuceOnText && (
@@ -554,10 +556,23 @@ useColoringEffect({
 
           <div
             className={`
+            w-[80%] 
             text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
-            font-mono text-center p-6 sm:p-8 lg:p-12 rounded-2xl
-            
-          `}
+            font-mono text-center py-2 sm:py-2 lg:py-2  px-8 sm:px-8 lg:px-8 rounded-2xl
+ 
+            `}
+
+          style={{  
+
+                position : 'absolute',
+                top:'200px' , 
+                left: '50%' ,
+                transform: 'translateX(-50%)',
+                backgroundColor: currentTheme.buttonPrimary + "0D", // 10% opacity = 1A in hex
+                border: "2px solid " + currentTheme.buttonPrimary + "2D", // 30% opacity = 4D
+              
+              
+              }}
           >
             {/* // words counter  */}
             {isFocuceOnText && typingModeSelected === "time" ? (
@@ -578,7 +593,15 @@ useColoringEffect({
             ) : (
                 <div
                   className={`px-4 py-2 rounded-lg text-white font-bold  cursor-default select-none  text-center w-[4em]   right-4`}
-                  style={{ color: currentTheme.buttonSecondary }}
+                  style={{ color: currentTheme.buttonSecondary  , 
+                            // border: `1px solid ${currentTheme.buttonSecondary}`,
+                            position: 'absolute',
+                            top: '0px',
+                            left : '0px',
+                            transform: 'translateY(-100%)'
+
+
+                  }}
                 >
                   {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
                   {isFocuceOnText &&
@@ -588,15 +611,14 @@ useColoringEffect({
             )}
 
             <div
-              className="mx-w-full hitespace-normal break-words break-keep h-[180px] "
+              className="mx-w-full hitespace-normal break-words break-keep h-[200px]  "
 
               ref={containerRef}
               style={{
                 textAlign: "start",
                 fontSize: `${fontSizeRef.current}px`,
                 overflowY: "hidden",
-                position : 'absolute',
-                top:'200px'
+                
               }}
             >
               {/* // text render */}

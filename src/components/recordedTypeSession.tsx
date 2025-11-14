@@ -1,4 +1,4 @@
-import React, { type JSX } from "react";
+import React, { useEffect, type JSX } from "react";
 
 interface ModalProps {
   setIsRecordPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,8 +27,21 @@ export const RecordedTypeSession: React.FC<ModalProps> = ({
   
     setIsRecordActive(true);
   };
+ 
 
-  
+
+  //  reducing font size to fit content within container
+  useEffect(() => {
+  const container = containerRef.current;
+  if (!container) return;
+
+  let currentFontSize = fontSizeRef.current;
+
+  while (container.scrollHeight > container.clientHeight && currentFontSize > 8) {
+    currentFontSize -= 5;
+    container.style.fontSize = `${currentFontSize}px`;
+  }
+}, []);
  
   return (
     <div
@@ -45,16 +58,20 @@ export const RecordedTypeSession: React.FC<ModalProps> = ({
         <div className="absolute inset-0  opacity-20 blur-3xl rounded-2xl pointer-events-none"></div>
 
         {/* Modal content */}
-        <div ref={containerRef} 
-          style={{
-                textAlign: "start",
-                fontSize: `${fontSizeRef.current}px`,
-                overflowY: "hidden",
-              }}
-          className="relative z-10 text-white flex-1 flex items-center justify-center">
+        <div 
+           ref={containerRef} 
+           style={{
+            textAlign: "start",
+            fontSize: `${36}px`,
+            overflow: "hidden",
+            whiteSpace: "normal",           // allow wrapping
+            wordWrap: "break-word",         // break long words if needed
+            overflowWrap: "break-word",     // modern equivalent
+          }}
+          className="relative z-10 text-white ">
           {replayRenderedText}
         </div>
-
+     
         {/* Next / Action buttons */}
         <div className="relative z-10 flex justify-center gap-6 mt-4">
           <button
