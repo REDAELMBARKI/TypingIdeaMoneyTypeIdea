@@ -12,6 +12,7 @@ export const replayTextRenderer: React.FC<TextRendererProps> = ({
   currentText,
   currentTheme,
 }) => {
+  
   return (
     <div className="text-renderer">
       {currentText.split("").map((char, idx) => (

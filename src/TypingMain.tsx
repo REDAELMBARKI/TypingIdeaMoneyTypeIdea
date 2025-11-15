@@ -17,7 +17,6 @@ import type {
   // WordHistoryItem,
 } from "./types/experementTyping";
 import { useWrongWordsFinder } from "./customHooks/useWrongWordsFinder";
-import TypingOverModal from "./modals/TypingOverModal";
 import useTypingEnd from "./customHooks/useTypingEnd";
 import useIndexIncrementer from "./customHooks/useIndexIncrementer";
 import CapsOnModel from "./modals/CapsOnModel";
@@ -44,6 +43,7 @@ import { recordKeyStroke } from "./functions/typeSessionRecord";
 import { RecordedTypeSession } from "./components/recordedTypeSession";
 import { replayTextRenderer } from "./functions/replayTextTRenderer";
 import TypingChartResult from "./components/TypingChartResult";
+import useLiveDataContext from "./customHooks/useLiveDataContext";
 // import useCharacterDeleteHookV2 from "./customHooks/useCharacterDeleteHook2";
 
 // import useSessionReplay from "./customHooks/useSessionReplay";
@@ -63,11 +63,7 @@ const TypingApp: React.FC = () => {
 
   const [dynamicTextRange, setDynamicTextRange] = useState<number>(0); // the words count that can fit in the container raws
 
-  const [currentText, setCurrentText] = useState<string>("");
-  const [currentLetter, setCurrentLetter] = useState<currentLetterType>({
-    index: 0,
-    letter: "",
-  });
+ 
   // spaces tracker where the word left of before landing to next word
   // ----------------------------------------------------------------------
   // sound param (mute / activate)
@@ -113,11 +109,7 @@ const TypingApp: React.FC = () => {
   //text conatiner width
   const [containerWidth, setContainerWidth] = useState<number>(0);
   
-  const [globalState , setGlobalState] = useState<globalStatetype>({
-       wrongChars: [] ,
-       wrongWords: [] ,
-       wordHistory: []
-  }) 
+ 
 
 
   // recorded session typing modal
@@ -163,9 +155,11 @@ const TypingApp: React.FC = () => {
   const previousIndexRef = useRef<number>(0) ;
   // storeed copy of words history for replaying
   const wordHistoryCopyRef = useRef<WordHistoryItem[]>([]) ; 
-
+  // the text used to be paassedf to recordRender
+  const recordedSessionTextRef = useRef<string>("") ;
   // theme state
   const { currentTheme } = useThemeHook();
+  const {currentLetter, setCurrentLetter , currentText , setCurrentText} = useLiveDataContext() ;
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end of refs | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
@@ -494,13 +488,13 @@ useColoringEffect({
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ end of hooks +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
   if(isShowTypingOverModal) return   <TypingChartResult 
-                                                          //  wordHistoryCopyRef={wordHistoryCopyRef}
-                                                          // globalState={globalState}
-                                                          // setGlobalState={setGlobalState}
-                                                          // setIsRecordPanelOpen={setIsRecordPanelOpen}
-                                                          // wpmFinal={wpmFinal}
-                                                          // nextText={nextText}
-                                                          // handleReset={handleReset}
+                                                           wordHistoryCopyRef={wordHistoryCopyRef}
+                                                            globalState={globalState}
+                                                            setGlobalState={setGlobalState}
+                                                            setIsRecordPanelOpen={setIsRecordPanelOpen}
+                                                            wpmFinal={wpmFinal}
+                                                            nextText={nextText}
+                                                            handleReset={handleReset}
                                                         
                                                         />
   
@@ -641,20 +635,7 @@ useColoringEffect({
               {renderedText}
             </div>
 
-            <div className="">
-              {/* // typing over div model  */}
-              {/* {isShowTypingOverModal && (
-                <TypingOverModal 
-                  wordHistoryCopyRef={wordHistoryCopyRef}
-                  globalState={globalState}
-                  setGlobalState={setGlobalState}
-                  setIsRecordPanelOpen={setIsRecordPanelOpen}
-                  wpmFinal={wpmFinal}
-                  nextText={nextText}
-                  handleReset={handleReset}
-                />
-              )} */}
-            </div>
+    
 
           </div>
         </div>

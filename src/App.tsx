@@ -3,7 +3,8 @@ import {Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import './App.css'
 import Layout from './Layout'
 import TypingApp from './TypingMain'
-import { ThemeProvider } from './contexts/themeProvider'
+import { ThemeProvider } from './providers/themeProvider'
+import { CurrentLiveDataProvider } from './providers/CurrentLiveDataProvider'
 
 function App() {
 
@@ -12,9 +13,12 @@ function App() {
         <Router>
                <Routes>
                     <Route path='/' element={
+                      <CurrentLiveDataProvider>
                       <ThemeProvider>
                          <Layout />
                       </ThemeProvider>
+
+                      </CurrentLiveDataProvider>
                       
                       } >
                          <Route index element={<TypingApp />} />

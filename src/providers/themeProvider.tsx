@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ThemeContext } from "./themeContext";
+import { ThemeContext } from "../contexts/themeContext";
 import type { ThemeColors } from "../types/experementTyping";
 import { colorThemes } from "../data/themColors";
 
