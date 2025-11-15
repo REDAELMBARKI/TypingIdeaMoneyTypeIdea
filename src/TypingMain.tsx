@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo, type JSX } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import useThemeHook from "./customHooks/useThemeHook";
 import Footer from "./partials/Footer";
 
@@ -9,8 +9,6 @@ import useTypingSound from "./customHooks/useTypingSound";
 import { allowedKeys } from "./data/allowdKeys";
 import useControlleBoundery from "./customHooks/useControlleBoundery";
 import type {
-  currentLetterType,
-  globalStatetype,
   KeyRecord,
   Mode,
   WordHistoryItem,
@@ -40,10 +38,10 @@ import useColoringEffect from "./customHooks/useColoringEffect";
 import usePersistantSelectedSessionParams from "./customHooks/usePersistantSelectedSessionParams";
 import { lasyErrorSoundStoredState, lasySoundStoredState, lazyLoadedSelectedMode, lazyLoadedSelectedTime, lazyLoadedSessionWordsCount } from "./functions/lazyLoadedSessionData";
 import { recordKeyStroke } from "./functions/typeSessionRecord";
-import { RecordedTypeSession } from "./components/recordedTypeSession";
-import { replayTextRenderer } from "./functions/replayTextTRenderer";
 import TypingChartResult from "./components/TypingChartResult";
-import useLiveDataContext from "./customHooks/useLiveDataContext";
+import useLiveDataContext from "./contextHooks/useLiveDataContext";
+import useReplayDataContext from "./contextHooks/useReplayDataContext";
+import useContainerAndFontContext from "./contextHooks/useContainerAndFontContext";
 // import useCharacterDeleteHookV2 from "./customHooks/useCharacterDeleteHook2";
 
 // import useSessionReplay from "./customHooks/useSessionReplay";
@@ -109,12 +107,6 @@ const TypingApp: React.FC = () => {
   //text conatiner width
   const [containerWidth, setContainerWidth] = useState<number>(0);
   
- 
-
-
-  // recorded session typing modal
-  const [isRecordPanelOpen,setIsRecordPanelOpen] =  useState<boolean>(false);
-  const [isRecordActive,setIsRecordActive] =  useState<boolean>(false);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end states | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
@@ -132,11 +124,7 @@ const TypingApp: React.FC = () => {
 
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   const amountOfTimeRef = useRef<number | null>(null);
-  // text container
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  // text font size ref
-  const fontSizeRef = useRef<number>(40);
-  // underline ref
+  
 
   const startTypingTimeRef = useRef<number>(0);
 
@@ -156,15 +144,19 @@ const TypingApp: React.FC = () => {
   // storeed copy of words history for replaying
   const wordHistoryCopyRef = useRef<WordHistoryItem[]>([]) ; 
   // the text used to be paassedf to recordRender
-  const recordedSessionTextRef = useRef<string>("") ;
   // theme state
   const { currentTheme } = useThemeHook();
-  const {currentLetter, setCurrentLetter , currentText , setCurrentText} = useLiveDataContext() ;
+  const {currentLetter , currentText , setCurrentText ,
+    globalState 
+  } = useLiveDataContext() ;
+  // font size and container ref
+  const { containerRef , fontSizeRef } = useContainerAndFontContext() ;
+  // replay context data 
+  const {isRecordActive , isRecordPanelOpen} =  useReplayDataContext();
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end of refs | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
 
-  // console logs ////////////////
    useEffect(() => {
     if(!isRecordActive) return ;
     const letters = Array.from(document.querySelectorAll('.letter')) as HTMLElement[] ;
@@ -195,7 +187,6 @@ const TypingApp: React.FC = () => {
    }, [isRecordActive]);
   ///////////////////////////////////
   
-
 
   useEffect(() => {
     if(previousIndexRef.current > currentLetter.index) {
@@ -273,6 +264,7 @@ useColoringEffect({
 
 // ddetects onece we hit the line 3
  useLine3Listener({
+  isShowTypingOverModal,
   containerRef,
   typedWordsAmount,
   prevLineRef,
@@ -336,11 +328,7 @@ useColoringEffect({
   const { nextText, handleReset } = useTypingControlleFunctions({
     sampleTexts,
     hiddenInputRef,
-    currentText,
-    setGlobalState ,
-    setCurrentLetter,
     setIsTypingEnds,
-    setCurrentText,
     setInputValue,
     setTypedWordsAmount,
     setIsShowTypingOverModal,
@@ -358,8 +346,6 @@ useColoringEffect({
     isTypingEnds,
     startTypingTimeRef,
     amountOfTimeRef,
-    globalState ,
-    currentText,
     totalCorrectedCharsRef,
   });
   // wpm reset service
@@ -390,10 +376,6 @@ useColoringEffect({
   useSpaceJump({
     setIsTypingEnds ,
     inputValue,
-    currentLetter,
-    currentText,
-    setCurrentLetter,
-    setGlobalState ,
   });
 
   // typing watcher (typing active or not)
@@ -401,23 +383,14 @@ useColoringEffect({
 
   // index incriment controller
   useIndexIncrementer({
-    currentText,
-    currentLetter,
     inputValue,
     setInputValue,
-    globalState ,
-    setGlobalState ,
     isWrongWord,
     setIsWrongWord,
-    setCurrentLetter,
   });
 
   // findes the wrong words
   useWrongWordsFinder({
-    currentLetter,
-    currentText,
-     globalState ,
-    setGlobalState ,
     inputValue,
   });
 
@@ -443,11 +416,6 @@ useColoringEffect({
 
   // delete click handler
   const handleDeleteChar = useCharacterDeleteHook({
-    currentText,
-    currentLetter,
-    setCurrentLetter,
-    globalState , 
-    setGlobalState ,
     trachWord,
     setTrachWord,
     setTypedWordsAmount,
@@ -461,19 +429,14 @@ useColoringEffect({
   //error sound
   useErrorTypingSound({
     inputValue,
-    currentLetter,
-    currentText,
     isErrorSoundEnabled,
   });
 
   // typing  watcher
-  useTypingEnd({ currentLetter, currentText, setIsTypingEnds });
+  useTypingEnd({setIsTypingEnds });
 
   useControlleBoundery({
-    globalState , 
     hiddenInputRef,
-    currentLetter,
-    currentText,
     setIsWrongWord,
     setInputValue,
     trachWord,
@@ -481,21 +444,18 @@ useColoringEffect({
   });
 
 
-  const replayRenderedText = replayTextRenderer({currentText , currentTheme}) as JSX.Element[] ;
-
   
+
+
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ end of hooks +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
-  if(isShowTypingOverModal) return   <TypingChartResult 
-                                                           wordHistoryCopyRef={wordHistoryCopyRef}
-                                                            globalState={globalState}
-                                                            setGlobalState={setGlobalState}
-                                                            setIsRecordPanelOpen={setIsRecordPanelOpen}
+  if(isShowTypingOverModal) return   <TypingChartResult    
+                                                            wordHistoryCopyRef={wordHistoryCopyRef}
                                                             wpmFinal={wpmFinal}
                                                             nextText={nextText}
                                                             handleReset={handleReset}
-                                                        
+                                                            
                                                         />
   
 
@@ -528,9 +488,7 @@ useColoringEffect({
   //   { time: 55, wpm: 98 },
   //   { time: 60, wpm: 85 }
   // ];
-  if(isRecordPanelOpen) return <RecordedTypeSession setIsRecordPanelOpen={setIsRecordPanelOpen} fontSizeRef={fontSizeRef}
-                                                     replayRenderedText={replayRenderedText}  setIsRecordActive={setIsRecordActive}  
-                                                     containerRef={containerRef} />
+
   return (
     <div
       className={`min-h-screen transition-colors duration-300  `}

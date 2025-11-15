@@ -1,6 +1,5 @@
 
 
-import React from "react";
 import type { ThemeColors } from "../types/experementTyping";
 
 interface TextRendererProps {

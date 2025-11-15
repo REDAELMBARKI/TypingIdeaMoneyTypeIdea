@@ -1,17 +1,16 @@
 
 import { useEffect } from 'react'
-import type { currentLetterType } from '../types/experementTyping';
+import useLiveDataContext from '../contextHooks/useLiveDataContext';
 
 interface errorTypingSoundProps {
-    currentLetter : currentLetterType ;
-    currentText : string ; 
+   
     isErrorSoundEnabled:boolean ;
     inputValue : string ;
 }
 
 
-export default function useErrorTypingSound({inputValue , currentText , currentLetter ,isErrorSoundEnabled}:errorTypingSoundProps){
-    
+export default function useErrorTypingSound({inputValue  ,isErrorSoundEnabled}:errorTypingSoundProps){
+    const {currentText , currentLetter} = useLiveDataContext() ; 
     const isCorrectInput = () => {
                 if(inputValue === "" || currentLetter.index === 0) return true;
 

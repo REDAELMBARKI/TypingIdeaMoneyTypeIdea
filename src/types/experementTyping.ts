@@ -1,3 +1,5 @@
+
+
 export interface currentLetterType  {
     index:number , 
     letter:string , 
@@ -65,8 +67,5 @@ export interface typingOverModalProps {
   handleReset : () => void ;
   nextText : () => void ;
    wpmFinal: number ; 
-   setIsRecordPanelOpen : React.Dispatch<React.SetStateAction<boolean>> ;
-    globalState: globalStatetype ;
-    setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>>
-    wordHistoryCopyRef: React.RefObject<WordHistoryItem[]>
+    wordHistoryCopyRef: React.RefObject<WordHistoryItem[]> 
 }

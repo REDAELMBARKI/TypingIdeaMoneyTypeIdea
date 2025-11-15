@@ -1,14 +1,14 @@
 import { useEffect } from "react";
-import type { currentLetterType } from "../types/experementTyping";
+import useLiveDataContext from "../contextHooks/useLiveDataContext";
 
 
 
 interface typingEndProps {
- currentLetter: currentLetterType;
-  currentText: string;
   setIsTypingEnds: React.Dispatch<React.SetStateAction<boolean>>
 }
-const useTypingEnd = ({currentLetter , currentText , setIsTypingEnds}:typingEndProps) => {
+const useTypingEnd = ({setIsTypingEnds}:typingEndProps) => {
+
+    const {currentLetter , currentText  } = useLiveDataContext() ;
     useEffect(()=>{
     // shows end typing model 
     

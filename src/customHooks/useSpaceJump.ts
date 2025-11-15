@@ -1,18 +1,14 @@
 import { useEffect } from "react";
-import type { currentLetterType, globalStatetype } from "../types/experementTyping";
+import useLiveDataContext from "../contextHooks/useLiveDataContext";
 
 interface spaceJumpPropps {
    inputValue : string ;
-   currentLetter : currentLetterType ;
-   currentText :string ;
-   setCurrentLetter: React.Dispatch<React.SetStateAction<currentLetterType>> ;
-    setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>>
     setIsTypingEnds: React.Dispatch<React.SetStateAction<boolean>>
 }
 
  
-const  useSpaceJump   = ({inputValue , currentLetter , currentText , setCurrentLetter , setGlobalState,setIsTypingEnds}:spaceJumpPropps) => {
-  
+const  useSpaceJump   = ({inputValue , setIsTypingEnds}:spaceJumpPropps) => {
+      const {currentLetter , currentText , setCurrentLetter , setGlobalState } =  useLiveDataContext()
       useEffect(()=>{
                         
                 if(inputValue !== " ") return ;

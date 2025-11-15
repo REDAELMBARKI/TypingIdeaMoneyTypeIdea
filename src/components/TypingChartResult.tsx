@@ -4,7 +4,7 @@ import {
   ArrowRight,
   RefreshCw,
   Camera,
-  Star,
+  // Star,
   Download,
 } from "lucide-react";
 import {
@@ -23,7 +23,9 @@ import { Line } from "react-chartjs-2";
 import confetti from "canvas-confetti";
 import useThemeHook from "../customHooks/useThemeHook";
 import type { typingOverModalProps } from "../types/experementTyping";
-import { handleReplayRecordedSession } from "../functions/handleReplayRecordedSession";
+import useLiveDataContext from "../contextHooks/useLiveDataContext";
+import { RecordedTypeSession } from "./recordedTypeSession";
+import useReplayDataContext from "../contextHooks/useReplayDataContext";
 
 ChartJS.register(
   CategoryScale,
@@ -48,17 +50,23 @@ const dummyData = generateDummyData();
 const accuracy = (Math.random() * 5 + 95).toFixed(1);
 const totalErrors = Math.floor(Math.random() * 10) + 2;
 const totalTime = 60;
-const bestWpm = Math.max(...dummyData.map((d) => d.wpm));
+// const bestWpm = Math.max(...dummyData.map((d) => d.wpm));
 
+//  the component
 
-
-//  the component 
-
-function TypingChartResult({wordHistoryCopyRef , wpmFinal ,globalState  , setGlobalState,  handleReset , nextText  , setIsRecordPanelOpen }:typingOverModalProps) {
-    wordHistoryCopyRef.current = [...globalState.wordHistory] ;
+function TypingChartResult({
+  wordHistoryCopyRef,
+  wpmFinal,
+  handleReset,
+  nextText
+}: typingOverModalProps) {
+  const { globalState, setGlobalState } = useLiveDataContext();
+  wordHistoryCopyRef.current = [...globalState.wordHistory];
 
   const chartRef = useRef(null);
-  const { currentTheme } = useThemeHook();
+  const { currentTheme } = useThemeHook(); 
+  const {setIsRecordPanelOpen , isRecordPanelOpen } = useReplayDataContext(); 
+
   const confettiColors = useRef<string[]>([
     currentTheme.red,
     currentTheme.accent,
@@ -164,7 +172,7 @@ function TypingChartResult({wordHistoryCopyRef , wpmFinal ,globalState  , setGlo
     ],
   };
 
-  const chartOptions : ChartOptions<'line'> = {
+  const chartOptions: ChartOptions<"line"> = {
     responsive: true,
     maintainAspectRatio: true,
     interaction: {
@@ -258,14 +266,21 @@ function TypingChartResult({wordHistoryCopyRef , wpmFinal ,globalState  , setGlo
     },
   };
 
-  
+  const handleReplay = () => { 
+        
+         setGlobalState({
+            wrongChars: [] ,
+            wrongWords: [] ,
+            wordHistory: []
+        })
+        setIsRecordPanelOpen(true);
+  };
 
+  const handleScreenShot = () => {}; 
 
-  const handleReplay = () => {
-    handleReplayRecordedSession({setGlobalState, setIsRecordPanelOpen })
-  }
-  
-  const handleScreenShot = () => {}
+   
+   if(isRecordPanelOpen) return <RecordedTypeSession   />
+                                                           
   return (
     <div
       className="h-screen  overflow-hidden flex flex-col p-6"
@@ -281,24 +296,29 @@ function TypingChartResult({wordHistoryCopyRef , wpmFinal ,globalState  , setGlo
       >
         <div className="flex gap-6 items-start flex-1 min-h-0 ">
           {/* stats */}
-          <LeftDataAboutTheSession sessionWpm={wpmFinal}/>
-            {/* chart */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="flex-1 p-6  min-h-0 "
-              style={{
-                backgroundColor: currentTheme.page_bg,
-              }}
-            >
-              <div className="h-full">
-                <Line ref={chartRef} data={chartData} options={chartOptions} />
-              </div>
-            </motion.div>
+          <LeftDataAboutTheSession sessionWpm={wpmFinal} />
+          {/* chart */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="flex-1 p-6  min-h-0 "
+            style={{
+              backgroundColor: currentTheme.page_bg,
+            }}
+          >
+            <div className="h-full">
+              <Line ref={chartRef} data={chartData} options={chartOptions} />
+            </div>
+          </motion.div>
         </div>
         {/* // button list */}
-        <ChartButtonsOptions handleNext={nextText} handleReplay={handleReplay} handleReset={handleReset} handleScreenShot={handleScreenShot} />
+        <ChartButtonsOptions
+          handleNext={nextText}
+          handleReplay={handleReplay}
+          handleReset={handleReset}
+          handleScreenShot={handleScreenShot}
+        />
       </motion.div>
     </div>
   );
@@ -310,10 +330,18 @@ interface ChartButtonsOptionsProps {
   handleNext: () => void;
   handleReset: () => void;
   handleScreenShot: () => void;
-  handleReplay: () => void;
+  handleReplay: () => void; 
+ 
 }
-const ChartButtonsOptions = ({handleNext , handleReset , handleScreenShot , handleReplay}:ChartButtonsOptionsProps) => {
+const ChartButtonsOptions = ({
+  handleNext,
+  handleReset,
+  handleScreenShot,
+  handleReplay, 
+
+}: ChartButtonsOptionsProps) => {
   const { currentTheme } = useThemeHook();
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -321,7 +349,7 @@ const ChartButtonsOptions = ({handleNext , handleReset , handleScreenShot , hand
       transition={{ delay: 0.6, duration: 0.5 }}
       className="flex justify-center gap-6 flex-shrink-0  items-center "
     >
-      <div className="flex gap-4">
+      {/* <div className="flex gap-4">
         {[
           { icon: RotateCcw, label: "Replay", action : handleReplay},
           { icon: ArrowRight, label: "Next", action : handleNext},
@@ -343,6 +371,62 @@ const ChartButtonsOptions = ({handleNext , handleReset , handleScreenShot , hand
             <Icon className="w-6 h-6" style={{ color : currentTheme.gray }} />
           </button>
         ))}
+      </div> */}
+      <div className="flex gap-4">
+        {/* Replay */}
+        <button
+          onClick={()=> handleReplay()}
+          className="flex items-center gap-2 p-3 rounded-xl transition-all duration-200 
+               hover:bg-gray-800 hover:scale-105 active:scale-95"
+          title="Replay"
+        >
+          <RotateCcw className="w-6 h-6" style={{ color: currentTheme.gray }} />
+          <span className="text-sm" style={{ color: currentTheme.gray }}>
+            Replay
+          </span>
+        </button>
+
+        {/* Next */}
+        <button
+          onClick={handleNext}
+          className="flex items-center gap-2 p-3 rounded-xl transition-all duration-200 
+               hover:bg-gray-800 hover:scale-105 active:scale-95"
+          title="Next"
+        >
+          <ArrowRight
+            className="w-6 h-6"
+            style={{ color: currentTheme.gray }}
+          />
+          <span className="text-sm" style={{ color: currentTheme.gray }}>
+            Next
+          </span>
+        </button>
+
+        {/* Repeat */}
+        <button
+          onClick={handleReset}
+          className="flex items-center gap-2 p-3 rounded-xl transition-all duration-200 
+               hover:bg-gray-800 hover:scale-105 active:scale-95"
+          title="Repeat"
+        >
+          <RefreshCw className="w-6 h-6" style={{ color: currentTheme.gray }} />
+          <span className="text-sm" style={{ color: currentTheme.gray }}>
+            Repeat
+          </span>
+        </button>
+
+        {/* Screenshot */}
+        <button
+          onClick={handleScreenShot}
+          className="flex items-center gap-2 p-3 rounded-xl transition-all duration-200 
+               hover:bg-gray-800 hover:scale-105 active:scale-95"
+          title="Screenshot"
+        >
+          <Camera className="w-6 h-6" style={{ color: currentTheme.gray }} />
+          <span className="text-sm" style={{ color: currentTheme.gray }}>
+            Screenshot
+          </span>
+        </button>
       </div>
 
       <button
@@ -374,75 +458,74 @@ const ChartButtonsOptions = ({handleNext , handleReset , handleScreenShot , hand
   );
 };
 
-
-
-const LeftDataAboutTheSession = ({sessionWpm}:{sessionWpm : number}) => {
+const LeftDataAboutTheSession = ({ sessionWpm }: { sessionWpm: number }) => {
   const { currentTheme } = useThemeHook();
-  return ( <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.35, duration: 0.5 }}
-            className="flex flex-col gap-5 min-w-max flex-shrink-0 pt-8"
-          >
-            <div className="flex flex-col">
-              <span
-                style={{ color: currentTheme.accent }}
-                className="text-sm font-medium mb-1"
-              >
-                WPM
-              </span>
-              <span
-                style={{ color: currentTheme.white }}
-                className="text-4xl font-bold"
-              >
-                {sessionWpm}
-              </span>
-            </div>
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: 0.35, duration: 0.5 }}
+      className="flex flex-col gap-5 min-w-max flex-shrink-0 pt-8"
+    >
+      <div className="flex flex-col">
+        <span
+          style={{ color: currentTheme.accent }}
+          className="text-sm font-medium mb-1"
+        >
+          WPM
+        </span>
+        <span
+          style={{ color: currentTheme.white }}
+          className="text-4xl font-bold"
+        >
+          {sessionWpm}
+        </span>
+      </div>
 
-            <div className="flex flex-col">
-              <span
-                style={{ color: currentTheme.accent }}
-                className="text-sm font-medium mb-1"
-              >
-                Accuracy
-              </span>
-              <span
-                style={{ color: currentTheme.white }}
-                className="text-4xl font-bold"
-              >
-                {accuracy}%
-              </span>
-            </div>
+      <div className="flex flex-col">
+        <span
+          style={{ color: currentTheme.accent }}
+          className="text-sm font-medium mb-1"
+        >
+          Accuracy
+        </span>
+        <span
+          style={{ color: currentTheme.white }}
+          className="text-4xl font-bold"
+        >
+          {accuracy}%
+        </span>
+      </div>
 
-            <div className="flex flex-col">
-              <span
-                style={{ color: currentTheme.warning }}
-                className="text-sm font-medium mb-1"
-              >
-                Total Errors
-              </span>
-              <span
-                style={{ color: currentTheme.white }}
-                className="text-4xl font-bold"
-              >
-                {totalErrors}
-              </span>
-            </div>
+      <div className="flex flex-col">
+        <span
+          style={{ color: currentTheme.warning }}
+          className="text-sm font-medium mb-1"
+        >
+          Total Errors
+        </span>
+        <span
+          style={{ color: currentTheme.white }}
+          className="text-4xl font-bold"
+        >
+          {totalErrors}
+        </span>
+      </div>
 
-            <div className="flex flex-col">
-              <span
-                style={{ color: currentTheme.success }}
-                className="text-sm font-medium mb-1"
-              >
-                Time
-              </span>
-              <span
-                style={{ color: currentTheme.white }}
-                className="text-4xl font-bold"
-              >
-                {totalTime}s
-              </span>
-            </div>
-          </motion.div>)
-
-  }
+      <div className="flex flex-col">
+        <span
+          style={{ color: currentTheme.success }}
+          className="text-sm font-medium mb-1"
+        >
+          Time
+        </span>
+        <span
+          style={{ color: currentTheme.white }}
+          className="text-4xl font-bold"
+        >
+          {totalTime}s
+        </span>
+      </div>
+    </motion.div>
+  );
+};

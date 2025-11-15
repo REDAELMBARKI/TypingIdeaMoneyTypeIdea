@@ -1,22 +1,22 @@
-import type { currentLetterType, globalStatetype } from "../types/experementTyping";
+import useLiveDataContext from "../contextHooks/useLiveDataContext";
 
 import { useEffect } from "react";
 // Import just the function
 // import isEqual from 'lodash/isEqual';
 
 interface wrongWordsProps {
-        currentText: string;
-        currentLetter: currentLetterType;
        inputValue : string ;
-       setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>> 
-       globalState : globalStatetype
 
 }
 
 
 
 
-export const useWrongWordsFinder = ({currentLetter , currentText , setGlobalState , globalState :{wrongChars} , inputValue}:wrongWordsProps) =>{
+export const useWrongWordsFinder = ({ inputValue}:wrongWordsProps) =>{
+
+
+       const {globalState : {wrongChars} , currentLetter  , currentText  , setGlobalState  } =  useLiveDataContext() ; 
+
 
       useEffect(()=>{
 

@@ -12,10 +12,11 @@ interface line3listenerprops {
   currentLetter: currentLetterType
   containerWidth : number 
    sessionWordsCount : number
+   isShowTypingOverModal : boolean ;
 }
 
 const useLine3Listener = ({
-
+isShowTypingOverModal,
   containerRef,
   typedWordsAmount,
   prevLineRef,
@@ -24,12 +25,15 @@ const useLine3Listener = ({
 }: line3listenerprops) => {
   const wordsRef = useRef<HTMLElement[]>([]) ;
 
+ 
+
+
 
   useEffect(() => {
+  if (!containerRef.current || !wordsRef.current || isShowTypingOverModal ) return;
 
-  if (!containerRef.current || !wordsRef.current) return;
-
-  const interval = setInterval(() => {
+  const interval = setInterval(() => { 
+     if (!containerRef.current) return;
      wordsRef.current = Array.from(containerRef.current!.querySelectorAll(".word"));
     if (wordsRef.current.length >= sessionWordsCount * 2 ) { // include spaces becus every space is a words in how i render the etxt
       clearInterval(interval);
@@ -45,8 +49,10 @@ const useLine3Listener = ({
 // detects the line 3
 // detects the line 3
 useEffect(() => {
-  if (!containerRef.current) return;
+  if (!containerRef.current || isShowTypingOverModal) return;
   if (!wordsRef.current || wordsRef.current.length === 0) return;
+  
+  
 
   const containerWidth = containerRef.current.getBoundingClientRect().width;
   

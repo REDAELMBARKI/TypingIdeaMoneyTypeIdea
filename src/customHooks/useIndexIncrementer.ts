@@ -1,27 +1,20 @@
 import React, { useEffect } from "react";
-import type { currentLetterType, globalStatetype } from "../types/experementTyping";
+import useLiveDataContext from "../contextHooks/useLiveDataContext";
 
-interface useIncrimenterProps {
-      currentLetter: currentLetterType;
-      currentText: string;
-        setCurrentLetter: React.Dispatch<
-    React.SetStateAction<{
-      index: number;
-      letter: string;
-    }>
-  >;
+interface useIncrimenterProps {    
       setIsWrongWord: React.Dispatch<React.SetStateAction<boolean>>;
       setInputValue: React.Dispatch<React.SetStateAction<string>>;
        inputValue : string ;
         isWrongWord : boolean ; 
-        setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>>
-        globalState : globalStatetype
      
 }
 
 
-function useIndexIncrementer({currentText , currentLetter , inputValue , setInputValue , globalState : {wrongChars} ,isWrongWord, setIsWrongWord ,setGlobalState ,setCurrentLetter}:useIncrimenterProps) {
-   useEffect(() => {
+function useIndexIncrementer({inputValue , setInputValue ,isWrongWord, setIsWrongWord }:useIncrimenterProps) {
+   
+    const {globalState : {wrongChars} , currentLetter  , currentText  , setGlobalState ,setCurrentLetter } =  useLiveDataContext() ;
+    
+    useEffect(() => {
     
     // prevent space click to be treated as wrongchar (eather jump to next word or stick) as we are not in space position 
     if(currentText[currentLetter.index] !== " "  && inputValue === " " ) return ;

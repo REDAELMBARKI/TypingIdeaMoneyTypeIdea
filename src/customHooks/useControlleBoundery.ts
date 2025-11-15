@@ -1,31 +1,25 @@
 import React, { useEffect, useRef } from "react";
-import type { currentLetterType, globalStatetype } from "../types/experementTyping";
+import useLiveDataContext from "../contextHooks/useLiveDataContext";
 
 interface BlureType {
   hiddenInputRef: React.RefObject<HTMLInputElement | null>;
 
-  currentLetter: currentLetterType;
-  currentText: string;
 
   setIsWrongWord: React.Dispatch<React.SetStateAction<boolean>>;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   trachWord: string[];
   setTrachWord: React.Dispatch<React.SetStateAction<string[]>>;
-  globalState: globalStatetype
 }
 
 const useControlleBoundery = ({
-  globalState : {wrongChars },
   hiddenInputRef,
-  currentLetter,
-  currentText,
   setIsWrongWord,
   setInputValue,
   trachWord,
   setTrachWord
 }: BlureType) => {
   // this collects the extra trach chars and make a word of them
-
+  const {globalState : {wrongChars } , currentLetter , currentText} = useLiveDataContext() ; 
   const trachWordRef = useRef<string[]>([]);
   const currentLetterRef = useRef(currentLetter);
   // keep refs in sync with latest state

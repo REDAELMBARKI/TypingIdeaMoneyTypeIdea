@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import correctTypedCharsCounterHandler from "../functions/correctTypedCharsCounterHandler";
 import { timeAmountCountHandler } from "../functions/timeAmountCountHandler";
-import type { globalStatetype } from "../types/experementTyping";
+import useLiveDataContext from "../contextHooks/useLiveDataContext";
 
 
 
@@ -9,17 +9,15 @@ interface wpmCalculattionHandlerProps {
     isTypingEnds : boolean ;
     setWpmFinal: React.Dispatch<React.SetStateAction<number>>;
     setIsShowTypingOverModal: React.Dispatch<React.SetStateAction<boolean>>;
-    currentText: string;
     totalCorrectedCharsRef: React.RefObject<number | null>;
     amountOfTimeRef: React.RefObject<number | null>;
     startTypingTimeRef: React.RefObject<number>;
-    globalState: globalStatetype
 
 }
 
-const useWpmCalculationHandler = ({setIsShowTypingOverModal , setWpmFinal , isTypingEnds,startTypingTimeRef,amountOfTimeRef ,globalState,  currentText , totalCorrectedCharsRef }:wpmCalculattionHandlerProps)  => {
+const useWpmCalculationHandler = ({setIsShowTypingOverModal , setWpmFinal , isTypingEnds,startTypingTimeRef,amountOfTimeRef  , totalCorrectedCharsRef }:wpmCalculattionHandlerProps)  => {
       
-        const  { wordHistory , wrongChars } = globalState ;
+        const {globalState : {wordHistory , wrongChars } , currentText} = useLiveDataContext() ;
         // wpm Calculations 
         useEffect(()=>{
           if(!isTypingEnds ) return ;

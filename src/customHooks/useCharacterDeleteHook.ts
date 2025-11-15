@@ -1,38 +1,24 @@
-import type { 
-  currentLetterType, 
-  globalStatetype 
-} from "../types/experementTyping";
+import useLiveDataContext from "../contextHooks/useLiveDataContext";
 
 interface TextRenderProps {
-  currentLetter: currentLetterType;
-  currentText: string;
-  setCurrentLetter: React.Dispatch<
-    React.SetStateAction<{
-      index: number;
-      letter: string;
-    }>
-  >;
+   
   trachWord: string[];
   setTrachWord: React.Dispatch<React.SetStateAction<string[]>>;
   setTypedWordsAmount: React.Dispatch<React.SetStateAction<number>>;
-  setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>>;
-  globalState: globalStatetype;
 }
 
 function useCharacterDeleteHook({
-  currentText,
-  currentLetter,
-  setCurrentLetter,
-  setGlobalState,
+
   trachWord,
   setTrachWord,
-  globalState ,
-  globalState : { wrongChars, wrongWords, wordHistory },
+  
   setTypedWordsAmount,
 }: TextRenderProps) {
+  const {globalState , globalState : {wrongChars, wrongWords, wordHistory } , currentLetter  , currentText  , setGlobalState ,setCurrentLetter } =  useLiveDataContext() ;
+  
+  
   const handleDeleteChar = () => {
     const currentIndex = currentLetter.index;
-    
 
     // Early return: can't delete at position 0
     if (currentIndex === 0) return;

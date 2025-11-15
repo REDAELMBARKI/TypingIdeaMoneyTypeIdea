@@ -28,8 +28,7 @@ export const textRender = ({
   
 
 
-
-
+        
   let globalIndex = 0; 
    
    return  currentText.split(/(\s+)/).map((word , wordIndex) => {

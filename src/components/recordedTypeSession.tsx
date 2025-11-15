@@ -1,21 +1,14 @@
-import React, { useEffect, type JSX } from "react";
+import React, { useEffect } from "react";
+import useReplayDataContext from "../contextHooks/useReplayDataContext";
+import useContainerAndFontContext from "../contextHooks/useContainerAndFontContext";
 
-interface ModalProps {
-  setIsRecordPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsRecordActive: React.Dispatch<React.SetStateAction<boolean>>;
-  replayRenderedText: JSX.Element[]; // your rendered typing session
-  containerRef: React.RefObject<HTMLDivElement  | null>;
-  fontSizeRef: React.RefObject<number>
-}
 
-export const RecordedTypeSession: React.FC<ModalProps> = ({
-  setIsRecordPanelOpen,
-  setIsRecordActive,
-  replayRenderedText,
-  containerRef , 
-  fontSizeRef
-}) => {
 
+export const RecordedTypeSession = () => {
+
+  const {setIsRecordActive , setIsRecordPanelOpen } = useReplayDataContext();
+  const {containerRef  , fontSizeRef}  = useContainerAndFontContext();
+  const {replayRenderedTextRef} = useReplayDataContext();
   const handleClose = () => {
     
     setIsRecordPanelOpen(false);
@@ -27,7 +20,10 @@ export const RecordedTypeSession: React.FC<ModalProps> = ({
   
     setIsRecordActive(true);
   };
- 
+  
+  useEffect(() => {
+    console.log(containerRef.current?.querySelectorAll('span'))
+  }, []);
 
 
   //  reducing font size to fit content within container
@@ -69,7 +65,7 @@ export const RecordedTypeSession: React.FC<ModalProps> = ({
             overflowWrap: "break-word",     // modern equivalent
           }}
           className="relative z-10 text-white ">
-          {replayRenderedText}
+          {replayRenderedTextRef.current ?? 'not txt '}
         </div>
      
         {/* Next / Action buttons */}

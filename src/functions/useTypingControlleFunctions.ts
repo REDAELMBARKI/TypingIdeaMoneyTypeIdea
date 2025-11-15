@@ -1,42 +1,34 @@
 import { useCallback } from "react";
-import type { currentLetterType, globalStatetype } from "../types/experementTyping";
+import useLiveDataContext from "../contextHooks/useLiveDataContext";
 
 interface VarsResterProps {
-  setCurrentLetter: React.Dispatch<React.SetStateAction<currentLetterType>>;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   setTypedWordsAmount: React.Dispatch<React.SetStateAction<number>>;
   setIsShowTypingOverModal: React.Dispatch<React.SetStateAction<boolean>>
-  setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>>
 }
 
 interface TypingControlleFunctionsProps extends VarsResterProps {
-  setCurrentText: React.Dispatch<React.SetStateAction<string>>;
-  // currentLetter: currentLetterType;
   setIsTypingEnds: React.Dispatch<React.SetStateAction<boolean>>;
-  currentText: string;
   hiddenInputRef: React.RefObject<HTMLInputElement | null>;
   sampleTexts: string[];
-
 }
 
 export default function useTypingControlleFunctions({
   setTypedWordsAmount,
   sampleTexts,
   hiddenInputRef,
-  currentText,
-  setCurrentLetter,
   setIsTypingEnds,
-  setCurrentText,
   setInputValue,
   setIsShowTypingOverModal , 
-  setGlobalState 
 }: TypingControlleFunctionsProps) {
+
+
+   const {currentText , setCurrentLetter , setCurrentText , setGlobalState} = useLiveDataContext() ;
+
 
   // --- Define varsRester FIRST ---
   const varsRester = useCallback(({
-    setCurrentLetter,
     setInputValue,
-    setGlobalState ,
     setTypedWordsAmount,
     setIsShowTypingOverModal
   }: VarsResterProps) => {
@@ -53,9 +45,7 @@ export default function useTypingControlleFunctions({
 
   const handleReset = useCallback(() => {
     varsRester({
-      setCurrentLetter,
       setInputValue,
-      setGlobalState ,
       setTypedWordsAmount,
       setIsShowTypingOverModal 
     });
@@ -70,9 +60,7 @@ export default function useTypingControlleFunctions({
 
   const nextText = useCallback(() => {
     varsRester({
-      setCurrentLetter,
       setInputValue,
-      setGlobalState ,
       setTypedWordsAmount,
       setIsShowTypingOverModal
     });
