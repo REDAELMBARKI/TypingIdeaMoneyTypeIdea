@@ -36,17 +36,18 @@ import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
 import useLine3Listener from "./customHooks/useLine3Listener";
 import useColoringEffect from "./customHooks/useColoringEffect";
 import usePersistantSelectedSessionParams from "./customHooks/usePersistantSelectedSessionParams";
-import { lasyErrorSoundStoredState, lasySoundStoredState, lazyLoadedSelectedMode, lazyLoadedSelectedTime, lazyLoadedSessionWordsCount } from "./functions/lazyLoadedSessionData";
+import {
+  lazyLoadedSelectedMode,
+  lazyLoadedSelectedTime,
+  lazyLoadedSessionWordsCount,
+} from "./functions/lazyLoadedSessionData";
 import { recordKeyStroke } from "./functions/typeSessionRecord";
 import TypingChartResult from "./components/TypingChartResult";
 import useLiveDataContext from "./contextHooks/useLiveDataContext";
 import useReplayDataContext from "./contextHooks/useReplayDataContext";
 import useContainerAndFontContext from "./contextHooks/useContainerAndFontContext";
-// import useCharacterDeleteHookV2 from "./customHooks/useCharacterDeleteHook2";
-
-// import useSessionReplay from "./customHooks/useSessionReplay";
-
-
+import { useTypingSessionStateContext } from "./contextHooks/useTypingSessionStateContext";
+import AnimatedArrowLeftRightButton from "./components/ArrowLeftRight";
 
 
 const TypingApp: React.FC = () => {
@@ -57,21 +58,12 @@ const TypingApp: React.FC = () => {
   // the text sliced index where the text will be sliced from (the text starts from this index )
   const [textSliceStartIndex] = useState<number>(0);
   // current text state 15 words to be genrated at the first time (the text ends in this index)
-  const [sessionWordsCount, setSessionWordsCount] = useState<number>(lazyLoadedSessionWordsCount);
+  const [sessionWordsCount, setSessionWordsCount] = useState<number>(
+    lazyLoadedSessionWordsCount
+  );
 
   const [dynamicTextRange, setDynamicTextRange] = useState<number>(0); // the words count that can fit in the container raws
 
- 
-  // spaces tracker where the word left of before landing to next word
-  // ----------------------------------------------------------------------
-  // sound param (mute / activate)
-  const [isNormalTypingSoundEnabled, setIsNormalTypingSoundEnabled] =
-    useState<boolean>(lasySoundStoredState);
-  const [isErrorSoundEnabled, setIsErrorSoundEnabled] = useState<boolean>(
-    lasyErrorSoundStoredState
-  );
-  // game end controller state
-  const [isTypingEnds, setIsTypingEnds] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
   // chars that are worong and colored in red
   const [isWrongWord, setIsWrongWord] = useState<boolean>(false);
@@ -79,16 +71,20 @@ const TypingApp: React.FC = () => {
   const [trachWord, setTrachWord] = useState<string[]>([]);
   const [isTypingActive, setIsTypingActive] = useState<boolean>(false);
 
-
   const [isCapsOn, setIsCapsOn] = useState<boolean>(false);
   // select time fo session typing
-  const [selectedTime, setSelectedTime] = useState<number>(lazyLoadedSelectedTime);
+  const [selectedTime, setSelectedTime] = useState<number>(
+    lazyLoadedSelectedTime
+  );
   // time elased or count down realstate
-  const [elapsedTime, setElapsedTime] = useState<number>(lazyLoadedSelectedTime);
-  // typign begin listener
-  const [isTypingStarted, setIsTypingStarted] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState<number>(
+    lazyLoadedSelectedTime
+  );
+
   // typing mode (words | time )
-  const [typingModeSelected, setTypingModeSelected] = useState<Mode>(lazyLoadedSelectedMode);
+  const [typingModeSelected, setTypingModeSelected] = useState<Mode>(
+    lazyLoadedSelectedMode
+  );
   // the amount of time the typing session took
   // const [amountOfTime,setAmountOfTime] = useState<number>();
   // words typed
@@ -105,8 +101,7 @@ const TypingApp: React.FC = () => {
   const [isShiftFirstLine, setIsShiftFirstLine] = useState<boolean>(false);
 
   //text conatiner width
-  const [containerWidth, setContainerWidth] = useState<number>(0);
-  
+
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end states | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
@@ -115,7 +110,7 @@ const TypingApp: React.FC = () => {
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | refs | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
   // line 3 data
-  
+
   const line3YRef = useRef<{ top: number } | null>(null);
   // th epreviousline
   const prevLineRef = useRef<number>(0);
@@ -124,156 +119,158 @@ const TypingApp: React.FC = () => {
 
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
   const amountOfTimeRef = useRef<number | null>(null);
-  
 
-  const startTypingTimeRef = useRef<number>(0);
+  // words count of the chars in every first line
+  const firstRowLastIndexRef = useRef<number>(0);
 
-  // words count of the chars in every first line 
-  const firstRowLastIndexRef = useRef<number>(0)
+  // did mount for skipping the initial effect render
 
-  // did mount for skipping the initial effect render 
+  const didMountsessionWordsCount = useRef(false);
+  const didMountSelectedTime = useRef(false);
 
-  const didMountsessionWordsCount = useRef(false); 
-  const didMountSelectedTime= useRef(false); 
-
- // sessionRecord 
-  const  sessionRecordRef = useRef<KeyRecord[]>([]) ;
+  // sessionRecord
+  const sessionRecordRef = useRef<KeyRecord[]>([]);
 
   // previous index ref for replaying
-  const previousIndexRef = useRef<number>(0) ;
+  const previousIndexRef = useRef<number>(0);
   // storeed copy of words history for replaying
-  const wordHistoryCopyRef = useRef<WordHistoryItem[]>([]) ; 
+  const wordHistoryCopyRef = useRef<WordHistoryItem[]>([]);
   // the text used to be paassedf to recordRender
   // theme state
   const { currentTheme } = useThemeHook();
-  const {currentLetter , currentText , setCurrentText ,
-    globalState 
-  } = useLiveDataContext() ;
+  const { currentLetter, currentText, setCurrentText, globalState } =
+    useLiveDataContext();
   // font size and container ref
-  const { containerRef , fontSizeRef } = useContainerAndFontContext() ;
-  // replay context data 
-  const {isRecordActive , isRecordPanelOpen} =  useReplayDataContext();
+  const { containerRef, fontSizeRef, containerWidth, setContainerWidth } =
+    useContainerAndFontContext();
+  // replay context data
+  const { isRecordActive, isRecordPanelOpen } = useReplayDataContext();
+
+  //  typing session states
+  const {
+    isErrorSoundEnabled,
+    isNormalTypingSoundEnabled,
+    isTypingEnds,
+    isTypingStarted,
+    setIsErrorSoundEnabled,
+    setIsNormalTypingSoundEnabled,
+    setIsTypingEnds,
+    setIsTypingStarted,
+    startTypingTimeRef,
+  } = useTypingSessionStateContext();
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end of refs | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
 
-   useEffect(() => {
-    if(!isRecordActive) return ;
-    const letters = Array.from(document.querySelectorAll('.letter')) as HTMLElement[] ;
-   
+  useEffect(() => {
+    if (!isRecordActive) return;
+    const letters = Array.from(
+      document.querySelectorAll(".letter")
+    ) as HTMLElement[];
+
     sessionRecordRef.current.forEach((record) => {
       setTimeout(() => {
-         const letter = letters[record.currentLetterIndex] ;
-          if (record.isTyped && !record.isWrong ) {
-            letter.style.color = currentTheme.white; // correct
-          } else if (record.isWrong) {
-            letter.style.color = currentTheme.red;   // wrong
-          }
-          else{
-            letter.style.color = currentTheme.gray;   // wrong
-          }
-       
-          if(record.isDelete){
-            letter.style.color = currentTheme.gray;   // deleted
-          }
+        const letter = letters[record.currentLetterIndex];
+        if (record.isTyped && !record.isWrong) {
+          letter.style.color = currentTheme.white; // correct
+        } else if (record.isWrong) {
+          letter.style.color = currentTheme.red; // wrong
+        } else {
+          letter.style.color = currentTheme.gray; // wrong
+        }
 
-
-          
-          
-
+        if (record.isDelete) {
+          letter.style.color = currentTheme.gray; // deleted
+        }
       }, record.timestamp);
     });
-
-   }, [isRecordActive]);
+  }, [isRecordActive]);
   ///////////////////////////////////
-  
 
   useEffect(() => {
-    if(previousIndexRef.current > currentLetter.index) {
-         sessionRecordRef.current.push({
-           isDelete: true ,
-           isWrong: false,
-           isTyped: false,
-          timestamp: Date.now() - startTypingTimeRef.current,
-          currentLetterIndex: currentLetter.index ,
-        }
-        );
-      }
-      previousIndexRef.current = currentLetter.index ;
+    if (previousIndexRef.current > currentLetter.index) {
+      sessionRecordRef.current.push({
+        isDelete: true,
+        isWrong: false,
+        isTyped: false,
+        timestamp: Date.now() - startTypingTimeRef.current,
+        currentLetterIndex: currentLetter.index,
+      });
+    }
+    previousIndexRef.current = currentLetter.index;
   }, [currentLetter.index]);
   // get the coun of words in the first line to shift
-useEffect(() => {
-  if (!containerRef.current || !isShiftFirstLine) return;
+  useEffect(() => {
+    if (!containerRef.current || !isShiftFirstLine) return;
 
-  let wordsWidthAccum = 0;
-  firstRowLastIndexRef.current = 0 ;
-  const words = Array.from(containerRef.current.querySelectorAll(".word")) as HTMLElement[];
-  const containerWidth = containerRef.current.getBoundingClientRect().width;
+    let wordsWidthAccum = 0;
+    firstRowLastIndexRef.current = 0;
+    const words = Array.from(
+      containerRef.current.querySelectorAll(".word")
+    ) as HTMLElement[];
+    const containerWidth = containerRef.current.getBoundingClientRect().width;
 
-  for (let i = 0; i < words.length; i++) {
-    const element = words[i];
-    const elementWidth = element.getBoundingClientRect().width;
-    const nextAccum = wordsWidthAccum + elementWidth;
+    for (let i = 0; i < words.length; i++) {
+      const element = words[i];
+      const elementWidth = element.getBoundingClientRect().width;
+      const nextAccum = wordsWidthAccum + elementWidth;
 
-    // If adding this word would exceed container width, stop
-    if (nextAccum > containerWidth) break;
+      // If adding this word would exceed container width, stop
+      if (nextAccum > containerWidth) break;
 
-    // Add text length
-    firstRowLastIndexRef.current += element.textContent?.length || 0;
+      // Add text length
+      firstRowLastIndexRef.current += element.textContent?.length || 0;
 
-    // Include margin to be more accurate
-    const style = getComputedStyle(element);
-    const marginRight = parseFloat(style.marginRight) || 0;
-    wordsWidthAccum = nextAccum + marginRight;
-  }
-}, [isShiftFirstLine]);
-
-
- useEffect(() => {
-  if(!isShiftFirstLine) {
-    return ;
-  }
-
-
-  console.log('last index' , firstRowLastIndexRef.current)
-  
+      // Include margin to be more accurate
+      const style = getComputedStyle(element);
+      const marginRight = parseFloat(style.marginRight) || 0;
+      wordsWidthAccum = nextAccum + marginRight;
+    }
   }, [isShiftFirstLine]);
 
+  useEffect(() => {
+    if (!isShiftFirstLine) {
+      return;
+    }
+
+    console.log("last index", firstRowLastIndexRef.current);
+  }, [isShiftFirstLine]);
 
   useEffect(() => {
-    
-     setCurrentText(sampleTexts[0].split(" ").slice(0, sessionWordsCount).join(" ")) 
-
+    setCurrentText(
+      sampleTexts[0].split(" ").slice(0, sessionWordsCount).join(" ")
+    );
   }, [sessionWordsCount]);
 
-
   // session's selected time and words count persistance
-  usePersistantSelectedSessionParams({sessionWordsCount , selectedTime , didMountsessionWordsCount , didMountSelectedTime })
+  usePersistantSelectedSessionParams({
+    sessionWordsCount,
+    selectedTime,
+    didMountsessionWordsCount,
+    didMountSelectedTime,
+  });
 
-  
-// coloring effect 
-useColoringEffect({  
-  currentTheme,
-  containerRef,
-  currentLetter,
-  inputValue , 
-  globalState
-})
+  // coloring effect
+  useColoringEffect({
+    currentTheme,
+    containerRef,
+    currentLetter,
+    inputValue,
+    globalState,
+  });
 
-
-
-// ddetects onece we hit the line 3
- useLine3Listener({
-  isShowTypingOverModal,
-  containerRef,
-  typedWordsAmount,
-  prevLineRef,
-  line3YRef,
-  setIsShiftFirstLine,
-  currentLetter ,
-  containerWidth , 
-  sessionWordsCount
-});
+  // ddetects onece we hit the line 3
+  useLine3Listener({
+    isShowTypingOverModal,
+    containerRef,
+    typedWordsAmount,
+    prevLineRef,
+    line3YRef,
+    setIsShiftFirstLine,
+    currentLetter,
+    containerWidth,
+    sessionWordsCount,
+  });
 
   //////////////////////////////////////////////////////////
 
@@ -287,9 +284,8 @@ useColoringEffect({
   useEffect(() => {
     if (!isTypingStarted) return;
     ElapsedTimeHandler({ selectedTime, setElapsedTime });
-  }, [isTypingStarted , selectedTime]);
+  }, [isTypingStarted, selectedTime]);
 
-  
   useEffect(() => {
     // Focus the hidden input on component mount
     if (hiddenInputRef.current) {
@@ -297,17 +293,12 @@ useColoringEffect({
     }
   }, [isFocuceOnText]);
 
-
-
-  
-
-
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++hooks++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
 
   // store session typing data andtimestamps for relpay
- 
+
   //  text raws to be rendered slicer
   useTextRawsSlicer({
     sessionWordsCount,
@@ -319,8 +310,6 @@ useColoringEffect({
     dynamicTextRange,
     setDynamicTextRange,
   });
-
-
 
   // caps listener
   useCapsLockListener({ setIsCapsOn });
@@ -374,7 +363,7 @@ useColoringEffect({
 
   // jumps to next word in space clicking (before the current word ends)
   useSpaceJump({
-    setIsTypingEnds ,
+    setIsTypingEnds,
     inputValue,
   });
 
@@ -394,24 +383,30 @@ useColoringEffect({
     inputValue,
   });
 
-
-
   // text chars render function
   const renderedText = useMemo(
     () =>
       textRender({
-        isRecordPanelOpen ,
+        isRecordPanelOpen,
         currentTheme,
         currentText,
         currentLetter,
         inputValue,
         isWrongWord,
         trachWord,
-        globalState ,
+        globalState,
         isTypingActive,
-        firstRowLastIndexRef , 
+        firstRowLastIndexRef,
       }),
-    [currentText, currentTheme , trachWord  , globalState.wordHistory ,globalState.wrongWords , containerWidth , isShiftFirstLine ] // only rebuild when text or theme changes
+    [
+      currentText,
+      currentTheme,
+      trachWord,
+      globalState.wordHistory,
+      globalState.wrongWords,
+      containerWidth,
+      isShiftFirstLine,
+    ] // only rebuild when text or theme changes
   );
 
   // delete click handler
@@ -420,8 +415,6 @@ useColoringEffect({
     setTrachWord,
     setTypedWordsAmount,
   });
-
-
 
   // audio player
   // regular typing sound
@@ -433,7 +426,7 @@ useColoringEffect({
   });
 
   // typing  watcher
-  useTypingEnd({setIsTypingEnds });
+  useTypingEnd({ setIsTypingEnds });
 
   useControlleBoundery({
     hiddenInputRef,
@@ -443,22 +436,18 @@ useColoringEffect({
     setTrachWord,
   });
 
-
-  
-
-
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ end of hooks +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
-  if(isShowTypingOverModal) return   <TypingChartResult    
-                                                            wordHistoryCopyRef={wordHistoryCopyRef}
-                                                            wpmFinal={wpmFinal}
-                                                            nextText={nextText}
-                                                            handleReset={handleReset}
-                                                            
-                                                        />
-  
-
+  if (isShowTypingOverModal)
+    return (
+      <TypingChartResult
+        wordHistoryCopyRef={wordHistoryCopyRef}
+        wpmFinal={wpmFinal}
+        nextText={nextText}
+        handleReset={handleReset}
+      />
+    );
 
   //   const sampleSessionStats = {
   //   wpm: 85,
@@ -503,11 +492,9 @@ useColoringEffect({
         {/* Text Display */}
         <div className="w-full max-w-screen mx-auto mt-[100px]  ">
           {/* chow controlls only if we dont type any more line 1000 no keydown */}
-
           {!isFocuceOnText && (
             <section className="opacity-0 animate-appear-smooth  ">
-              <TypingBoardControls 
-
+              <TypingBoardControls
                 sessionWordsCount={sessionWordsCount}
                 setIsNormalTypingSoundEnabled={setIsNormalTypingSoundEnabled}
                 setIsErrorSoundEnabled={setIsErrorSoundEnabled}
@@ -521,26 +508,22 @@ useColoringEffect({
               />
             </section>
           )}
-
+          {/* the container begin tag */}
           <div
             className={`
             w-[80%] 
             text-lg sm:text-lg lg:text-2xl leading-relaxed sm:leading-relaxed lg:leading-relaxed
             font-mono text-center py-2 sm:py-2 lg:py-2  px-8 sm:px-8 lg:px-8 rounded-2xl
- 
+             relative
             `}
-
-          style={{  
-
-                position : 'absolute',
-                top:'200px' , 
-                left: '50%' ,
-                transform: 'translateX(-50%)',
-                backgroundColor: currentTheme.buttonPrimary + "0D", // 10% opacity = 1A in hex
-                border: "2px solid " + currentTheme.buttonPrimary + "2D", // 30% opacity = 4D
-              
-              
-              }}
+            style={{
+              position: "absolute",
+              top: "200px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              backgroundColor: currentTheme.buttonPrimary + "0D", // 10% opacity = 1A in hex
+              border: "2px solid " + currentTheme.buttonPrimary + "2D", // 30% opacity = 4D
+            }}
           >
             {/* // words counter  */}
             {isFocuceOnText && typingModeSelected === "time" ? (
@@ -559,43 +542,52 @@ useColoringEffect({
                 {typingModeSelected === "time" && elapsedTime}
               </div>
             ) : (
-                <div
-                  className={`px-4 py-2 rounded-lg text-white font-bold  cursor-default select-none  text-center w-[4em]   right-4`}
-                  style={{ color: currentTheme.buttonSecondary  , 
-                            // border: `1px solid ${currentTheme.buttonSecondary}`,
-                            position: 'absolute',
-                            top: '0px',
-                            left : '0px',
-                            transform: 'translateY(-100%)'
-
-
-                  }}
-                >
-                  {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
-                  {isFocuceOnText &&
-                    typingModeSelected === "words" &&
-                    typedWordsAmount + "/" + sessionWordsCount}
-                </div>
+              <div
+                className={`px-4 py-2 rounded-lg text-white font-bold  cursor-default select-none  text-center w-[4em]   right-4`}
+                style={{
+                  color: currentTheme.buttonSecondary,
+                  // border: `1px solid ${currentTheme.buttonSecondary}`,
+                  position: "absolute",
+                  top: "0px",
+                  left: "0px",
+                  transform: "translateY(-100%)",
+                }}
+              >
+                {/*  (currentText.split(' ').length - 1)  i used lenth -1 cuz we an extra char at the end empty space cuz of the space we add in the ext */}
+                {isFocuceOnText &&
+                  typingModeSelected === "words" &&
+                  typedWordsAmount + "/" + sessionWordsCount}
+              </div>
             )}
 
             <div
               className="mx-w-full hitespace-normal break-words break-keep h-[200px]  "
-
               ref={containerRef}
               style={{
                 textAlign: "start",
                 fontSize: `${fontSizeRef.current}px`,
                 overflowY: "hidden",
-                
               }}
             >
               {/* // text render */}
               {renderedText}
+
+              {/*change text button */}
+              <div
+                className="
+                    absolute bottom-0 left-1/2 
+                    -translate-x-1/2 translate-y-1/2
+                    cursor-pointer 
+                    px-6 py-2
+                    rounded-3xl
+                  "
+               
+              >
+               <AnimatedArrowLeftRightButton />
+              </div>
             </div>
-
-    
-
-          </div>
+          </div>{" "}
+          {/*  the container close tag */}
         </div>
 
         {/* Hidden Input Field */}
@@ -612,7 +604,13 @@ useColoringEffect({
 
             // Only allow one character
             const value = e.target.value;
-            recordKeyStroke({inputKey:value, currentText , sessionRecordRef, startTypingTimeRef, currentLetter});
+            recordKeyStroke({
+              inputKey: value,
+              currentText,
+              sessionRecordRef,
+              startTypingTimeRef,
+              currentLetter,
+            });
             if (value.length > 1) {
               setInputValue(value.slice(-1));
             } else {
@@ -635,9 +633,10 @@ useColoringEffect({
         />
 
         {/* Controls */}
-        <div className="flex items-center justify-center mt-8 space-x-4 " 
-         style={{ position: 'absolute'  , top : '400px'}}
-         >
+        <div
+          className="flex items-center justify-center mt-8 space-x-4 "
+          style={{ position: "absolute", top: "400px" }}
+        >
           {!isFocuceOnText && (
             <section className="opacity-0 animate-appear-smooth flex gap-3">
               <Reseter
@@ -645,27 +644,14 @@ useColoringEffect({
                 currentTheme={currentTheme}
                 handleReset={handleReset}
               />
-    
             </section>
           )}
         </div>
-
-
-        {/* Stats Placeholder */}
-        {/* <div style={{ position: 'absolute'  , top : '500px'}}>
-
-        {!isFocuceOnText && (
-          <States wpmFinal={wpmFinal} currentTheme={currentTheme} />
-        )}
-
-        </div> */}
-
       </main>
 
       {/* Footer */}
-      <footer style={{ position: 'absolute'  , bottom : '10%' , width: '100%'}}>
-
-      <Footer />
+      <footer style={{ position: "absolute", bottom: "10%", width: "100%" }}>
+        <Footer />
       </footer>
     </div>
   );

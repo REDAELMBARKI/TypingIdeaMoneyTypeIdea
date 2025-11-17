@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { sliceWordsHandler } from "../functions/sliceWordsHandler";
 import { containerWordsRangeFitHandler } from "../functions/containerWordsRangeFitHandler";
+import { useTypingSessionStateContext } from "../contextHooks/useTypingSessionStateContext";
 
 
 interface textRawsSlicerProps {
@@ -19,10 +20,12 @@ interface textRawsSlicerProps {
 const useTextRawsSlicer = ({sessionWordsCount ,line3YRef , containerWidth , containerRef  , setCurrentText  , textSliceStartIndex , setDynamicTextRange ,dynamicTextRange} : textRawsSlicerProps) => {
       
       const wordsCountAllowed = useRef<number | undefined>(undefined);
-      useEffect(() => {
-            
-            if(! containerRef.current ) return ;
-         
+      const {isTypingEnds} = useTypingSessionStateContext() ; 
+      
+       useEffect(() => {
+            if(isTypingEnds) return ; 
+            if(! containerRef.current) return ;
+            //if the session eds stod executing this
            
             wordsCountAllowed.current = containerWordsRangeFitHandler({containerRef , line3YRef} ) || 0 ;
             setDynamicTextRange(wordsCountAllowed.current!)
@@ -32,15 +35,7 @@ const useTextRawsSlicer = ({sessionWordsCount ,line3YRef , containerWidth , cont
       }, [containerWidth , dynamicTextRange]);
 
 
-       // shift the text once we hit the line 3
-        // firstIndexInSecondLIne in the first word indenx in the second line 
-      // useEffect(() => {
-      //   if(!wordsCountAllowed.current) return ; 
-        
-      //   setCurrentText(prevText => {
-      //       return prevText.split(/(\s+)/).slice(firstRowWordsCountToShiftRef.current).join(' ')
-      //   }) ; 
-      // }, [isShiftFirstLine])
+
       
 
             

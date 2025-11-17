@@ -1,12 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import {
-  RotateCcw,
-  ArrowRight,
-  RefreshCw,
-  Camera,
-  // Star,
-  Download,
-} from "lucide-react";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -26,6 +19,11 @@ import type { typingOverModalProps } from "../types/experementTyping";
 import useLiveDataContext from "../contextHooks/useLiveDataContext";
 import { RecordedTypeSession } from "./recordedTypeSession";
 import useReplayDataContext from "../contextHooks/useReplayDataContext";
+import { replayTextRenderer } from "../functions/replayTextTRenderer";
+import useContainerAndFontContext from "../contextHooks/useContainerAndFontContext";
+import { screenShoter } from "../functions/screenShoter";
+import ChartButtonsOptions from "./ChartButtonsOptions";
+import LeftDataAboutTheSession from "./typingresult/LeftDataAboutTheSession";
 
 ChartJS.register(
   CategoryScale,
@@ -47,9 +45,7 @@ const generateDummyData = () => {
 };
 
 const dummyData = generateDummyData();
-const accuracy = (Math.random() * 5 + 95).toFixed(1);
-const totalErrors = Math.floor(Math.random() * 10) + 2;
-const totalTime = 60;
+
 // const bestWpm = Math.max(...dummyData.map((d) => d.wpm));
 
 //  the component
@@ -60,13 +56,19 @@ function TypingChartResult({
   handleReset,
   nextText
 }: typingOverModalProps) {
+
+  
+
   const { globalState, setGlobalState } = useLiveDataContext();
   wordHistoryCopyRef.current = [...globalState.wordHistory];
-
+  const ResultContainerRef  = useRef<HTMLDivElement | null>(null)
   const chartRef = useRef(null);
+
+
   const { currentTheme } = useThemeHook(); 
   const {setIsRecordPanelOpen , isRecordPanelOpen } = useReplayDataContext(); 
-
+  const {currentText} = useLiveDataContext();
+  const {containerWidth } = useContainerAndFontContext();
   const confettiColors = useRef<string[]>([
     currentTheme.red,
     currentTheme.accent,
@@ -75,6 +77,8 @@ function TypingChartResult({
     currentTheme.info,
     currentTheme.white,
   ]).current;
+
+
 
   useEffect(() => {
     const duration = 4000;
@@ -192,22 +196,22 @@ function TypingChartResult({
         bodyColor: currentTheme.white,
         padding: 14,
         borderRadius: 12,
-        titleFont: { size: 13, weight: "600" as const },
-        bodyFont: { size: 12, weight: "500" as const },
+        titleFont: { size: 13, weight: "bold" as const },
+        bodyFont: { size: 12, weight: "bold" as const },
         boxPadding: 6,
         displayColors: false,
         callbacks: {
-          title: function (context: any) {
+          title: function (context:any) {
             return `Time: ${context[0].label}`;
           },
-          label: function (context: any) {
+          label: function (context:any) {
             const dataIndex = context.dataIndex;
             const data = dummyData[dataIndex];
             if (context.datasetIndex === 0) {
               return [
                 `WPM: ${context.parsed.y}`,
                 `Errors: ${data.errors}`,
-                `Accuracy: ${accuracy}%`,
+                `Accuracy: ${0}%`,
               ];
             }
             return "";
@@ -219,12 +223,12 @@ function TypingChartResult({
       x: {
         grid: {
           color: `${currentTheme.border}40`,
-          drawBorder: false,
+          // drawBorder: false,
           drawTicks: true,
         },
         ticks: {
           color: `${currentTheme.white}80`,
-          font: { size: 11, weight: "500" as const },
+          font: { size: 11, weight: "bold" as const },
           padding: 8,
         },
       },
@@ -233,17 +237,17 @@ function TypingChartResult({
         position: "left" as const,
         grid: {
           color: `${currentTheme.border}40`,
-          drawBorder: false,
+          // drawBorder: false,
         },
         ticks: {
           color: `${currentTheme.white}80`,
-          font: { size: 11, weight: "500" as const },
+          font: { size: 11, weight: "bold" as const },
         },
         title: {
           display: true,
           text: "WPM",
           color: `${currentTheme.white}99`,
-          font: { size: 11, weight: "600" as const },
+          font: { size: 11, weight: "bolder" as const },
         },
       },
       y1: {
@@ -254,13 +258,13 @@ function TypingChartResult({
         },
         ticks: {
           color: `${currentTheme.white}80`,
-          font: { size: 11, weight: "500" as const },
+          font: { size: 11, weight: "bold" as const },
         },
         title: {
           display: true,
           text: "Errors",
           color: `${currentTheme.white}99`,
-          font: { size: 11, weight: "600" as const },
+          font: { size: 11, weight: "bolder" as const },
         },
       },
     },
@@ -276,23 +280,50 @@ function TypingChartResult({
         setIsRecordPanelOpen(true);
   };
 
-  const handleScreenShot = () => {}; 
+  
 
-   
-   if(isRecordPanelOpen) return <RecordedTypeSession   />
-                                                           
+
+
+  // handling text ------------------------------------------------
+  // Force re-render when containerWidth changes
+
+
+const updatedReplayText = replayTextRenderer({ currentText, currentTheme });
+
+ 
+
+const  handleScreenShot = () => {
+    if(!ResultContainerRef.current) throw new Error('no container to take a screen shot for ') ;
+    screenShoter(ResultContainerRef.current) ;
+} 
+
+
+  // this is the model showring the recorded text 
+  if(isRecordPanelOpen) return (
+                         <RecordedTypeSession
+                           key={containerWidth} 
+                           replayRenderedText={updatedReplayText} 
+                             />
+      )
   return (
+    
+   
+    <>
+   
     <div
       className="h-screen  overflow-hidden flex flex-col p-6"
       style={{
         backgroundColor: currentTheme.page_bg,
+        display : isRecordPanelOpen ?  'none' : 'hidden'
       }}
+
+      ref={ResultContainerRef}
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-7xl mx-auto flex flex-col h-full items-between py-[60px] "
+        className="w-full max-w-7xl mx-auto flex flex-col h-full items-between py-[60px] relative"
       >
         <div className="flex gap-6 items-start flex-1 min-h-0 ">
           {/* stats */}
@@ -321,211 +352,10 @@ function TypingChartResult({
         />
       </motion.div>
     </div>
+   </>
   );
 }
 
 export default TypingChartResult;
 
-interface ChartButtonsOptionsProps {
-  handleNext: () => void;
-  handleReset: () => void;
-  handleScreenShot: () => void;
-  handleReplay: () => void; 
- 
-}
-const ChartButtonsOptions = ({
-  handleNext,
-  handleReset,
-  handleScreenShot,
-  handleReplay, 
 
-}: ChartButtonsOptionsProps) => {
-  const { currentTheme } = useThemeHook();
-  
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.6, duration: 0.5 }}
-      className="flex justify-center gap-6 flex-shrink-0  items-center "
-    >
-      {/* <div className="flex gap-4">
-        {[
-          { icon: RotateCcw, label: "Replay", action : handleReplay},
-          { icon: ArrowRight, label: "Next", action : handleNext},
-          { icon: RefreshCw, label: "Repeat",  action : handleReset},
-          { icon: Camera, label: "Screenshot", action : handleScreenShot},
-        ].map(({ icon: Icon, label , action } , i) => (
-          <button
-            key={i}
-            onClick={action}
-            className="relative p-4 transition-all duration-300"
-            style={{
-              backgroundColor: "transparent",
-              border: "none",
-             
-            }}
-           
-            title={label}
-          > {label}
-            <Icon className="w-6 h-6" style={{ color : currentTheme.gray }} />
-          </button>
-        ))}
-      </div> */}
-      <div className="flex gap-4">
-        {/* Replay */}
-        <button
-          onClick={()=> handleReplay()}
-          className="flex items-center gap-2 p-3 rounded-xl transition-all duration-200 
-               hover:bg-gray-800 hover:scale-105 active:scale-95"
-          title="Replay"
-        >
-          <RotateCcw className="w-6 h-6" style={{ color: currentTheme.gray }} />
-          <span className="text-sm" style={{ color: currentTheme.gray }}>
-            Replay
-          </span>
-        </button>
-
-        {/* Next */}
-        <button
-          onClick={handleNext}
-          className="flex items-center gap-2 p-3 rounded-xl transition-all duration-200 
-               hover:bg-gray-800 hover:scale-105 active:scale-95"
-          title="Next"
-        >
-          <ArrowRight
-            className="w-6 h-6"
-            style={{ color: currentTheme.gray }}
-          />
-          <span className="text-sm" style={{ color: currentTheme.gray }}>
-            Next
-          </span>
-        </button>
-
-        {/* Repeat */}
-        <button
-          onClick={handleReset}
-          className="flex items-center gap-2 p-3 rounded-xl transition-all duration-200 
-               hover:bg-gray-800 hover:scale-105 active:scale-95"
-          title="Repeat"
-        >
-          <RefreshCw className="w-6 h-6" style={{ color: currentTheme.gray }} />
-          <span className="text-sm" style={{ color: currentTheme.gray }}>
-            Repeat
-          </span>
-        </button>
-
-        {/* Screenshot */}
-        <button
-          onClick={handleScreenShot}
-          className="flex items-center gap-2 p-3 rounded-xl transition-all duration-200 
-               hover:bg-gray-800 hover:scale-105 active:scale-95"
-          title="Screenshot"
-        >
-          <Camera className="w-6 h-6" style={{ color: currentTheme.gray }} />
-          <span className="text-sm" style={{ color: currentTheme.gray }}>
-            Screenshot
-          </span>
-        </button>
-      </div>
-
-      <button
-        className="relative rounded-2xl px-6 py-3 transition-all duration-300 font-semibold flex items-center gap-2"
-        style={{
-          backgroundColor: currentTheme.accent,
-          border: "none",
-          color: currentTheme.page_bg,
-          transform: "scale(1)",
-        }}
-        onMouseEnter={(e) => {
-          const btn = e.currentTarget as HTMLButtonElement;
-          btn.style.backgroundColor = currentTheme.info;
-          btn.style.boxShadow = `0 0 28px ${currentTheme.accent}60`;
-          btn.style.transform = "scale(1.08)";
-        }}
-        onMouseLeave={(e) => {
-          const btn = e.currentTarget as HTMLButtonElement;
-          btn.style.backgroundColor = currentTheme.accent;
-          btn.style.boxShadow = "none";
-          btn.style.transform = "scale(1)";
-        }}
-        aria-label="Save Result"
-      >
-        <Download className="w-5 h-5" />
-        Save Result
-      </button>
-    </motion.div>
-  );
-};
-
-const LeftDataAboutTheSession = ({ sessionWpm }: { sessionWpm: number }) => {
-  const { currentTheme } = useThemeHook();
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.35, duration: 0.5 }}
-      className="flex flex-col gap-5 min-w-max flex-shrink-0 pt-8"
-    >
-      <div className="flex flex-col">
-        <span
-          style={{ color: currentTheme.accent }}
-          className="text-sm font-medium mb-1"
-        >
-          WPM
-        </span>
-        <span
-          style={{ color: currentTheme.white }}
-          className="text-4xl font-bold"
-        >
-          {sessionWpm}
-        </span>
-      </div>
-
-      <div className="flex flex-col">
-        <span
-          style={{ color: currentTheme.accent }}
-          className="text-sm font-medium mb-1"
-        >
-          Accuracy
-        </span>
-        <span
-          style={{ color: currentTheme.white }}
-          className="text-4xl font-bold"
-        >
-          {accuracy}%
-        </span>
-      </div>
-
-      <div className="flex flex-col">
-        <span
-          style={{ color: currentTheme.warning }}
-          className="text-sm font-medium mb-1"
-        >
-          Total Errors
-        </span>
-        <span
-          style={{ color: currentTheme.white }}
-          className="text-4xl font-bold"
-        >
-          {totalErrors}
-        </span>
-      </div>
-
-      <div className="flex flex-col">
-        <span
-          style={{ color: currentTheme.success }}
-          className="text-sm font-medium mb-1"
-        >
-          Time
-        </span>
-        <span
-          style={{ color: currentTheme.white }}
-          className="text-4xl font-bold"
-        >
-          {totalTime}s
-        </span>
-      </div>
-    </motion.div>
-  );
-};

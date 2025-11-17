@@ -2,10 +2,11 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import Layout from "./Layout";
 import TypingApp from "./TypingMain";
-import { ThemeProvider } from "./providers/themeProvider";
-import { CurrentLiveDataProvider } from "./providers/CurrentLiveDataProvider";
-import ReplayDataContextProvider from "./providers/ReplayDataContextProvider";
-import ContainerAndFontContextProvider from "./providers/ContainerAndFontContext";
+import { ThemeProvider } from "./ContextProviders/themeProvider";
+import { CurrentLiveDataProvider } from "./ContextProviders/CurrentLiveDataProvider";
+import ReplayDataContextProvider from "./ContextProviders/ReplayDataContextProvider";
+import ContainerAndFontContextProvider from "./ContextProviders/ContainerAndFontContext";
+import TypingSessionStateContextProvider from "./ContextProviders/TypingSessionStateContextProvider";
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
             path="/"
             element={
               <ThemeProvider>
+                 <TypingSessionStateContextProvider>
+
                   <ContainerAndFontContextProvider> 
                 <CurrentLiveDataProvider>
                     <ReplayDataContextProvider>
@@ -23,6 +26,7 @@ function App() {
                     </ReplayDataContextProvider>
                 </CurrentLiveDataProvider>
                   </ContainerAndFontContextProvider>
+                 </TypingSessionStateContextProvider>
               </ThemeProvider>
             }
           >

@@ -1,14 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, type JSX } from "react";
 import useReplayDataContext from "../contextHooks/useReplayDataContext";
 import useContainerAndFontContext from "../contextHooks/useContainerAndFontContext";
 
 
 
-export const RecordedTypeSession = () => {
-
+export const RecordedTypeSession = ({replayRenderedText}:{replayRenderedText : JSX.Element | null }) => {
+   
   const {setIsRecordActive , setIsRecordPanelOpen } = useReplayDataContext();
-  const {containerRef  , fontSizeRef}  = useContainerAndFontContext();
-  const {replayRenderedTextRef} = useReplayDataContext();
+  const {containerRef  , fontSizeRef , containerWidth}  = useContainerAndFontContext();
+ 
+
   const handleClose = () => {
     
     setIsRecordPanelOpen(false);
@@ -20,11 +21,6 @@ export const RecordedTypeSession = () => {
   
     setIsRecordActive(true);
   };
-  
-  useEffect(() => {
-    console.log(containerRef.current?.querySelectorAll('span'))
-  }, []);
-
 
   //  reducing font size to fit content within container
   useEffect(() => {
@@ -37,7 +33,7 @@ export const RecordedTypeSession = () => {
     currentFontSize -= 5;
     container.style.fontSize = `${currentFontSize}px`;
   }
-}, []);
+}, [containerWidth]);
  
   return (
     <div
@@ -65,7 +61,7 @@ export const RecordedTypeSession = () => {
             overflowWrap: "break-word",     // modern equivalent
           }}
           className="relative z-10 text-white ">
-          {replayRenderedTextRef.current ?? 'not txt '}
+          {replayRenderedText}
         </div>
      
         {/* Next / Action buttons */}

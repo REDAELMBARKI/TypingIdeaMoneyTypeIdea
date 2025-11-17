@@ -1,4 +1,4 @@
-import { createContext, type JSX } from "react";
+import { createContext } from "react";
 
  type ReplayDataContextType ={
     isRecordPanelOpen: boolean 
@@ -6,7 +6,6 @@ import { createContext, type JSX } from "react";
 
     setIsRecordActive: React.Dispatch<React.SetStateAction<boolean>>
     setIsRecordPanelOpen: React.Dispatch<React.SetStateAction<boolean>>
-    replayRenderedTextRef: React.RefObject<JSX.Element[]>
 
 }
 export const ReplayDataContext = createContext<ReplayDataContextType | undefined>(undefined) ;

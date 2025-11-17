@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ContainerAndFontContext } from "../contexts/ContainerAndFontContext";
 
 
@@ -9,9 +9,11 @@ const ContainerAndFontContextProvider = ({children}:{children : React.ReactNode}
   const containerRef = useRef<HTMLDivElement | null>(null);
   // text font size ref
   const fontSizeRef = useRef<number>(40);
-  // underline ref
+  // containerWidth
+   const [containerWidth, setContainerWidth] = useState<number>(0);
+
     return (
-        <ContainerAndFontContext.Provider value={{containerRef , fontSizeRef}}>
+        <ContainerAndFontContext.Provider value={{containerRef , fontSizeRef , containerWidth, setContainerWidth}}>
             {children}          
         </ContainerAndFontContext.Provider>
     )
