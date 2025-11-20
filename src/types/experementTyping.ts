@@ -69,3 +69,12 @@ export interface typingOverModalProps {
    wpmFinal: number ; 
     wordHistoryCopyRef: React.RefObject<WordHistoryItem[]> 
 }
+
+export const parametersTypes = {
+  numbers : 'numbers' ,
+  symbols : 'symbols' ,
+  quotes : 'quotes' ,
+  punctuation : 'punctuation' , 
+  sound : 'sound' , 
+  errorSound : 'errorSound'
+}

@@ -9,7 +9,7 @@ interface buttonExtraOptionProps {
       Icon : React.ComponentType<React.SVGProps<SVGSVGElement>> ;
       handleParamOption ? : (paramType: string) => void
       handleSoundSettingOption?: (soundSet: string) => void
-      action? : () => void
+      action? : (currentText?:string ) => void
       selectedParameters?: string[] 
       soundSettings?: string[] 
       style? : React.CSSProperties

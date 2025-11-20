@@ -39,7 +39,6 @@ import usePersistantSelectedSessionParams from "./customHooks/usePersistantSelec
 import {
   lazyLoadedSelectedMode,
   lazyLoadedSelectedTime,
-  lazyLoadedSessionWordsCount,
 } from "./functions/lazyLoadedSessionData";
 import { recordKeyStroke } from "./functions/typeSessionRecord";
 import TypingChartResult from "./components/TypingChartResult";
@@ -57,10 +56,7 @@ const TypingApp: React.FC = () => {
 
   // the text sliced index where the text will be sliced from (the text starts from this index )
   const [textSliceStartIndex] = useState<number>(0);
-  // current text state 15 words to be genrated at the first time (the text ends in this index)
-  const [sessionWordsCount, setSessionWordsCount] = useState<number>(
-    lazyLoadedSessionWordsCount
-  );
+ 
 
   const [dynamicTextRange, setDynamicTextRange] = useState<number>(0); // the words count that can fit in the container raws
 
@@ -72,10 +68,7 @@ const TypingApp: React.FC = () => {
   const [isTypingActive, setIsTypingActive] = useState<boolean>(false);
 
   const [isCapsOn, setIsCapsOn] = useState<boolean>(false);
-  // select time fo session typing
-  const [selectedTime, setSelectedTime] = useState<number>(
-    lazyLoadedSelectedTime
-  );
+ 
   // time elased or count down realstate
   const [elapsedTime, setElapsedTime] = useState<number>(
     lazyLoadedSelectedTime
@@ -157,6 +150,10 @@ const TypingApp: React.FC = () => {
     setIsTypingEnds,
     setIsTypingStarted,
     startTypingTimeRef,
+    selectedTime , 
+    sessionWordsCount , 
+    setSelectedTime , 
+    setSessionWordsCount
   } = useTypingSessionStateContext();
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ | end of refs | ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -305,7 +302,6 @@ const TypingApp: React.FC = () => {
     line3YRef,
     containerWidth,
     containerRef,
-    setCurrentText,
     textSliceStartIndex,
     dynamicTextRange,
     setDynamicTextRange,
@@ -495,7 +491,6 @@ const TypingApp: React.FC = () => {
           {!isFocuceOnText && (
             <section className="opacity-0 animate-appear-smooth  ">
               <TypingBoardControls
-                sessionWordsCount={sessionWordsCount}
                 setIsNormalTypingSoundEnabled={setIsNormalTypingSoundEnabled}
                 setIsErrorSoundEnabled={setIsErrorSoundEnabled}
                 setSessionWordsCount={setSessionWordsCount}

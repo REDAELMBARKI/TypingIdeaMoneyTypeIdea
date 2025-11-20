@@ -1,5 +1,5 @@
 import { useContext } from "react"
-import { TypingSessionStateContext } from "../contexts/TypingSessionState"
+import { TypingSessionStateContext } from "../contexts/TypingSessionStateContext"
 
 
 

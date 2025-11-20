@@ -14,7 +14,16 @@ type typingSessionStateContextType = {
       setIsNormalTypingSoundEnabled: React.Dispatch<React.SetStateAction<boolean>>
       setIsErrorSoundEnabled: React.Dispatch<React.SetStateAction<boolean>>
       // 
-        
+
+      // selected amount of session words count and time 
+      setSessionWordsCount: React.Dispatch<React.SetStateAction<number>>
+      sessionWordsCount: number
+      setSelectedTime: React.Dispatch<React.SetStateAction<number>>
+      selectedTime : number 
+
+      // selected param 
+      setSelectedParameters: React.Dispatch<React.SetStateAction<string[]>>
+      selectedParameters : string[]
 }
 
 

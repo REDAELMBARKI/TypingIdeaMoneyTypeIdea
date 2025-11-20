@@ -1,13 +1,25 @@
 import { useRef, useState } from "react";
-import { TypingSessionStateContext } from "../contexts/TypingSessionState";
-import { lasyErrorSoundStoredState, lasySoundStoredState } from "../functions/lazyLoadedSessionData";
+import { TypingSessionStateContext } from "../contexts/TypingSessionStateContext";
+import { lasyErrorSoundStoredState, lasySoundStoredState, lazyLoadedSelectedTime, lazyLoadedSessionWordsCount, lazyLoadeStoredParams } from "../functions/lazyLoadedSessionData";
 
 
 
 
 
 
-const TypingSessionStateContextProvider = ({children}:{children :  React.ReactNode  }) => {
+const TypingSessionStateContextProvider = ({children}:{children :  React.ReactNode  }) => { 
+   // selected ampunt of words and time 
+    // current text state 15 words to be genrated at the first time (the text ends in this index)
+     const [sessionWordsCount, setSessionWordsCount] = useState<number>(
+       lazyLoadedSessionWordsCount
+     );
+   
+      // select time fo session typing
+     const [selectedTime, setSelectedTime] = useState<number>(
+       lazyLoadedSelectedTime
+     );
+
+
      const startTypingTimeRef = useRef<number>(0);
      const [isNormalTypingSoundEnabled, setIsNormalTypingSoundEnabled] =
     useState<boolean>(lasySoundStoredState);
@@ -21,10 +33,14 @@ const TypingSessionStateContextProvider = ({children}:{children :  React.ReactNo
 
     // typign begin listener
     const [isTypingStarted, setIsTypingStarted] = useState(false);
+
+
+    // selected parametres 
+     const [selectedParameters , setSelectedParameters] = useState<string[]>(lazyLoadeStoredParams) ;
      return (
            <TypingSessionStateContext.Provider value={{isTypingEnds, setIsTypingEnds ,isNormalTypingSoundEnabled, setIsNormalTypingSoundEnabled ,isErrorSoundEnabled, setIsErrorSoundEnabled , 
-            isTypingStarted, setIsTypingStarted , 
-            startTypingTimeRef
+            isTypingStarted, setIsTypingStarted ,  sessionWordsCount, setSessionWordsCount ,selectedTime, setSelectedTime ,
+            startTypingTimeRef , selectedParameters , setSelectedParameters
             }}>
               {children}
            </TypingSessionStateContext.Provider>

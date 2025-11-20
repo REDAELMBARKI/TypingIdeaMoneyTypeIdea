@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Timer,
   Hash,
@@ -9,11 +9,13 @@ import {
   XCircle,
   Quote,
 } from "lucide-react";
-import type { Mode, ThemeColors } from "../types/experementTyping";
+import { parametersTypes, type Mode, type ThemeColors } from "../types/experementTyping";
 import ButtonExtraOption from "./ButtonExtraOption";
 import { isEqual } from "lodash";
 import useThemeHook from "../customHooks/useThemeHook";
-import { lazyLoadedSoundSettings, lazyLoadeStoredParams } from "../functions/lazyLoadedSessionData";
+import { lazyLoadedSoundSettings } from "../functions/lazyLoadedSessionData";
+import { useTextTransformer } from "../functions/textTransform";
+import { useTypingSessionStateContext } from "../contextHooks/useTypingSessionStateContext";
 
 
 interface TypingBoardControlsProps {
@@ -26,23 +28,28 @@ interface TypingBoardControlsProps {
 
   setIsErrorSoundEnabled : React.Dispatch<React.SetStateAction<boolean>>
   setIsNormalTypingSoundEnabled : React.Dispatch<React.SetStateAction<boolean>> 
-   sessionWordsCount : number ;
    selectedTime:number ;
 }
 
 
-export default function TypingBoardControls({sessionWordsCount,setSessionWordsCount , setIsNormalTypingSoundEnabled , setIsErrorSoundEnabled  , currentTheme ,setTypingModeSelected,typingModeSelected  ,selectedTime , setSelectedTime}:TypingBoardControlsProps) {
+export default function TypingBoardControls({setSessionWordsCount , setIsNormalTypingSoundEnabled , setIsErrorSoundEnabled  , currentTheme ,setTypingModeSelected,typingModeSelected  ,selectedTime , setSelectedTime}:TypingBoardControlsProps) {
   
   const [showTimes, setShowTimes] = useState(false);
   const [showWords,setShowWords] =  useState(false);
-  const [selectedParameters , setSelectedParameters] = useState<string[]>(lazyLoadeStoredParams) ;
+  const {addNumbersToText , removeNumbersFromText , 
+       addPunctuationToText , removePunctuationFromText
+  } = useTextTransformer()
+  const {sessionWordsCount , selectedParameters , setSelectedParameters} = useTypingSessionStateContext()
+  
+  const previousSelectedParametersRef = useRef<string[] | null >(null);
   const [soundSettings , setSoundSettings] = useState<string[]>(lazyLoadedSoundSettings) ;
   const timesOpt = [30, 60, 120];
   const wordsOpt= [10,20,30,50];
   
   const optionsList = typingModeSelected == "time" ? timesOpt : wordsOpt ;
+
   const  handleParamOption = (paramType:string) => {
-          
+           previousSelectedParametersRef.current =  selectedParameters ;
            if(selectedParameters.includes(paramType)){
               setSelectedParameters(selectedParameters.filter(param => param !== paramType))
               return ;
@@ -71,8 +78,8 @@ export default function TypingBoardControls({sessionWordsCount,setSessionWordsCo
      
       }, [selectedParameters]); 
     
-
-
+    
+  
      useEffect(() => { 
       const   oldSoundSettings: string[] =  JSON.parse(localStorage.getItem('soundSettings') ?? `[]`) ; 
       
@@ -84,7 +91,7 @@ export default function TypingBoardControls({sessionWordsCount,setSessionWordsCo
       }, [soundSettings]); 
 
 
-
+    
 
     useEffect(() => {
         const oldTypingModeSelected : string = JSON.parse(localStorage.getItem('selectedMode') ?? '""') ;
@@ -94,9 +101,35 @@ export default function TypingBoardControls({sessionWordsCount,setSessionWordsCo
         }
     }, [typingModeSelected]);
 
+ 
+    
+    const NSoundHandler = () => setIsNormalTypingSoundEnabled(prev => !prev)  ; 
+    const ErrSoundHandler = ()=> setIsErrorSoundEnabled(prev => !prev)  ; 
+    
+  useEffect(() => {
+  //numbers
+  if (selectedParameters.includes(parametersTypes.numbers)) {
+    addNumbersToText();
+  } else {
+    removeNumbersFromText();
+  }
 
-  const NSoundHandler = ()=> setIsNormalTypingSoundEnabled(prev => !prev)  ; 
-  const ErrSoundHandler = ()=> setIsErrorSoundEnabled(prev => !prev)  ; 
+   // punctuation
+  if (selectedParameters.includes(parametersTypes.punctuation)) {
+    addPunctuationToText();
+  } else {
+    removePunctuationFromText();
+  }
+
+  //quotes
+   if (selectedParameters.includes(parametersTypes.quotes)) {
+    addPunctuationToText();
+  } else {
+    removePunctuationFromText();
+  }
+
+
+}, [selectedParameters]); 
 
   return (
     <div className="w-full relative flex items-center justify-center gap-6 px-4 py-2 ">
@@ -119,18 +152,7 @@ export default function TypingBoardControls({sessionWordsCount,setSessionWordsCo
    
     
       
-      {/* Words Mode (new button) first level has top label of typing mods */}
-      {/* <button className="flex items-center gap-2 text-sm hover:scale-110 transition text-slate-700 cursor-pointer"
-      onClick={()=> { 
-                      if(showTimes) setShowTimes(false) ;
-                      setTypingModeSelected('words') 
-                      setShowWords(!showWords)
-                    }}
-      >
-        <TextInitial size={22} style={{color: typingModeSelected == "words" ? currentTheme.buttonHover : currentTheme.white }}  />
-        <span className="text-xs " style={{color: typingModeSelected == "words" ? currentTheme.buttonHover : currentTheme.white }} >Words</span>
-      </button> */}
-      
+  
        <ButtonExtraOption
            action={()=> { 
                       if(showTimes) setShowTimes(false) ;
@@ -150,25 +172,20 @@ export default function TypingBoardControls({sessionWordsCount,setSessionWordsCo
       
       {/* Other Functional Buttons // these are on the seconds level option or extra options  */}
       <div className="flex items-center gap-5 ml-2">
-          <ButtonExtraOption  selectedParameters={selectedParameters}  handleParamOption={handleParamOption} label="Numbers" Icon={Hash} currentTheme={currentTheme} />
-          <ButtonExtraOption  selectedParameters={selectedParameters}  handleParamOption={handleParamOption} label="Quote" Icon={Quote} currentTheme={currentTheme} />
-          <ButtonExtraOption  selectedParameters={selectedParameters}  handleParamOption={handleParamOption}  label="Symbols" Icon={SquareAsteriskIcon} currentTheme={currentTheme} />
-          <ButtonExtraOption selectedParameters={selectedParameters}  handleParamOption={handleParamOption}  label="Punctuation" Icon={CaseSensitive} currentTheme={currentTheme} />
+          <ButtonExtraOption  selectedParameters={selectedParameters}  handleParamOption={handleParamOption}  label={parametersTypes.numbers} Icon={Hash} currentTheme={currentTheme} />
+          <ButtonExtraOption  selectedParameters={selectedParameters}  handleParamOption={handleParamOption}  label={parametersTypes.quotes} Icon={Quote} currentTheme={currentTheme} />
+          <ButtonExtraOption  selectedParameters={selectedParameters}  handleParamOption={handleParamOption}  label={parametersTypes.symbols} Icon={SquareAsteriskIcon} currentTheme={currentTheme} />
+          <ButtonExtraOption selectedParameters={selectedParameters}  handleParamOption={handleParamOption}   label={parametersTypes.punctuation} Icon={CaseSensitive} currentTheme={currentTheme} />
 
           {/* // sound buttons activation */}
           {/* normal sound */}
-          <ButtonExtraOption  soundSettings={soundSettings} handleSoundSettingOption={handleSoundSettingOption} action={NSoundHandler} label="sound" Icon={Volume2} currentTheme={currentTheme} />
+          <ButtonExtraOption  soundSettings={soundSettings} handleSoundSettingOption={handleSoundSettingOption} action={NSoundHandler} label={parametersTypes.sound} Icon={Volume2} currentTheme={currentTheme} />
           {/* erro sound */}
-          <ButtonExtraOption soundSettings={soundSettings} handleSoundSettingOption={handleSoundSettingOption} action={ErrSoundHandler} label="errorSound" Icon={XCircle} currentTheme={currentTheme} />
+          <ButtonExtraOption soundSettings={soundSettings} handleSoundSettingOption={handleSoundSettingOption} action={ErrSoundHandler} label={parametersTypes.errorSound} Icon={XCircle} currentTheme={currentTheme} />
           
       </div>
      
-     {/* thith level has actions and labeled as actions  like to shuufle the texts */}
-      {/* <div>
-       <ButtonExtraOption handleParamOption={handleParamOption}  label="Shuffle" Icon={ShuffleIcon} currentTheme={currentTheme} />
-      </div> */}
 
-       
         {/* this one is options that belongs to typing mode selected i neeed to forth level */}
       <div>
 

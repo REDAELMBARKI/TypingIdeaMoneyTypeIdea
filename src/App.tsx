@@ -17,16 +17,15 @@ function App() {
             path="/"
             element={
               <ThemeProvider>
-                 <TypingSessionStateContextProvider>
-
-                  <ContainerAndFontContextProvider> 
-                <CurrentLiveDataProvider>
-                    <ReplayDataContextProvider>
-                      <Layout />
-                    </ReplayDataContextProvider>
-                </CurrentLiveDataProvider>
+                <TypingSessionStateContextProvider>
+                  <ContainerAndFontContextProvider>
+                    <CurrentLiveDataProvider>
+                      <ReplayDataContextProvider>
+                        <Layout />
+                      </ReplayDataContextProvider>
+                    </CurrentLiveDataProvider>
                   </ContainerAndFontContextProvider>
-                 </TypingSessionStateContextProvider>
+                </TypingSessionStateContextProvider>
               </ThemeProvider>
             }
           >
