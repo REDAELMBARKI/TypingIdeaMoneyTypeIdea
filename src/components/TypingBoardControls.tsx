@@ -16,6 +16,7 @@ import useThemeHook from "../customHooks/useThemeHook";
 import { lazyLoadedSoundSettings } from "../functions/lazyLoadedSessionData";
 import { useTextTransformer } from "../functions/textTransform";
 import { useTypingSessionStateContext } from "../contextHooks/useTypingSessionStateContext";
+import useLiveDataContext from "../contextHooks/useLiveDataContext";
 
 
 interface TypingBoardControlsProps {
@@ -37,7 +38,8 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
   const [showTimes, setShowTimes] = useState(false);
   const [showWords,setShowWords] =  useState(false);
   const {addNumbersToText , removeNumbersFromText , 
-       addPunctuationToText , removePunctuationFromText
+       addPunctuationToText , removePunctuationFromText , 
+       addQuotesToText , removeQuotesFromText
   } = useTextTransformer()
   const {sessionWordsCount , selectedParameters , setSelectedParameters} = useTypingSessionStateContext()
   
@@ -45,7 +47,7 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
   const [soundSettings , setSoundSettings] = useState<string[]>(lazyLoadedSoundSettings) ;
   const timesOpt = [30, 60, 120];
   const wordsOpt= [10,20,30,50];
-  
+  const {setCurrentText , baseText} =  useLiveDataContext()
   const optionsList = typingModeSelected == "time" ? timesOpt : wordsOpt ;
 
   const  handleParamOption = (paramType:string) => {
@@ -107,29 +109,50 @@ export default function TypingBoardControls({setSessionWordsCount , setIsNormalT
     const ErrSoundHandler = ()=> setIsErrorSoundEnabled(prev => !prev)  ; 
     
   useEffect(() => {
-  //numbers
-  if (selectedParameters.includes(parametersTypes.numbers)) {
-    addNumbersToText();
-  } else {
-    removeNumbersFromText();
-  }
 
-   // punctuation
-  if (selectedParameters.includes(parametersTypes.punctuation)) {
-    addPunctuationToText();
-  } else {
-    removePunctuationFromText();
-  }
+      setCurrentText(prevTxt => {
+                  let updatedText = prevTxt ;
+                  const newParamsTodd =  selectedParameters.filter(param => !previousSelectedParametersRef.current?.includes(param))
+                  const oldParamsToremove =  previousSelectedParametersRef.current?.filter(param => !selectedParameters.includes(param))
+                  
+  
 
-  //quotes
-   if (selectedParameters.includes(parametersTypes.quotes)) {
-    addPunctuationToText();
-  } else {
-    removePunctuationFromText();
-  }
+                  if(newParamsTodd.includes(parametersTypes.numbers)){
+                    updatedText = addNumbersToText(updatedText)  
+                  }
+                  if(newParamsTodd.includes(parametersTypes.quotes)){
+                        updatedText = addQuotesToText(updatedText)
+                  }
+                  if(newParamsTodd.includes(parametersTypes.punctuation)){
+                         updatedText =  addPunctuationToText(updatedText)
+                  }
 
 
-}, [selectedParameters]); 
+
+
+                  if(oldParamsToremove?.includes(parametersTypes.numbers)) {
+                       updatedText =  removeNumbersFromText(updatedText)
+                  }
+            
+                  if(oldParamsToremove?.includes(parametersTypes.quotes)) {
+                       updatedText =  removeQuotesFromText(updatedText)
+                  }
+
+
+                  if(oldParamsToremove?.includes(parametersTypes.punctuation)) {
+                       updatedText =  removePunctuationFromText(updatedText)
+                  }
+
+                 
+                
+
+                  return updatedText ;
+             
+           }) 
+
+           previousSelectedParametersRef.current = [...selectedParameters];
+
+}, [selectedParameters , baseText]); 
 
   return (
     <div className="w-full relative flex items-center justify-center gap-6 px-4 py-2 ">

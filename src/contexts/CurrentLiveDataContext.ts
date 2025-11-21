@@ -13,7 +13,9 @@ interface CurrentLiveDataContextType {
    setCurrentLetter: React.Dispatch<React.SetStateAction<currentLetterType>>
     currentLetter : currentLetterType 
     setGlobalState: React.Dispatch<React.SetStateAction<globalStatetype>>
-    globalState : globalStatetype
+    globalState : globalStatetype ; 
+     setBaseText: React.Dispatch<React.SetStateAction<string>>
+    baseText  : string
 }
 
 export const CurrentLiveDataContext = createContext<CurrentLiveDataContextType | undefined>(undefined);

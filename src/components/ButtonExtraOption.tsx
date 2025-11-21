@@ -65,9 +65,9 @@ const  ButtonExtraOption = ({style ,  soundSettings = [] ,  selectedParameters =
       <React.Fragment >
    
                     <div 
-                    
+                    style={{userSelect : 'none'}}
                     className={`flex items-center gap-2 text-sm hover:scale-110 transition  rounded-lg`}>
-                                    <label className="cursor-pointer relative flex items-center rounded-lg" 
+                                    <label  className="cursor-pointer relative flex items-center rounded-lg " 
                                     
                                     style={style ?? {}}
                                     >

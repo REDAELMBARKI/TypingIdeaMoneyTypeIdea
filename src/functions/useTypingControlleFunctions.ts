@@ -10,12 +10,10 @@ interface VarsResterProps {
 interface TypingControlleFunctionsProps extends VarsResterProps {
   setIsTypingEnds: React.Dispatch<React.SetStateAction<boolean>>;
   hiddenInputRef: React.RefObject<HTMLInputElement | null>;
-  sampleTexts: string[];
 }
 
 export default function useTypingControlleFunctions({
   setTypedWordsAmount,
-  sampleTexts,
   hiddenInputRef,
   setIsTypingEnds,
   setInputValue,
@@ -23,7 +21,7 @@ export default function useTypingControlleFunctions({
 }: TypingControlleFunctionsProps) {
 
 
-   const {currentText , setCurrentLetter , setCurrentText , setGlobalState} = useLiveDataContext() ;
+   const {currentText , setCurrentLetter , setCurrentText , setGlobalState ,  baseText} = useLiveDataContext() ;
 
 
   // --- Define varsRester FIRST ---
@@ -56,7 +54,7 @@ export default function useTypingControlleFunctions({
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
-  }, [sampleTexts,hiddenInputRef]);
+  }, []);
 
   const nextText = useCallback(() => {
     varsRester({
@@ -65,14 +63,13 @@ export default function useTypingControlleFunctions({
       setIsShowTypingOverModal
     });
 
-    const randomText = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
-    setCurrentText(randomText);
+    setCurrentText(baseText);
     setIsTypingEnds(false);
 
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
-  }, [sampleTexts,hiddenInputRef]);
+  }, [baseText,hiddenInputRef]);
 
   return { nextText, handleReset };
 }

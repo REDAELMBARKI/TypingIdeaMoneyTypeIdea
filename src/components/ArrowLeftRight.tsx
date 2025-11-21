@@ -1,9 +1,12 @@
+import useLiveDataContext from "../contextHooks/useLiveDataContext";
 import useThemeHook from "../customHooks/useThemeHook";
 import { RotateCw } from "lucide-react";
+import { sampleTexts } from "../data/texts";
+import { baseTextNumberGenerator } from "../functions/baseTextNumber";
 
 const AnimatedArrowLeftRightButton = () => {
   const { currentTheme } = useThemeHook();
-  
+  const {setBaseText} =  useLiveDataContext()
   return (
     <>
       <style>{`
@@ -44,7 +47,13 @@ const AnimatedArrowLeftRightButton = () => {
       `}</style>
 
       <div className="btn-conteiner">
-        <button className="btn-content">
+        <button className="btn-content" 
+    
+        onClick={() => {
+          setBaseText(sampleTexts[baseTextNumberGenerator()])
+        }}
+        
+        >
           <RotateCw className="restart-icon" size={24} strokeWidth={2} />
         </button>
       </div>

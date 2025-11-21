@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import useThemeHook from "./customHooks/useThemeHook";
 import Footer from "./partials/Footer";
 
-import Reseter from "./partials/Reseter";
 import { textRender } from "./functions/textRender";
 import useCharacterDeleteHook from "./customHooks/useCharacterDeleteHook";
 import useTypingSound from "./customHooks/useTypingSound";
@@ -31,7 +30,6 @@ import useTypingControlleFunctions from "./functions/useTypingControlleFunctions
 import useWpmServiceReset from "./customHooks/useWpmServiceReset";
 import useWpmCalculationHandler from "./customHooks/useWpmCalculationHandler";
 import useThemePreviewerAndSetter from "./customHooks/useThemePreviewerAndSetter";
-import { sampleTexts } from "./data/texts";
 import useTextRawsSlicer from "./customHooks/useTextRawsSlicer";
 import useLine3Listener from "./customHooks/useLine3Listener";
 import useColoringEffect from "./customHooks/useColoringEffect";
@@ -131,7 +129,7 @@ const TypingApp: React.FC = () => {
   // the text used to be paassedf to recordRender
   // theme state
   const { currentTheme } = useThemeHook();
-  const { currentLetter, currentText, setCurrentText, globalState } =
+  const { currentLetter, currentText, setCurrentText, globalState ,  baseText} =
     useLiveDataContext();
   // font size and container ref
   const { containerRef, fontSizeRef, containerWidth, setContainerWidth } =
@@ -235,9 +233,9 @@ const TypingApp: React.FC = () => {
 
   useEffect(() => {
     setCurrentText(
-      sampleTexts[0].split(" ").slice(0, sessionWordsCount).join(" ")
+      baseText.split(" ").slice(0, sessionWordsCount).join(" ")
     );
-  }, [sessionWordsCount]);
+  }, [baseText,sessionWordsCount]);
 
   // session's selected time and words count persistance
   usePersistantSelectedSessionParams({
@@ -290,6 +288,7 @@ const TypingApp: React.FC = () => {
     }
   }, [isFocuceOnText]);
 
+
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++hooks++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  \
@@ -311,7 +310,6 @@ const TypingApp: React.FC = () => {
   useCapsLockListener({ setIsCapsOn });
 
   const { nextText, handleReset } = useTypingControlleFunctions({
-    sampleTexts,
     hiddenInputRef,
     setIsTypingEnds,
     setInputValue,
@@ -574,11 +572,12 @@ const TypingApp: React.FC = () => {
                     -translate-x-1/2 translate-y-1/2
                     cursor-pointer 
                     px-6 py-2
-                    rounded-3xl
+                    rounded-3xl 
+                  
                   "
                
               >
-               <AnimatedArrowLeftRightButton />
+                 <AnimatedArrowLeftRightButton /> 
               </div>
             </div>
           </div>{" "}
@@ -627,21 +626,7 @@ const TypingApp: React.FC = () => {
           spellCheck="false"
         />
 
-        {/* Controls */}
-        <div
-          className="flex items-center justify-center mt-8 space-x-4 "
-          style={{ position: "absolute", top: "400px" }}
-        >
-          {!isFocuceOnText && (
-            <section className="opacity-0 animate-appear-smooth flex gap-3">
-              <Reseter
-                isBlured={currentLetter.index === 0 ? true : false}
-                currentTheme={currentTheme}
-                handleReset={handleReset}
-              />
-            </section>
-          )}
-        </div>
+      
       </main>
 
       {/* Footer */}

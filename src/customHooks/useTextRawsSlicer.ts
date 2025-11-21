@@ -24,7 +24,11 @@ const useTextRawsSlicer = ({sessionWordsCount ,line3YRef , containerWidth , cont
       const wordsCountAllowed = useRef<number | undefined>(undefined);
       const {isTypingEnds , selectedParameters} = useTypingSessionStateContext() ; 
       const {setCurrentText} = useLiveDataContext()
-      const {addNumbersToText , addPunctuationToText} =  useTextTransformer()
+      const {addPunctuationToText , removePunctuationFromText ,
+             addNumbersToText ,removeNumbersFromText , 
+             addQuotesToText , removeQuotesFromText 
+      } =  useTextTransformer()
+      
 
        useEffect(() => {
             if(isTypingEnds) return ; 
@@ -37,14 +41,44 @@ const useTextRawsSlicer = ({sessionWordsCount ,line3YRef , containerWidth , cont
             const text = sliceWordsHandler(textSliceStartIndex , wordsCountAllowed.current! , sessionWordsCount) ; 
           
             setCurrentText(text)
-            
-            if(selectedParameters.includes(parametersTypes.numbers)){
-                  addNumbersToText()
+
+           setCurrentText(prevTxt => {
+                let updatedText = prevTxt ;
+                
+                
+                if(selectedParameters.includes(parametersTypes.punctuation)){
+                      updatedText =  addPunctuationToText(updatedText)
+                  }
+                  else{
+                        
+                        updatedText =  removePunctuationFromText(updatedText)
+                  }
+
                   
-            }
-            if(selectedParameters.includes(parametersTypes.punctuation)){
-                 addPunctuationToText()
-            } 
+                  if(selectedParameters.includes(parametersTypes.numbers)){
+                    updatedText = addNumbersToText(updatedText)  
+                  }
+                  else {
+                       updatedText =  removeNumbersFromText(updatedText)
+                  }
+
+
+
+                  if(selectedParameters.includes(parametersTypes.quotes)){
+                  updatedText =    addQuotesToText(updatedText)
+                  }
+                  else{
+                        updatedText = removeQuotesFromText(updatedText)
+                  }
+
+          
+                  return updatedText ;
+             
+           })
+
+
+
+
 
             
       }, [containerWidth , dynamicTextRange]);
